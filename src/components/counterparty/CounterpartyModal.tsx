@@ -257,48 +257,52 @@ export function CounterpartyModal({
               {sortedPending.length === 0 ? (
                 <EmptyState text="Все сигналы обработаны" />
               ) : (
-                <div className="space-y-2.5">
+                <div className="space-y-2">
                   {visiblePending.map((r) => {
                     const p = priorityBadge[r.priority];
                     return (
-                      <div key={r.id} className="rounded-xl border border-border bg-white p-4">
-                        <div className="flex flex-wrap items-start justify-between gap-3">
-                          <div className="flex min-w-0 items-start gap-3">
-                            <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-amber-50 text-amber-700">
-                              <AlertTriangle className="h-4 w-4" />
-                            </div>
-                            <div className="min-w-0">
-                              <div className="flex flex-wrap items-center gap-2">
-                                <span className="font-medium">{r.type}</span>
-                                <span className={`rounded-full px-2 py-0.5 text-[10px] font-medium ${p.cls}`}>
-                                  {p.label}
-                                </span>
-                                <span className="rounded-full bg-muted px-2 py-0.5 text-[10px] text-muted-foreground">
-                                  Требует проверки
-                                </span>
-                              </div>
-                              <div className="mt-1 text-sm text-muted-foreground">{r.description}</div>
-                              <div className="mt-2 flex flex-wrap gap-x-3 gap-y-1 text-[11px] text-muted-foreground">
-                                <span>Источник: <b className="text-foreground">{r.source}</b></span>
-                                <span>Обнаружено: <b className="text-foreground">{r.detectedAt}</b></span>
-                              </div>
-                              <div className="mt-1.5 text-[11px]">
-                                <span className="text-muted-foreground">Рекомендуется: </span>
-                                <span className="font-medium">{r.recommendedAction}</span>
-                              </div>
-                            </div>
+                      <div
+                        key={r.id}
+                        className="group rounded-lg border border-[#E5E7EB] bg-white px-4 py-3 transition hover:bg-muted/30"
+                      >
+                        <div className="flex flex-wrap items-start gap-3 sm:flex-nowrap">
+                          <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-amber-50 text-amber-700">
+                            <AlertTriangle className="h-4 w-4" />
                           </div>
-                        </div>
-                        <div className="mt-3 flex flex-wrap gap-2">
-                          <Button size="sm" onClick={() => openDrawer(r, "confirm")}>
-                            <CheckCircle2 className="mr-1.5 h-4 w-4" /> Подтвердить
-                          </Button>
-                          <Button size="sm" variant="outline" onClick={() => openDrawer(r, "dismiss")}>
-                            <XCircle className="mr-1.5 h-4 w-4" /> Снять
-                          </Button>
-                          <Button size="sm" variant="ghost" onClick={() => openDrawer(r, "verify")}>
-                            <Search className="mr-1.5 h-4 w-4" /> На проверку
-                          </Button>
+                          <div className="min-w-0 flex-1">
+                            <div className="truncate text-sm font-medium text-foreground">
+                              {r.type}
+                            </div>
+                            <div className="mt-0.5 flex flex-wrap items-center gap-x-1.5 gap-y-0.5 text-[11px] text-muted-foreground">
+                              <span>{r.source}</span>
+                              <span>·</span>
+                              <span>{r.detectedAt}</span>
+                              <span>·</span>
+                              <span className={`rounded-full px-1.5 py-0 text-[10px] font-medium ${p.cls}`}>
+                                {p.label}
+                              </span>
+                            </div>
+                            <div className="mt-1.5 text-xs text-muted-foreground line-clamp-2">
+                              {r.description}
+                            </div>
+                            {r.recommendedAction && (
+                              <div className="mt-1 text-[11px] text-muted-foreground">
+                                <span>Рекомендуется: </span>
+                                <span className="font-medium text-foreground">{r.recommendedAction}</span>
+                              </div>
+                            )}
+                          </div>
+                          <div className="flex shrink-0 flex-wrap items-center gap-1.5 sm:flex-nowrap">
+                            <Button size="sm" className="h-7 px-2.5 text-xs" onClick={() => openDrawer(r, "confirm")}>
+                              Подтвердить
+                            </Button>
+                            <Button size="sm" variant="outline" className="h-7 px-2.5 text-xs" onClick={() => openDrawer(r, "dismiss")}>
+                              Снять
+                            </Button>
+                            <Button size="sm" variant="ghost" className="h-7 px-2.5 text-xs" onClick={() => openDrawer(r, "verify")}>
+                              На проверку
+                            </Button>
+                          </div>
                         </div>
                       </div>
                     );
@@ -306,7 +310,7 @@ export function CounterpartyModal({
                   {hiddenPendingCount > 0 && (
                     <button
                       onClick={() => setShowAllPending((s) => !s)}
-                      className="flex w-full items-center justify-center gap-1.5 rounded-xl border border-dashed border-border bg-white py-2.5 text-sm font-medium text-muted-foreground transition hover:bg-muted/30 hover:text-foreground"
+                      className="flex w-full items-center justify-center gap-1.5 rounded-lg border border-dashed border-border bg-white py-2 text-xs font-medium text-muted-foreground transition hover:bg-muted/30 hover:text-foreground"
                     >
                       {showAllPending ? (
                         <>
@@ -320,6 +324,7 @@ export function CounterpartyModal({
                     </button>
                   )}
                 </div>
+
               )}
             </section>
 
