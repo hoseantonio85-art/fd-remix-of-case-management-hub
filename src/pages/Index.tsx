@@ -90,7 +90,7 @@ const tiles: {
 type Segment = { key: string; value: number; color: string; label: string };
 
 const defaultSegments: Segment[] = [
-  { key: "no_risk", value: 74.5, color: "#5BC48C", label: "В срок" },
+  { key: "no_risk", value: 74.5, color: "#5BC48C", label: "Без просрочки" },
   { key: "risk", value: 9.5, color: "#E9C657", label: "Просроч. на 0-30 д" },
   { key: "overdue", value: 9.5, color: "#EDB05A", label: "Просроч. на 30-60 д" },
   { key: "overdue_risk", value: 6.5, color: "#E26B3A", label: "Просроч. на 60+ д" },
@@ -100,7 +100,7 @@ const categoryPalette: Record<CategoryKey, { amount: string; segments: Segment[]
   risk: {
     amount: "1,3",
     segments: [
-      { key: "a", label: "В срок", value: 45, color: "#FBE9A8" },
+      { key: "a", label: "Без просрочки", value: 45, color: "#FBE9A8" },
       { key: "b", label: "Просроч. на 0-30 д", value: 25, color: "#F4D470" },
       { key: "c", label: "Просроч. на 30-60 д", value: 18, color: "#E9C657" },
       { key: "d", label: "Просроч. на 60+ д", value: 12, color: "#B5912F" },
@@ -109,7 +109,7 @@ const categoryPalette: Record<CategoryKey, { amount: string; segments: Segment[]
   overdue_risk: {
     amount: "1,4",
     segments: [
-      { key: "a", label: "В срок", value: 40, color: "#F8D2BE" },
+      { key: "a", label: "Без просрочки", value: 40, color: "#F8D2BE" },
       { key: "b", label: "Просроч. на 0-30 д", value: 25, color: "#F0A788" },
       { key: "c", label: "Просроч. на 30-60 д", value: 20, color: "#E26B3A" },
       { key: "d", label: "Просроч. на 60+ д", value: 15, color: "#9A3A18" },
@@ -118,7 +118,7 @@ const categoryPalette: Record<CategoryKey, { amount: string; segments: Segment[]
   no_risk: {
     amount: "1,2",
     segments: [
-      { key: "a", label: "В срок", value: 50, color: "#C5ECD4" },
+      { key: "a", label: "Без просрочки", value: 50, color: "#C5ECD4" },
       { key: "b", label: "Просроч. на 0-30 д", value: 22, color: "#8FD8AE" },
       { key: "c", label: "Просроч. на 30-60 д", value: 18, color: "#5BC48C" },
       { key: "d", label: "Просроч. на 60+ д", value: 10, color: "#1E6B43" },
@@ -127,7 +127,7 @@ const categoryPalette: Record<CategoryKey, { amount: string; segments: Segment[]
   overdue: {
     amount: "1,2",
     segments: [
-      { key: "a", label: "В срок", value: 38, color: "#FBE0BC" },
+      { key: "a", label: "Без просрочки", value: 38, color: "#FBE0BC" },
       { key: "b", label: "Просроч. на 0-30 д", value: 27, color: "#F4C384" },
       { key: "c", label: "Просроч. на 30-60 д", value: 20, color: "#EDB05A" },
       { key: "d", label: "Просроч. на 60+ д", value: 15, color: "#8B5A14" },

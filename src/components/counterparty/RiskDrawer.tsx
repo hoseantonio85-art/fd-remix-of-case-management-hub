@@ -13,12 +13,6 @@ export type RiskSavePayload =
   | { kind: "dismiss"; date: string; comment: string; responsible: string }
   | { kind: "verify"; date: string; plannedDate: string; comment: string; responsible: string };
 
-const decisionOptions: { value: DecisionKind; label: string; hint: string }[] = [
-  { value: "confirm", label: "Подтвердить проблему", hint: "Зафиксировать риск и выбрать меры" },
-  { value: "dismiss", label: "Снять риск", hint: "Риск не подтверждается, требуется комментарий" },
-  { value: "verify", label: "Требуется дополнительная проверка", hint: "Назначить ответственного и срок" },
-];
-
 const kindBadge: Record<string, string> = {
   required: "bg-foreground/5 text-foreground border border-border",
   recommended: "bg-primary/10 text-primary",
@@ -28,6 +22,18 @@ const kindLabel: Record<string, string> = {
   required: "обязательная",
   recommended: "рекомендуемая",
   situational: "по ситуации",
+};
+
+const titleByMode: Record<DecisionKind, string> = {
+  confirm: "Подтверждение риска",
+  dismiss: "Снятие риска",
+  verify: "Дополнительная проверка",
+};
+
+const saveLabelByMode: Record<DecisionKind, string> = {
+  confirm: "Сохранить решение",
+  dismiss: "Снять риск",
+  verify: "Отправить на проверку",
 };
 
 export function RiskDrawer({
@@ -43,7 +49,7 @@ export function RiskDrawer({
   onOpenChange: (o: boolean) => void;
   onSave: (riskId: string, payload: RiskSavePayload) => void;
 }) {
-  const [decision, setDecision] = useState<DecisionKind>(initialDecision);
+  const mode = initialDecision;
   const [selected, setSelected] = useState<string[]>([]);
   const [date, setDate] = useState(new Date().toLocaleDateString("ru-RU"));
   const [plannedDate, setPlannedDate] = useState("");
@@ -52,14 +58,13 @@ export function RiskDrawer({
 
   useEffect(() => {
     if (open) {
-      setDecision(initialDecision);
       setSelected([]);
       setDate(new Date().toLocaleDateString("ru-RU"));
       setPlannedDate(new Date(Date.now() + 7 * 86400000).toLocaleDateString("ru-RU"));
       setComment("");
       setResponsible("Михайлова Е.");
     }
-  }, [open, risk?.id, initialDecision]);
+  }, [open, risk?.id, mode]);
 
   const measures = useMemo(() => (risk ? measuresByRisk[risk.type] ?? [] : []), [risk]);
 
@@ -69,17 +74,17 @@ export function RiskDrawer({
     setSelected((p) => (p.includes(m) ? p.filter((x) => x !== m) : [...p, m]));
 
   const canSave =
-    decision === "confirm"
+    mode === "confirm"
       ? selected.length > 0
-      : decision === "dismiss"
+      : mode === "dismiss"
         ? comment.trim().length > 0
         : comment.trim().length > 0 && responsible.trim().length > 0 && plannedDate.trim().length > 0;
 
   const handleSave = () => {
     if (!canSave) return;
-    if (decision === "confirm")
+    if (mode === "confirm")
       onSave(risk.id, { kind: "confirm", date, measures: selected, comment, responsible });
-    else if (decision === "dismiss")
+    else if (mode === "dismiss")
       onSave(risk.id, { kind: "dismiss", date, comment, responsible });
     else onSave(risk.id, { kind: "verify", date, plannedDate, comment, responsible });
     onOpenChange(false);
@@ -89,7 +94,7 @@ export function RiskDrawer({
     <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent side="right" className="w-full overflow-y-auto bg-white sm:max-w-xl">
         <SheetHeader>
-          <SheetTitle>Решение по сигналу</SheetTitle>
+          <SheetTitle>{titleByMode[mode]}</SheetTitle>
         </SheetHeader>
 
         <div className="mt-6 space-y-6">
@@ -102,35 +107,7 @@ export function RiskDrawer({
             </div>
           </div>
 
-          <div>
-            <div className="mb-2 text-sm font-semibold">Решение по сигналу</div>
-            <div className="space-y-2">
-              {decisionOptions.map((o) => {
-                const active = decision === o.value;
-                return (
-                  <label
-                    key={o.value}
-                    className={`flex cursor-pointer items-start gap-3 rounded-lg border p-3 transition ${
-                      active ? "border-primary bg-primary/5" : "border-border bg-card hover:bg-accent/40"
-                    }`}
-                  >
-                    <input
-                      type="radio"
-                      className="mt-1 accent-[color:var(--primary)]"
-                      checked={active}
-                      onChange={() => setDecision(o.value)}
-                    />
-                    <div>
-                      <div className="text-sm font-medium">{o.label}</div>
-                      <div className="text-xs text-muted-foreground">{o.hint}</div>
-                    </div>
-                  </label>
-                );
-              })}
-            </div>
-          </div>
-
-          {decision === "confirm" && (
+          {mode === "confirm" && (
             <div>
               <div className="mb-2 text-sm font-semibold">Меры реагирования</div>
               <div className="space-y-2">
@@ -168,13 +145,15 @@ export function RiskDrawer({
               <label className="mb-1 block text-xs text-muted-foreground">Дата решения</label>
               <Input value={date} onChange={(e) => setDate(e.target.value)} />
             </div>
-            <div>
-              <label className="mb-1 block text-xs text-muted-foreground">
-                Ответственный {decision === "verify" && <span className="text-destructive">*</span>}
-              </label>
-              <Input value={responsible} onChange={(e) => setResponsible(e.target.value)} />
-            </div>
-            {decision === "verify" && (
+            {mode === "verify" && (
+              <div>
+                <label className="mb-1 block text-xs text-muted-foreground">
+                  Ответственный <span className="text-destructive">*</span>
+                </label>
+                <Input value={responsible} onChange={(e) => setResponsible(e.target.value)} />
+              </div>
+            )}
+            {mode === "verify" && (
               <div className="sm:col-span-2">
                 <label className="mb-1 block text-xs text-muted-foreground">
                   Плановая дата проверки <span className="text-destructive">*</span>
@@ -185,7 +164,7 @@ export function RiskDrawer({
             <div className="sm:col-span-2">
               <label className="mb-1 block text-xs text-muted-foreground">
                 Комментарий{" "}
-                {(decision === "dismiss" || decision === "verify") && (
+                {(mode === "dismiss" || mode === "verify") && (
                   <span className="text-destructive">*</span>
                 )}
               </label>
@@ -203,7 +182,7 @@ export function RiskDrawer({
               Отмена
             </Button>
             <Button className="flex-1" disabled={!canSave} onClick={handleSave}>
-              Сохранить решение
+              {saveLabelByMode[mode]}
             </Button>
           </div>
         </div>

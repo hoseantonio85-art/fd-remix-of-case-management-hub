@@ -264,7 +264,7 @@ export function CounterpartyModal({
                         key={r.id}
                         className="group rounded-lg border border-[#E5E7EB] bg-white px-4 py-3 transition hover:bg-muted/30"
                       >
-                        <div className="flex flex-wrap items-start gap-3 sm:flex-nowrap">
+                        <div className="flex items-start gap-3">
                           <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-amber-50 text-amber-700">
                             <AlertTriangle className="h-4 w-4" />
                           </div>
@@ -284,24 +284,18 @@ export function CounterpartyModal({
                             <div className="mt-1.5 text-xs text-muted-foreground line-clamp-2">
                               {r.description}
                             </div>
-                            {r.recommendedAction && (
-                              <div className="mt-1 text-[11px] text-muted-foreground">
-                                <span>Рекомендуется: </span>
-                                <span className="font-medium text-foreground">{r.recommendedAction}</span>
-                              </div>
-                            )}
                           </div>
-                          <div className="flex shrink-0 flex-wrap items-center gap-1.5 sm:flex-nowrap">
-                            <Button size="sm" className="h-7 px-2.5 text-xs" onClick={() => openDrawer(r, "confirm")}>
-                              Подтвердить
-                            </Button>
-                            <Button size="sm" variant="outline" className="h-7 px-2.5 text-xs" onClick={() => openDrawer(r, "dismiss")}>
-                              Снять
-                            </Button>
-                            <Button size="sm" variant="ghost" className="h-7 px-2.5 text-xs" onClick={() => openDrawer(r, "verify")}>
-                              На проверку
-                            </Button>
-                          </div>
+                        </div>
+                        <div className="mt-3 flex flex-wrap items-center gap-1.5">
+                          <Button size="sm" className="h-7 px-2.5 text-xs" onClick={() => openDrawer(r, "confirm")}>
+                            Подтвердить
+                          </Button>
+                          <Button size="sm" variant="outline" className="h-7 px-2.5 text-xs" onClick={() => openDrawer(r, "dismiss")}>
+                            Снять
+                          </Button>
+                          <Button size="sm" variant="ghost" className="h-7 px-2.5 text-xs" onClick={() => openDrawer(r, "verify")}>
+                            На проверку
+                          </Button>
                         </div>
                       </div>
                     );
