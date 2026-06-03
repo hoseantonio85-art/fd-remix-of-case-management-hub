@@ -199,66 +199,111 @@ function SidebarItem({
 
 type RiskChipKey = "all" | RiskType;
 
-const riskChipConfig: { key: RiskChipKey; label: string; short: string; active: string; idle: string }[] = [
-  {
-    key: "all",
-    label: "Все признаки",
-    short: "Все",
-    active: "bg-slate-200 border-slate-400 text-slate-900",
-    idle: "bg-slate-50 border-slate-200 text-slate-600 hover:bg-slate-100",
-  },
-  {
-    key: "Ухудшилось финансовое состояние",
-    label: "Финсостояние",
-    short: "Финсостояние",
-    active: "bg-amber-100 border-amber-400 text-amber-900",
-    idle: "bg-amber-50/60 border-amber-200/70 text-amber-800/70 hover:bg-amber-50",
-  },
-  {
-    key: "Уголовное дело",
-    label: "Уголовное дело",
-    short: "Уголовное",
-    active: "bg-red-100 border-red-400 text-red-900",
-    idle: "bg-red-50/60 border-red-200/70 text-red-800/70 hover:bg-red-50",
-  },
-  {
-    key: "Административные нарушения",
-    label: "Адм. нарушения",
-    short: "Адм.",
-    active: "bg-orange-100 border-orange-400 text-orange-900",
-    idle: "bg-orange-50/60 border-orange-200/70 text-orange-800/70 hover:bg-orange-50",
-  },
-  {
-    key: "Неисполнение контракта группы",
-    label: "Неисполнение",
-    short: "Неисполнение",
-    active: "bg-yellow-100 border-yellow-500 text-yellow-900",
-    idle: "bg-yellow-50/60 border-yellow-200/70 text-yellow-800/70 hover:bg-yellow-50",
-  },
-  {
-    key: "Ограничения деятельности",
-    label: "Ограничения",
-    short: "Ограничения",
-    active: "bg-slate-300 border-slate-500 text-slate-900",
-    idle: "bg-slate-100/70 border-slate-200 text-slate-600 hover:bg-slate-200/60",
-  },
-  {
-    key: "Банкротство / ликвидация",
-    label: "Банкротство",
-    short: "Банкротство",
-    active: "bg-rose-100 border-rose-400 text-rose-900",
-    idle: "bg-rose-50/60 border-rose-200/70 text-rose-800/70 hover:bg-rose-50",
-  },
-];
-
-const riskChipShort: Record<RiskType, { short: string; cls: string }> = {
-  "Ухудшилось финансовое состояние": { short: "Финсостояние", cls: "bg-amber-100 text-amber-900" },
-  "Уголовное дело": { short: "Уголовное", cls: "bg-red-100 text-red-900" },
-  "Административные нарушения": { short: "Адм.", cls: "bg-orange-100 text-orange-900" },
-  "Неисполнение контракта группы": { short: "Неисполнение", cls: "bg-yellow-100 text-yellow-900" },
-  "Ограничения деятельности": { short: "Ограничения", cls: "bg-slate-200 text-slate-800" },
-  "Банкротство / ликвидация": { short: "Банкротство", cls: "bg-rose-100 text-rose-900" },
+type RiskMetaItem = {
+  icon: LucideIcon;
+  short: string;
+  label: string;
+  iconColor: string;
+  activeBg: string;
+  activeText: string;
+  activeBorder: string;
+  idleIconColor: string;
 };
+
+const riskMeta: Record<RiskType, RiskMetaItem> = {
+  "Ухудшилось финансовое состояние": {
+    icon: TrendingDown,
+    short: "Ухудшилось фин. состояние",
+    label: "Ухудшилось фин. состояние",
+    iconColor: "text-rose-600",
+    activeBg: "bg-rose-50",
+    activeText: "text-rose-900",
+    activeBorder: "border-rose-300",
+    idleIconColor: "text-rose-500/70",
+  },
+  "Банкротство / ликвидация": {
+    icon: Scale,
+    short: "Банкротство / ликвидация",
+    label: "Банкротство / ликвидация",
+    iconColor: "text-rose-700",
+    activeBg: "bg-rose-50",
+    activeText: "text-rose-900",
+    activeBorder: "border-rose-300",
+    idleIconColor: "text-rose-600/70",
+  },
+  "Неисполнение контракта группы": {
+    icon: FileX,
+    short: "Неисполнение контракта",
+    label: "Неисполнение контракта группы",
+    iconColor: "text-amber-700",
+    activeBg: "bg-amber-50",
+    activeText: "text-amber-900",
+    activeBorder: "border-amber-300",
+    idleIconColor: "text-amber-600/70",
+  },
+  "Уголовное дело": {
+    icon: ShieldAlert,
+    short: "Уголовное дело",
+    label: "Уголовное дело",
+    iconColor: "text-red-700",
+    activeBg: "bg-red-50",
+    activeText: "text-red-900",
+    activeBorder: "border-red-300",
+    idleIconColor: "text-red-600/70",
+  },
+  "Ограничения деятельности": {
+    icon: Ban,
+    short: "Ограничения",
+    label: "Ограничения деятельности",
+    iconColor: "text-slate-700",
+    activeBg: "bg-slate-100",
+    activeText: "text-slate-900",
+    activeBorder: "border-slate-400",
+    idleIconColor: "text-slate-500",
+  },
+  "Административные нарушения": {
+    icon: AlertTriangle,
+    short: "Адм. нарушения",
+    label: "Адм. нарушения",
+    iconColor: "text-orange-700",
+    activeBg: "bg-orange-50",
+    activeText: "text-orange-900",
+    activeBorder: "border-orange-300",
+    idleIconColor: "text-orange-600/70",
+  },
+};
+
+// Optional virtual chip "Просрочена задолженность в группе" — uses group icon
+const groupOverdueChip = {
+  icon: UsersRound,
+  label: "Просрочена задолженность в группе",
+  short: "Группа",
+  iconColor: "text-amber-700",
+  activeBg: "bg-amber-50",
+  activeText: "text-amber-900",
+  activeBorder: "border-amber-300",
+  idleIconColor: "text-amber-600/70",
+};
+
+const allChipMeta = {
+  icon: LayoutGrid,
+  label: "Все признаки",
+  short: "Все",
+  iconColor: "text-slate-700",
+  activeBg: "bg-slate-100",
+  activeText: "text-slate-900",
+  activeBorder: "border-slate-400",
+  idleIconColor: "text-slate-500",
+};
+
+const riskOrder: RiskType[] = [
+  "Ухудшилось финансовое состояние",
+  "Банкротство / ликвидация",
+  "Неисполнение контракта группы",
+  "Уголовное дело",
+  "Ограничения деятельности",
+  "Административные нарушения",
+];
 
 export default function Index() {
   const [active, setActive] = useState<Counterparty | null>(null);
