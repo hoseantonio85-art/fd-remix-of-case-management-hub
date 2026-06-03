@@ -15,11 +15,8 @@ import {
   Gauge,
   GraduationCap,
   Headphones,
-  ArrowDown,
-  Briefcase,
-  UsersRound,
 } from "lucide-react";
-import { counterparties, type Counterparty } from "@/lib/mock-data";
+import { counterparties, type Counterparty, type RiskType } from "@/lib/mock-data";
 import { CounterpartyModal } from "@/components/counterparty/CounterpartyModal";
 
 type CategoryKey = "risk" | "overdue_risk" | "no_risk" | "overdue";
