@@ -475,25 +475,34 @@ export default function Index() {
 
             {showRiskChips && (
               <div className="mb-5 flex flex-wrap gap-2">
-                {riskChipConfig.map((chip) => {
-                  const count = riskCounts[chip.key] ?? 0;
-                  const isActive = riskFilter === chip.key;
-                  const disabled = chip.key !== "all" && count === 0;
+                {(["all", ...riskOrder] as RiskChipKey[]).map((key) => {
+                  const meta = key === "all" ? allChipMeta : riskMeta[key as RiskType];
+                  const Icon = meta.icon;
+                  const count = riskCounts[key] ?? 0;
+                  const isActive = riskFilter === key;
+                  const disabled = key !== "all" && count === 0;
                   return (
                     <button
-                      key={chip.key}
+                      key={key}
                       disabled={disabled}
                       onClick={() =>
-                        setRiskFilter(isActive && chip.key !== "all" ? "all" : chip.key)
+                        setRiskFilter(isActive && key !== "all" ? "all" : key)
                       }
                       className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-medium transition ${
-                        isActive ? `${chip.active} shadow-sm` : chip.idle
+                        isActive
+                          ? `${meta.activeBg} ${meta.activeBorder} ${meta.activeText} shadow-sm`
+                          : `bg-white border-slate-200 text-slate-600 hover:bg-slate-50`
                       } ${disabled ? "opacity-40 cursor-not-allowed" : ""}`}
                     >
-                      {chip.label}
+                      <Icon
+                        className={`h-3.5 w-3.5 ${
+                          isActive ? meta.iconColor : meta.idleIconColor
+                        }`}
+                      />
+                      {meta.label}
                       <span
                         className={`rounded-full px-1.5 py-px text-[10px] ${
-                          isActive ? "bg-white/60" : "bg-white/70 text-muted-foreground"
+                          isActive ? "bg-white/70" : "bg-slate-100 text-muted-foreground"
                         }`}
                       >
                         {count}
@@ -523,90 +532,70 @@ export default function Index() {
                 </div>
               )}
               {filtered.map((c, idx) => {
-                const openSignals = c.risks.filter(
-                  (r) => r.status === "pending" || r.status === "verification",
-                ).length;
                 const stage = c.collection.find((s) => s.status === "current")?.stage ?? "—";
-                const tagCls =
-                  c.status === "overdue_risk"
-                    ? "bg-amber-100 text-amber-900"
-                    : c.status === "risk"
-                      ? "bg-amber-50 text-amber-800"
-                      : c.status === "overdue"
-                        ? "bg-orange-50 text-orange-800"
-                        : "bg-emerald-50 text-emerald-800";
+                const types = Array.from(new Set(c.risks.map((r) => r.type)));
+                const shownIcons = types.slice(0, 3);
+                const restIcons = types.length - shownIcons.length;
                 return (
                   <button
                     key={c.id}
                     onClick={() => setActive(c)}
-                    className={`grid w-full grid-cols-12 items-center gap-3 px-4 py-3 text-left transition hover:bg-muted/40 ${
+                    className={`flex w-full items-center gap-4 px-5 py-4 text-left transition hover:bg-slate-50 ${
                       idx > 0 ? "border-t border-border" : ""
                     }`}
                   >
-                    <div className="col-span-12 sm:col-span-4">
-                      <div className="text-sm font-medium">{c.name}</div>
-                      <div className="mt-0.5 text-[11px] text-muted-foreground">
-                        ИНН {c.inn} · {c.contracts.length} дог.
+                    <div className="flex min-w-0 flex-1 flex-col gap-1.5">
+                      <div className="flex flex-wrap items-center gap-1.5">
+                        {shownIcons.length === 0 ? (
+                          <span className="text-[10px] text-muted-foreground">Нет признаков</span>
+                        ) : (
+                          shownIcons.map((t) => {
+                            const m = riskMeta[t];
+                            const Icon = m.icon;
+                            return (
+                              <span
+                                key={t}
+                                title={m.label}
+                                className={`inline-flex h-6 w-6 items-center justify-center rounded-full border ${m.activeBorder} ${m.activeBg}`}
+                              >
+                                <Icon className={`h-3.5 w-3.5 ${m.iconColor}`} />
+                              </span>
+                            );
+                          })
+                        )}
+                        {restIcons > 0 && (
+                          <span className="inline-flex h-6 items-center rounded-full border border-slate-200 bg-slate-50 px-1.5 text-[10px] font-medium text-slate-600">
+                            +{restIcons}
+                          </span>
+                        )}
+                      </div>
+                      <div className="text-sm font-semibold text-foreground">{c.name}</div>
+                      <div className="text-[12px] text-muted-foreground">
+                        {c.inn} · {c.contracts.length} дог. · {stage} · изм. {c.lastUpdate}
                       </div>
                     </div>
-                    <div className="col-span-6 sm:col-span-2">
+                    <div className="hidden shrink-0 text-right sm:block">
                       <div className="text-[10px] uppercase tracking-wide text-muted-foreground">
                         Задолженность
                       </div>
-                      <div className="text-sm font-medium">{c.totalDebt}</div>
+                      <div className="text-sm font-semibold">{c.totalDebt}</div>
                     </div>
-                    <div className="col-span-6 sm:col-span-2">
+                    <div className="hidden shrink-0 text-right sm:block">
                       <div className="text-[10px] uppercase tracking-wide text-muted-foreground">
-                        Просрочено
+                        Просроченная
                       </div>
                       <div
-                        className={`text-sm font-medium ${
-                          c.overdueAmountNum > 0 ? "text-amber-700" : ""
+                        className={`text-sm font-semibold ${
+                          c.overdueAmountNum > 0 ? "text-rose-600" : "text-muted-foreground"
                         }`}
                       >
-                        {c.overdueDebt}
+                        {c.overdueAmountNum > 0 ? c.overdueDebt : "—"}
                       </div>
                     </div>
-                    <div className="col-span-12 flex flex-wrap items-center gap-1.5 sm:col-span-3">
-                      <span className={`rounded-full px-2 py-0.5 text-[10px] font-medium ${tagCls}`}>
-                        {c.tag}
+                    <div className="shrink-0">
+                      <span className="inline-flex h-8 w-8 items-center justify-center rounded-full border border-border bg-white text-muted-foreground">
+                        <ChevronRight className="h-4 w-4" />
                       </span>
-                      {(() => {
-                        const types = Array.from(new Set(c.risks.map((r) => r.type)));
-                        const shown = types.slice(0, 2);
-                        const rest = types.length - shown.length;
-                        return (
-                          <>
-                            {shown.map((t) => {
-                              const cfg = riskChipShort[t];
-                              return (
-                                <span
-                                  key={t}
-                                  className={`rounded-full px-1.5 py-0.5 text-[10px] font-medium ${cfg.cls}`}
-                                >
-                                  {cfg.short}
-                                </span>
-                              );
-                            })}
-                            {rest > 0 && (
-                              <span className="rounded-full bg-muted px-1.5 py-0.5 text-[10px] font-medium text-muted-foreground">
-                                + ещё {rest}
-                              </span>
-                            )}
-                            {openSignals > 0 && (
-                              <span className="rounded-full border border-amber-300 bg-amber-50 px-1.5 py-0.5 text-[10px] font-medium text-amber-900">
-                                {openSignals} сигн.
-                              </span>
-                            )}
-                          </>
-                        );
-                      })()}
-                      <div className="mt-0.5 w-full text-[11px] text-muted-foreground">
-                        Этап: {stage} · обн. {c.lastUpdate}
-                      </div>
-                    </div>
-                    <div className="col-span-12 hidden justify-end sm:col-span-1 sm:flex">
-                      <ChevronRight className="h-4 w-4 text-muted-foreground" />
                     </div>
                   </button>
                 );
