@@ -249,7 +249,7 @@ export function CounterpartyModal({
             );
           })()}
 
-          <div className="grid grid-cols-1 gap-6 bg-[#F6F6F4] px-6 py-6 lg:grid-cols-[minmax(0,1fr)_320px]">
+          <div className="grid grid-cols-1 gap-6 bg-white px-6 py-6 lg:grid-cols-[minmax(0,1fr)_320px]">
             <div className="space-y-6 min-w-0">
             {/* Section: Requires decision */}
             <section>
