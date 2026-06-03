@@ -3,7 +3,7 @@ import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sh
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Plus, ArrowRight } from "lucide-react";
-import type { Contract } from "@/lib/mock-data";
+import type { Contract, OverdueRecord } from "@/lib/mock-data";
 
 export function ContractDrawer({
   contract,
@@ -17,11 +17,12 @@ export function ContractDrawer({
   measures: string[];
   open: boolean;
   onOpenChange: (o: boolean) => void;
-  onAddOverdue: (id: string, amount: number, days: number) => void;
+  onAddOverdue: (id: string, record: OverdueRecord) => void;
   onAdvanceStage: (id: string) => void;
 }) {
   const [amount, setAmount] = useState("");
   const [days, setDays] = useState("");
+  const [comment, setComment] = useState("");
 
   if (!contract) return null;
   const overdue = contract.overdue > 0;
@@ -31,44 +32,34 @@ export function ContractDrawer({
       <SheetContent side="right" className="w-full overflow-y-auto sm:max-w-xl">
         <SheetHeader>
           <div
-            className={`inline-flex w-fit items-center rounded-full px-2.5 py-1 text-xs ${
-              overdue ? "bg-destructive/10 text-destructive" : "bg-muted text-muted-foreground"
+            className={`inline-flex w-fit items-center rounded-full px-2.5 py-1 text-[11px] ${
+              overdue ? "bg-amber-100 text-amber-900" : "bg-muted text-muted-foreground"
             }`}
           >
             {overdue ? "Есть просроченная задолженность" : "Без просрочки"}
           </div>
           <SheetTitle className="!mt-2">{contract.number}</SheetTitle>
-          <p className="text-sm text-muted-foreground">Договор по контрагенту</p>
+          <p className="text-sm text-muted-foreground">от {contract.date} · сумма {contract.amount.toFixed(1)} млн. ₽</p>
         </SheetHeader>
 
         <div className="mt-6 space-y-5">
-          <div className="rounded-xl border border-border p-4">
-            <div className="flex justify-between py-1.5 text-sm">
-              <span className="text-muted-foreground">Общая задолженность</span>
-              <span className="font-semibold">{contract.debt.toFixed(1)} млн. ₽</span>
-            </div>
-            <div className="flex justify-between py-1.5 text-sm">
-              <span className="text-muted-foreground">Просроченная задолженность</span>
-              <span className={`font-semibold ${overdue ? "text-destructive" : ""}`}>
-                {contract.overdue.toFixed(1)} млн. ₽
-              </span>
-            </div>
-            <div className="flex justify-between py-1.5 text-sm">
-              <span className="text-muted-foreground">Дней просрочки</span>
-              <span className="font-medium">{contract.overdueDays || "—"}</span>
-            </div>
-            <div className="flex justify-between py-1.5 text-sm">
-              <span className="text-muted-foreground">Этап взыскания</span>
-              <span className="font-medium">{contract.collectionStage ?? "Не начато"}</span>
-            </div>
+          <div className="rounded-xl border border-border bg-white p-4 text-sm">
+            <Row label="Общая задолженность" value={`${contract.debt.toFixed(1)} млн. ₽`} />
+            <Row
+              label="Просроченная задолженность"
+              value={`${contract.overdue.toFixed(1)} млн. ₽`}
+              valueClass={overdue ? "text-amber-700" : ""}
+            />
+            <Row label="Дней просрочки" value={contract.overdueDays ? String(contract.overdueDays) : "—"} />
+            <Row label="Этап взыскания" value={contract.collectionStage ?? "Не начато"} />
           </div>
 
           <div>
-            <div className="mb-2 text-sm font-semibold">Принятые меры реагирования</div>
+            <div className="mb-2 text-sm font-semibold">Меры по контрагенту</div>
             {measures.length > 0 ? (
-              <div className="flex flex-wrap gap-2">
+              <div className="flex flex-wrap gap-1.5">
                 {measures.map((m) => (
-                  <span key={m} className="rounded-full bg-primary/10 px-3 py-1 text-xs text-primary">
+                  <span key={m} className="rounded-full border border-border bg-white px-2.5 py-0.5 text-xs">
                     {m}
                   </span>
                 ))}
@@ -78,31 +69,77 @@ export function ContractDrawer({
             )}
           </div>
 
-          <div className="rounded-xl border border-border p-4">
-            <div className="mb-3 text-sm font-semibold">Добавить запись о просрочке</div>
+          <div>
+            <div className="mb-2 text-sm font-semibold">История просрочек</div>
+            {contract.overdueHistory.length === 0 ? (
+              <div className="rounded-md border border-dashed border-border px-3 py-4 text-center text-xs text-muted-foreground">
+                Записей нет
+              </div>
+            ) : (
+              <div className="overflow-hidden rounded-md border border-border">
+                {contract.overdueHistory.map((h, i) => (
+                  <div
+                    key={i}
+                    className={`flex flex-wrap items-center justify-between gap-2 px-3 py-2 text-xs ${
+                      i > 0 ? "border-t border-border" : ""
+                    }`}
+                  >
+                    <div>
+                      <div className="font-medium">{h.date} · {h.amount.toFixed(2)} млн. ₽ · {h.days} дн.</div>
+                      {h.comment && <div className="text-muted-foreground">{h.comment}</div>}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+
+          <div className="rounded-xl border border-border bg-white p-4">
+            <div className="mb-3 text-sm font-semibold">Добавить просрочку</div>
             <div className="grid grid-cols-2 gap-2">
               <Input placeholder="Сумма, ₽" value={amount} onChange={(e) => setAmount(e.target.value)} />
               <Input placeholder="Дней" value={days} onChange={(e) => setDays(e.target.value)} />
             </div>
+            <Input
+              className="mt-2"
+              placeholder="Комментарий (необязательно)"
+              value={comment}
+              onChange={(e) => setComment(e.target.value)}
+            />
             <Button
               variant="outline"
               className="mt-3 w-full"
               onClick={() => {
                 if (!amount) return;
-                onAddOverdue(contract.id, Number(amount) / 1_000_000, Number(days) || 0);
+                onAddOverdue(contract.id, {
+                  date: new Date().toLocaleDateString("ru-RU"),
+                  amount: Number(amount) / 1_000_000,
+                  days: Number(days) || 0,
+                  comment: comment || undefined,
+                });
                 setAmount("");
                 setDays("");
+                setComment("");
               }}
             >
-              <Plus className="mr-2 h-4 w-4" /> Добавить просрочку
+              <Plus className="mr-2 h-4 w-4" /> Добавить запись
             </Button>
           </div>
 
-          <Button className="w-full" onClick={() => onAdvanceStage(contract.id)}>
-            <ArrowRight className="mr-2 h-4 w-4" /> Перевести на следующий этап взыскания
+          <Button className="w-full" variant="secondary" onClick={() => onAdvanceStage(contract.id)}>
+            <ArrowRight className="mr-2 h-4 w-4" /> Перевести этап взыскания
           </Button>
         </div>
       </SheetContent>
     </Sheet>
+  );
+}
+
+function Row({ label, value, valueClass = "" }: { label: string; value: string; valueClass?: string }) {
+  return (
+    <div className="flex justify-between py-1.5">
+      <span className="text-muted-foreground">{label}</span>
+      <span className={`font-medium ${valueClass}`}>{value}</span>
+    </div>
   );
 }

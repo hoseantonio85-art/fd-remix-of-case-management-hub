@@ -1,83 +1,194 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
-import type { RiskSignal } from "@/lib/mock-data";
+import { measuresByRisk, type RiskSignal } from "@/lib/mock-data";
+
+export type DecisionKind = "confirm" | "dismiss" | "verify";
+
+export type RiskSavePayload =
+  | { kind: "confirm"; date: string; measures: string[]; comment: string; responsible: string }
+  | { kind: "dismiss"; date: string; comment: string; responsible: string }
+  | { kind: "verify"; date: string; plannedDate: string; comment: string; responsible: string };
+
+const decisionOptions: { value: DecisionKind; label: string; hint: string }[] = [
+  { value: "confirm", label: "Подтвердить проблему", hint: "Зафиксировать риск и выбрать меры" },
+  { value: "dismiss", label: "Снять риск", hint: "Риск не подтверждается, требуется комментарий" },
+  { value: "verify", label: "Требуется дополнительная проверка", hint: "Назначить ответственного и срок" },
+];
+
+const kindBadge: Record<string, string> = {
+  required: "bg-foreground/5 text-foreground border border-border",
+  recommended: "bg-primary/10 text-primary",
+  situational: "bg-muted text-muted-foreground",
+};
+const kindLabel: Record<string, string> = {
+  required: "обязательная",
+  recommended: "рекомендуемая",
+  situational: "по ситуации",
+};
 
 export function RiskDrawer({
   risk,
+  initialDecision,
   open,
   onOpenChange,
   onSave,
 }: {
   risk: RiskSignal | null;
+  initialDecision: DecisionKind;
   open: boolean;
   onOpenChange: (o: boolean) => void;
-  onSave: (riskId: string, payload: { date: string; measures: string[]; comment: string }) => void;
+  onSave: (riskId: string, payload: RiskSavePayload) => void;
 }) {
+  const [decision, setDecision] = useState<DecisionKind>(initialDecision);
   const [selected, setSelected] = useState<string[]>([]);
   const [date, setDate] = useState(new Date().toLocaleDateString("ru-RU"));
+  const [plannedDate, setPlannedDate] = useState("");
   const [comment, setComment] = useState("");
+  const [responsible, setResponsible] = useState("Михайлова Е.");
 
   useEffect(() => {
     if (open) {
+      setDecision(initialDecision);
       setSelected([]);
       setDate(new Date().toLocaleDateString("ru-RU"));
+      setPlannedDate(new Date(Date.now() + 7 * 86400000).toLocaleDateString("ru-RU"));
       setComment("");
+      setResponsible("Михайлова Е.");
     }
-  }, [open, risk?.id]);
+  }, [open, risk?.id, initialDecision]);
+
+  const measures = useMemo(() => (risk ? measuresByRisk[risk.type] ?? [] : []), [risk]);
 
   if (!risk) return null;
 
   const toggle = (m: string) =>
-    setSelected((prev) => (prev.includes(m) ? prev.filter((x) => x !== m) : [...prev, m]));
+    setSelected((p) => (p.includes(m) ? p.filter((x) => x !== m) : [...p, m]));
+
+  const canSave =
+    decision === "confirm"
+      ? selected.length > 0
+      : decision === "dismiss"
+        ? comment.trim().length > 0
+        : comment.trim().length > 0 && responsible.trim().length > 0 && plannedDate.trim().length > 0;
+
+  const handleSave = () => {
+    if (!canSave) return;
+    if (decision === "confirm")
+      onSave(risk.id, { kind: "confirm", date, measures: selected, comment, responsible });
+    else if (decision === "dismiss")
+      onSave(risk.id, { kind: "dismiss", date, comment, responsible });
+    else onSave(risk.id, { kind: "verify", date, plannedDate, comment, responsible });
+    onOpenChange(false);
+  };
 
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent side="right" className="w-full overflow-y-auto sm:max-w-xl">
         <SheetHeader>
-          <SheetTitle>Подтверждение риска</SheetTitle>
+          <SheetTitle>Решение по сигналу</SheetTitle>
         </SheetHeader>
 
         <div className="mt-6 space-y-6">
-          <div className="rounded-xl border border-border bg-muted/50 p-4">
-            <div className="text-xs uppercase tracking-wide text-muted-foreground">Выбранный риск</div>
+          <div className="rounded-xl border border-border bg-muted/40 p-4">
+            <div className="text-[11px] uppercase tracking-wide text-muted-foreground">Выбранный риск</div>
             <div className="mt-1 font-semibold">{risk.type}</div>
             <div className="mt-1 text-sm text-muted-foreground">{risk.description}</div>
             <div className="mt-2 text-xs text-muted-foreground">
-              Источник: {risk.source} · {risk.detectedAt}
+              Источник: {risk.source} · Обнаружено: {risk.detectedAt}
             </div>
           </div>
 
           <div>
-            <div className="mb-3 text-sm font-semibold">Меры реагирования</div>
-            <div className="grid grid-cols-1 gap-2">
-              {risk.availableMeasures.map((m) => {
-                const checked = selected.includes(m);
+            <div className="mb-2 text-sm font-semibold">Решение по сигналу</div>
+            <div className="space-y-2">
+              {decisionOptions.map((o) => {
+                const active = decision === o.value;
                 return (
                   <label
-                    key={m}
-                    className={`flex cursor-pointer items-start gap-3 rounded-xl border p-3 transition ${
-                      checked ? "border-primary bg-primary/5" : "border-border bg-card hover:bg-accent/40"
+                    key={o.value}
+                    className={`flex cursor-pointer items-start gap-3 rounded-lg border p-3 transition ${
+                      active ? "border-primary bg-primary/5" : "border-border bg-card hover:bg-accent/40"
                     }`}
                   >
-                    <Checkbox checked={checked} onCheckedChange={() => toggle(m)} className="mt-0.5" />
-                    <span className="text-sm">{m}</span>
+                    <input
+                      type="radio"
+                      className="mt-1 accent-[color:var(--primary)]"
+                      checked={active}
+                      onChange={() => setDecision(o.value)}
+                    />
+                    <div>
+                      <div className="text-sm font-medium">{o.label}</div>
+                      <div className="text-xs text-muted-foreground">{o.hint}</div>
+                    </div>
                   </label>
                 );
               })}
             </div>
           </div>
 
-          <div className="grid grid-cols-1 gap-3">
+          {decision === "confirm" && (
+            <div>
+              <div className="mb-2 text-sm font-semibold">Меры реагирования</div>
+              <div className="space-y-2">
+                {measures.map((m) => {
+                  const checked = selected.includes(m.name);
+                  return (
+                    <label
+                      key={m.name}
+                      className={`flex cursor-pointer items-start gap-3 rounded-lg border p-3 transition ${
+                        checked ? "border-primary bg-primary/5" : "border-border bg-card hover:bg-accent/40"
+                      }`}
+                    >
+                      <Checkbox checked={checked} onCheckedChange={() => toggle(m.name)} className="mt-0.5" />
+                      <div className="min-w-0 flex-1">
+                        <div className="flex flex-wrap items-center gap-2">
+                          <span className="text-sm font-medium">{m.name}</span>
+                          <span className={`rounded-full px-2 py-0.5 text-[10px] ${kindBadge[m.kind]}`}>
+                            {kindLabel[m.kind]}
+                          </span>
+                        </div>
+                        <div className="mt-0.5 text-xs text-muted-foreground">{m.hint}</div>
+                      </div>
+                    </label>
+                  );
+                })}
+              </div>
+              {selected.length === 0 && (
+                <div className="mt-2 text-xs text-muted-foreground">Выберите хотя бы одну меру</div>
+              )}
+            </div>
+          )}
+
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
             <div>
               <label className="mb-1 block text-xs text-muted-foreground">Дата решения</label>
               <Input value={date} onChange={(e) => setDate(e.target.value)} />
             </div>
             <div>
-              <label className="mb-1 block text-xs text-muted-foreground">Комментарий</label>
+              <label className="mb-1 block text-xs text-muted-foreground">
+                Ответственный {decision === "verify" && <span className="text-destructive">*</span>}
+              </label>
+              <Input value={responsible} onChange={(e) => setResponsible(e.target.value)} />
+            </div>
+            {decision === "verify" && (
+              <div className="sm:col-span-2">
+                <label className="mb-1 block text-xs text-muted-foreground">
+                  Плановая дата проверки <span className="text-destructive">*</span>
+                </label>
+                <Input value={plannedDate} onChange={(e) => setPlannedDate(e.target.value)} />
+              </div>
+            )}
+            <div className="sm:col-span-2">
+              <label className="mb-1 block text-xs text-muted-foreground">
+                Комментарий{" "}
+                {(decision === "dismiss" || decision === "verify") && (
+                  <span className="text-destructive">*</span>
+                )}
+              </label>
               <Textarea
                 rows={3}
                 placeholder="Опишите контекст принятого решения…"
@@ -87,18 +198,11 @@ export function RiskDrawer({
             </div>
           </div>
 
-          <div className="flex gap-3 pt-2">
+          <div className="flex gap-3 pt-1">
             <Button variant="outline" className="flex-1" onClick={() => onOpenChange(false)}>
               Отмена
             </Button>
-            <Button
-              className="flex-1"
-              disabled={selected.length === 0}
-              onClick={() => {
-                onSave(risk.id, { date, measures: selected, comment });
-                onOpenChange(false);
-              }}
-            >
+            <Button className="flex-1" disabled={!canSave} onClick={handleSave}>
               Сохранить решение
             </Button>
           </div>
