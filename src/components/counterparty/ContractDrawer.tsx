@@ -56,19 +56,12 @@ export function ContractDrawer({
           </div>
         </div>
         <div className="px-6 pb-6 pt-2">
-
-
-        <div className="mt-6 space-y-5">
+        <div className="mt-4 space-y-5">
           <div className="rounded-xl border border-border bg-white p-4 text-sm">
-            <Row label="Общая задолженность" value={`${contract.debt.toFixed(1)} млн. ₽`} />
-            <Row
-              label="Просроченная задолженность"
-              value={`${contract.overdue.toFixed(1)} млн. ₽`}
-              valueClass={overdue ? "text-amber-700" : ""}
-            />
             <Row label="Дней просрочки" value={contract.overdueDays ? String(contract.overdueDays) : "—"} />
             <Row label="Этап взыскания" value={contract.collectionStage ?? "Не начато"} />
           </div>
+
 
           <div>
             <div className="mb-2 text-sm font-semibold">Меры по контрагенту</div>
