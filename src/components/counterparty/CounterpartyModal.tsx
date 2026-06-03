@@ -480,6 +480,17 @@ function Stat({ label, value, accent }: { label: string; value: string; accent?:
   );
 }
 
+function DebtCard({ label, value, accent }: { label: string; value: string; accent?: boolean }) {
+  return (
+    <div className="rounded-xl border border-border bg-white px-4 py-3">
+      <div className="text-xs text-muted-foreground">{label}</div>
+      <div className={`mt-1 text-lg font-semibold ${accent ? "text-rose-600" : "text-foreground"}`}>
+        {value}
+      </div>
+    </div>
+  );
+}
+
 function SectionTitle({
   title,
   count,
