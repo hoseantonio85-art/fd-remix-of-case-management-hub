@@ -400,9 +400,6 @@ export function CounterpartyModal({
               </section>
             )}
 
-            {/* Section: Debt collection */}
-            <DebtStepper steps={steps} onAdvance={advanceStage} error={stepperError} />
-
             {/* Section: Contracts */}
             <section>
               <SectionTitle title="Договоры" count={contracts.length} muted />
@@ -435,9 +432,16 @@ export function CounterpartyModal({
                 })}
               </div>
             </section>
+            </div>
+
+            {/* Right column: meta */}
+            <aside className="space-y-4 lg:sticky lg:top-4 lg:self-start">
+              <DebtSummaryCard steps={steps} onOpenDetails={() => setDebtDrawerOpen(true)} />
+            </aside>
           </div>
         </DialogContent>
       </Dialog>
+
 
       <RiskDrawer
         risk={editing}
