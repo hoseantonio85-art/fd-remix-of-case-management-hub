@@ -1,26 +1,14 @@
-import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
 import { Search, ChevronDown, Sparkles } from "lucide-react";
 import { counterparties, type Counterparty } from "@/lib/mock-data";
 import { CounterpartyModal } from "@/components/counterparty/CounterpartyModal";
 
-export const Route = createFileRoute("/")({
-  head: () => ({
-    meta: [
-      { title: "Контрагенты — НОРМ" },
-      { name: "description", content: "Управление контрагентами и работа с дебиторской задолженностью" },
-    ],
-  }),
-  component: Index,
-});
-
-function Index() {
+export default function Index() {
   const [active, setActive] = useState<Counterparty | null>(null);
 
   return (
     <div className="min-h-screen bg-muted/30">
       <div className="mx-auto max-w-6xl px-6 py-10">
-        {/* Header */}
         <div className="mb-6 flex flex-wrap items-center justify-between gap-4">
           <div className="flex items-baseline gap-3">
             <h1 className="text-3xl font-semibold tracking-tight">Контрагенты</h1>
@@ -35,7 +23,6 @@ function Index() {
           </div>
         </div>
 
-        {/* AI banner */}
         <div className="mb-8 rounded-2xl border border-primary/30 bg-gradient-to-r from-primary/5 to-transparent p-4">
           <div className="flex items-start gap-3">
             <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-primary/15 text-primary">
@@ -52,7 +39,6 @@ function Index() {
           </div>
         </div>
 
-        {/* Debtor list */}
         <div className="mb-4 flex items-center justify-between">
           <h2 className="text-xl font-semibold">Список дебиторов</h2>
         </div>
