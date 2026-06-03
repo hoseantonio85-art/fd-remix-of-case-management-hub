@@ -23,7 +23,8 @@ import type {
 } from "@/lib/mock-data";
 import { RiskDrawer, type DecisionKind, type RiskSavePayload } from "./RiskDrawer";
 import { ContractDrawer } from "./ContractDrawer";
-import { DebtStepper } from "./DebtStepper";
+import { DebtSummaryCard } from "./DebtSummaryCard";
+import { DebtProcessDrawer } from "./DebtProcessDrawer";
 import { getToneForTag, toneStyles } from "./header-theme";
 
 const priorityBadge: Record<string, { label: string; cls: string }> = {
@@ -50,6 +51,7 @@ export function CounterpartyModal({
   const [contractDrawer, setContractDrawer] = useState<Contract | null>(null);
   const [stepperError, setStepperError] = useState<string | null>(null);
   const [showAllPending, setShowAllPending] = useState(false);
+  const [debtDrawerOpen, setDebtDrawerOpen] = useState(false);
 
   useEffect(() => {
     if (counterparty && open) {
@@ -247,7 +249,8 @@ export function CounterpartyModal({
             );
           })()}
 
-          <div className="space-y-6 bg-[#F6F6F4] px-6 py-6">
+          <div className="grid grid-cols-1 gap-6 bg-[#F6F6F4] px-6 py-6 lg:grid-cols-[minmax(0,1fr)_320px]">
+            <div className="space-y-6 min-w-0">
             {/* Section: Requires decision */}
             <section>
               <SectionTitle title="Требуют решения" count={sortedPending.length} tone="warn" />
@@ -399,9 +402,6 @@ export function CounterpartyModal({
               </section>
             )}
 
-            {/* Section: Debt collection */}
-            <DebtStepper steps={steps} onAdvance={advanceStage} error={stepperError} />
-
             {/* Section: Contracts */}
             <section>
               <SectionTitle title="Договоры" count={contracts.length} muted />
@@ -434,9 +434,23 @@ export function CounterpartyModal({
                 })}
               </div>
             </section>
+            </div>
+
+            {/* Right column: meta */}
+            <aside className="space-y-4 lg:sticky lg:top-4 lg:self-start">
+              <DebtSummaryCard steps={steps} onOpenDetails={() => setDebtDrawerOpen(true)} />
+            </aside>
           </div>
         </DialogContent>
       </Dialog>
+
+      <DebtProcessDrawer
+        steps={steps}
+        open={debtDrawerOpen}
+        onOpenChange={setDebtDrawerOpen}
+        onAdvance={advanceStage}
+        error={stepperError}
+      />
 
       <RiskDrawer
         risk={editing}
