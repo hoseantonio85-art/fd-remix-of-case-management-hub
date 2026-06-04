@@ -2,7 +2,6 @@ import { useEffect, useMemo, useState } from "react";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import {
-  AlertTriangle,
   ShieldCheck,
   ChevronRight,
   ChevronDown,
@@ -25,6 +24,7 @@ import { ContractDrawer } from "./ContractDrawer";
 import { DebtSummaryCard } from "./DebtSummaryCard";
 import { DebtProcessDrawer } from "./DebtProcessDrawer";
 import { getToneForTag, toneStyles } from "./header-theme";
+import { riskMeta } from "./risk-meta";
 
 const priorityBadge: Record<string, { label: string; cls: string }> = {
   high: { label: "Высокий приоритет", cls: "bg-amber-100 text-amber-900" },
@@ -215,9 +215,9 @@ export function CounterpartyModal({
   };
 
   return (
-    <>
-      <Dialog open={open} onOpenChange={onOpenChange}>
-        <DialogContent className="max-h-[92vh] w-[96vw] max-w-5xl gap-0 overflow-y-auto p-0 [&>button]:hidden">
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className="relative h-[calc(100vh-32px)] w-[96vw] max-w-5xl gap-0 overflow-hidden rounded-3xl p-0 [&>button]:hidden">
+        <div className="flex h-full flex-col overflow-y-auto">
           {/* Header */}
           {(() => {
             const tone = getToneForTag(counterparty.tag);
@@ -259,14 +259,18 @@ export function CounterpartyModal({
                 <div className="space-y-2">
                   {visiblePending.map((r) => {
                     const p = priorityBadge[r.priority];
+                    const rm = riskMeta[r.type];
+                    const RIcon = rm?.icon;
                     return (
                       <div
                         key={r.id}
                         className="group rounded-lg border border-[#E5E7EB] bg-white px-4 py-3 transition hover:bg-muted/30"
                       >
                         <div className="flex items-start gap-3">
-                          <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-amber-50 text-amber-700">
-                            <AlertTriangle className="h-4 w-4" />
+                          <div
+                            className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-full border ${rm?.activeBorder ?? "border-amber-200"} ${rm?.activeBg ?? "bg-amber-50"}`}
+                          >
+                            {RIcon && <RIcon className={`h-4 w-4 ${rm.iconColor}`} />}
                           </div>
                           <div className="min-w-0 flex-1">
                             <div className="truncate text-sm font-medium text-foreground">
@@ -440,48 +444,49 @@ export function CounterpartyModal({
             </aside>
 
           </div>
-        </DialogContent>
-      </Dialog>
+        </div>
 
-      <DebtProcessDrawer
-        steps={steps}
-        open={debtDrawerOpen}
-        onOpenChange={setDebtDrawerOpen}
-        onAdvance={advanceStage}
-        error={stepperError}
-      />
+        {/* In-modal drawers */}
+        <DebtProcessDrawer
+          steps={steps}
+          open={debtDrawerOpen}
+          onOpenChange={setDebtDrawerOpen}
+          onAdvance={advanceStage}
+          error={stepperError}
+        />
 
-      <RiskDrawer
-        risk={editing}
-        initialDecision={initialDecision}
-        open={drawerOpen}
-        onOpenChange={setDrawerOpen}
-        onSave={handleSave}
-      />
+        <RiskDrawer
+          risk={editing}
+          initialDecision={initialDecision}
+          open={drawerOpen}
+          onOpenChange={setDrawerOpen}
+          onSave={handleSave}
+        />
 
-      <ContractDrawer
-        counterpartyName={counterparty.name}
-        contract={contractDrawer}
-        measures={allMeasures}
-        open={!!contractDrawer}
-        onOpenChange={(o) => !o && setContractDrawer(null)}
-        onAddOverdue={addOverdue}
-        onAdvanceStage={(id) => {
-          advanceContractStage(id);
-          setContractDrawer((prev) => {
-            if (!prev) return prev;
-            const stages = [
-              "Досудебное урегулирование",
-              "Судебная работа",
-              "Принудительное взыскание",
-              "Завершение работы",
-            ];
-            const i = stages.indexOf(prev.collectionStage ?? "");
-            return { ...prev, collectionStage: stages[Math.min(i + 1, stages.length - 1)] || stages[0] };
-          });
-        }}
-      />
-    </>
+        <ContractDrawer
+          counterpartyName={counterparty.name}
+          contract={contractDrawer}
+          measures={allMeasures}
+          open={!!contractDrawer}
+          onOpenChange={(o) => !o && setContractDrawer(null)}
+          onAddOverdue={addOverdue}
+          onAdvanceStage={(id) => {
+            advanceContractStage(id);
+            setContractDrawer((prev) => {
+              if (!prev) return prev;
+              const stages = [
+                "Досудебное урегулирование",
+                "Судебная работа",
+                "Принудительное взыскание",
+                "Завершение работы",
+              ];
+              const i = stages.indexOf(prev.collectionStage ?? "");
+              return { ...prev, collectionStage: stages[Math.min(i + 1, stages.length - 1)] || stages[0] };
+            });
+          }}
+        />
+      </DialogContent>
+    </Dialog>
   );
 }
 

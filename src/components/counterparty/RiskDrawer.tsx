@@ -1,10 +1,10 @@
 import { useEffect, useMemo, useState } from "react";
-import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { measuresByRisk, type RiskSignal } from "@/lib/mock-data";
+import { InModalDrawer } from "./InModalDrawer";
 
 export type DecisionKind = "confirm" | "dismiss" | "verify";
 
@@ -91,11 +91,9 @@ export function RiskDrawer({
   };
 
   return (
-    <Sheet open={open} onOpenChange={onOpenChange}>
-      <SheetContent side="right" className="w-full overflow-y-auto bg-white sm:max-w-xl">
-        <SheetHeader>
-          <SheetTitle>{titleByMode[mode]}</SheetTitle>
-        </SheetHeader>
+    <InModalDrawer open={open} onOpenChange={onOpenChange}>
+      <div className="p-6">
+        <h2 className="text-lg font-semibold">{titleByMode[mode]}</h2>
 
         <div className="mt-6 space-y-6">
           <div className="rounded-xl border border-border bg-slate-50/60 p-4">
@@ -186,7 +184,7 @@ export function RiskDrawer({
             </Button>
           </div>
         </div>
-      </SheetContent>
-    </Sheet>
+      </div>
+    </InModalDrawer>
   );
 }

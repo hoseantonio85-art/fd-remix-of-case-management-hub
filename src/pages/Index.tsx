@@ -15,18 +15,10 @@ import {
   Gauge,
   GraduationCap,
   Headphones,
-  TrendingDown,
-  Scale,
-  UsersRound,
-  ShieldAlert,
-  Ban,
-  AlertTriangle,
-  FileX,
-  LayoutGrid,
-  type LucideIcon,
 } from "lucide-react";
 import { counterparties, type Counterparty, type RiskType } from "@/lib/mock-data";
 import { CounterpartyModal } from "@/components/counterparty/CounterpartyModal";
+import { riskMeta, allChipMeta, riskOrder } from "@/components/counterparty/risk-meta";
 
 type CategoryKey = "risk" | "overdue_risk" | "no_risk" | "overdue";
 
@@ -210,112 +202,6 @@ function SidebarItem({
 }
 
 type RiskChipKey = "all" | RiskType;
-
-type RiskMetaItem = {
-  icon: LucideIcon;
-  short: string;
-  label: string;
-  iconColor: string;
-  activeBg: string;
-  activeText: string;
-  activeBorder: string;
-  idleIconColor: string;
-};
-
-const riskMeta: Record<RiskType, RiskMetaItem> = {
-  "Ухудшилось финансовое состояние": {
-    icon: TrendingDown,
-    short: "Ухудшилось фин. состояние",
-    label: "Ухудшилось фин. состояние",
-    iconColor: "text-rose-600",
-    activeBg: "bg-rose-50",
-    activeText: "text-rose-900",
-    activeBorder: "border-rose-300",
-    idleIconColor: "text-rose-500/70",
-  },
-  "Банкротство / ликвидация": {
-    icon: Scale,
-    short: "Банкротство / ликвидация",
-    label: "Банкротство / ликвидация",
-    iconColor: "text-rose-700",
-    activeBg: "bg-rose-50",
-    activeText: "text-rose-900",
-    activeBorder: "border-rose-300",
-    idleIconColor: "text-rose-600/70",
-  },
-  "Неисполнение контракта группы": {
-    icon: FileX,
-    short: "Неисполнение контракта",
-    label: "Неисполнение контракта группы",
-    iconColor: "text-amber-700",
-    activeBg: "bg-amber-50",
-    activeText: "text-amber-900",
-    activeBorder: "border-amber-300",
-    idleIconColor: "text-amber-600/70",
-  },
-  "Уголовное дело": {
-    icon: ShieldAlert,
-    short: "Уголовное дело",
-    label: "Уголовное дело",
-    iconColor: "text-red-700",
-    activeBg: "bg-red-50",
-    activeText: "text-red-900",
-    activeBorder: "border-red-300",
-    idleIconColor: "text-red-600/70",
-  },
-  "Ограничения деятельности": {
-    icon: Ban,
-    short: "Ограничения",
-    label: "Ограничения деятельности",
-    iconColor: "text-slate-700",
-    activeBg: "bg-slate-100",
-    activeText: "text-slate-900",
-    activeBorder: "border-slate-400",
-    idleIconColor: "text-slate-500",
-  },
-  "Административные нарушения": {
-    icon: AlertTriangle,
-    short: "Адм. нарушения",
-    label: "Адм. нарушения",
-    iconColor: "text-orange-700",
-    activeBg: "bg-orange-50",
-    activeText: "text-orange-900",
-    activeBorder: "border-orange-300",
-    idleIconColor: "text-orange-600/70",
-  },
-};
-
-// Optional virtual chip "Просрочена задолженность в группе" — uses group icon
-const groupOverdueChip = {
-  icon: UsersRound,
-  label: "Просрочена задолженность в группе",
-  short: "Группа",
-  iconColor: "text-amber-700",
-  activeBg: "bg-amber-50",
-  activeText: "text-amber-900",
-  activeBorder: "border-amber-300",
-  idleIconColor: "text-amber-600/70",
-};
-
-const allChipMeta = {
-  icon: LayoutGrid,
-  label: "Все признаки",
-  short: "Все",
-  iconColor: "text-slate-700",
-  activeBg: "bg-slate-100",
-  activeText: "text-slate-900",
-  activeBorder: "border-slate-400",
-  idleIconColor: "text-slate-500",
-};
-
-const riskOrder: RiskType[] = [
-  "Ухудшилось финансовое состояние",
-  "Банкротство / ликвидация",
-  "Неисполнение контракта группы",
-  "Уголовное дело",
-  "Ограничения деятельности",
-  "Административные нарушения",
-];
 
 export default function Index() {
   const [active, setActive] = useState<Counterparty | null>(null);
@@ -537,13 +423,13 @@ export default function Index() {
               </div>
             )}
 
-            <div className="overflow-hidden rounded-xl border border-border bg-white">
+            <div className="space-y-2.5">
               {filtered.length === 0 && (
-                <div className="p-8 text-center text-sm text-muted-foreground">
+                <div className="rounded-2xl border border-border bg-white p-8 text-center text-sm text-muted-foreground">
                   Нет дебиторов в этой категории
                 </div>
               )}
-              {filtered.map((c, idx) => {
+              {filtered.map((c) => {
                 const stage = c.collection.find((s) => s.status === "current")?.stage ?? "—";
                 const types = Array.from(new Set(c.risks.map((r) => r.type)));
                 const shownIcons = types.slice(0, 3);
@@ -552,9 +438,7 @@ export default function Index() {
                   <button
                     key={c.id}
                     onClick={() => setActive(c)}
-                    className={`flex w-full items-center gap-4 px-5 py-4 text-left transition hover:bg-slate-50 ${
-                      idx > 0 ? "border-t border-border" : ""
-                    }`}
+                    className="flex w-full items-center gap-4 rounded-2xl border border-[#E5E7EB] bg-white px-5 py-4 text-left transition hover:border-slate-300 hover:shadow-sm"
                   >
                     <div className="flex min-w-0 flex-1 flex-col gap-1.5">
                       <div className="flex flex-wrap items-center gap-1.5">

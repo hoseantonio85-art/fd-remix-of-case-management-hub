@@ -1,10 +1,10 @@
 import { useState } from "react";
-import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Plus, ArrowRight } from "lucide-react";
 import type { Contract, OverdueRecord } from "@/lib/mock-data";
 import { toneStyles } from "./header-theme";
+import { InModalDrawer } from "./InModalDrawer";
 
 export function ContractDrawer({
   contract,
@@ -34,34 +34,30 @@ export function ContractDrawer({
   const tagLabel = overdue ? "Есть просроченная задолженность" : "Без просрочки";
 
   return (
-    <Sheet open={open} onOpenChange={onOpenChange}>
-      <SheetContent side="right" className="w-full overflow-y-auto p-0 sm:max-w-xl">
-        <div className={`px-6 pt-6 pb-5 ${styles.gradient}`}>
-          <SheetHeader className="space-y-0 text-left">
-            <span className={`inline-flex w-fit items-center rounded-full px-2.5 py-1 text-[11px] font-medium ${styles.badge}`}>
-              {tagLabel}
-            </span>
-            <SheetTitle className="!mt-3 text-2xl font-semibold tracking-tight">{contract.number}</SheetTitle>
-            {counterpartyName && (
-              <p className="!mt-1 text-sm text-muted-foreground">{counterpartyName}</p>
-            )}
-          </SheetHeader>
-          <div className="mt-5 grid grid-cols-1 gap-3 sm:grid-cols-2">
-            <DebtCard label="Задолженность" value={`${contract.debt.toFixed(1)} млн. ₽`} />
-            <DebtCard
-              label="Просроченная задолженность"
-              value={`${contract.overdue.toFixed(1)} млн. ₽`}
-              accent={overdue}
-            />
-          </div>
+    <InModalDrawer open={open} onOpenChange={onOpenChange}>
+      <div className={`px-6 pt-6 pb-5 ${styles.gradient}`}>
+        <span className={`inline-flex w-fit items-center rounded-full px-2.5 py-1 text-[11px] font-medium ${styles.badge}`}>
+          {tagLabel}
+        </span>
+        <h2 className="mt-3 text-2xl font-semibold tracking-tight">{contract.number}</h2>
+        {counterpartyName && (
+          <p className="mt-1 text-sm text-muted-foreground">{counterpartyName}</p>
+        )}
+        <div className="mt-5 grid grid-cols-1 gap-3 sm:grid-cols-2">
+          <DebtCard label="Задолженность" value={`${contract.debt.toFixed(1)} млн. ₽`} />
+          <DebtCard
+            label="Просроченная задолженность"
+            value={`${contract.overdue.toFixed(1)} млн. ₽`}
+            accent={overdue}
+          />
         </div>
-        <div className="px-6 pb-6 pt-2">
+      </div>
+      <div className="px-6 pb-6 pt-2">
         <div className="mt-4 space-y-5">
           <div className="rounded-xl border border-border bg-white p-4 text-sm">
             <Row label="Дней просрочки" value={contract.overdueDays ? String(contract.overdueDays) : "—"} />
             <Row label="Этап взыскания" value={contract.collectionStage ?? "Не начато"} />
           </div>
-
 
           <div>
             <div className="mb-2 text-sm font-semibold">Меры по контрагенту</div>
@@ -139,9 +135,8 @@ export function ContractDrawer({
             <ArrowRight className="mr-2 h-4 w-4" /> Перевести этап взыскания
           </Button>
         </div>
-        </div>
-      </SheetContent>
-    </Sheet>
+      </div>
+    </InModalDrawer>
   );
 }
 
@@ -164,4 +159,3 @@ function DebtCard({ label, value, accent }: { label: string; value: string; acce
     </div>
   );
 }
-
