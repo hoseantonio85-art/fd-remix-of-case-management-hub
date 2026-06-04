@@ -2,7 +2,6 @@ import { useEffect, useMemo, useState } from "react";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import {
-  AlertTriangle,
   ShieldCheck,
   ChevronRight,
   ChevronDown,
@@ -25,6 +24,7 @@ import { ContractDrawer } from "./ContractDrawer";
 import { DebtSummaryCard } from "./DebtSummaryCard";
 import { DebtProcessDrawer } from "./DebtProcessDrawer";
 import { getToneForTag, toneStyles } from "./header-theme";
+import { riskMeta } from "./risk-meta";
 
 const priorityBadge: Record<string, { label: string; cls: string }> = {
   high: { label: "Высокий приоритет", cls: "bg-amber-100 text-amber-900" },
