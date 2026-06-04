@@ -136,7 +136,7 @@ export function ContractDrawer({
         user: "NORM AI",
       },
     ]);
-  }, [contract, open]);
+  }, [contract?.id, open]);
 
   const currentTitle = STEPS[stepIdx];
   const nextTitle = STEPS[stepIdx + 1];
