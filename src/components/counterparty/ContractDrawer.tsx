@@ -130,6 +130,9 @@ export function ContractDrawer({
     setDueDate("");
     setOverdueComment("");
     setLocalOverdues([]);
+    setShowAddOverdue(false);
+    setOverdueAddedNotice(false);
+    setOverdueError(null);
     setHistory([
       {
         date: formatDDMMYYYY(TODAY),
