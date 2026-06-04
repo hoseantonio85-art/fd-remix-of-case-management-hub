@@ -459,17 +459,23 @@ export function ContractDrawer({
             <LabeledInput
               label="Сумма просроченной ДЗ, ₽"
               value={amount}
-              onChange={setAmount}
+              onChange={(v) => {
+                setAmount(v);
+                setOverdueError(null);
+              }}
               placeholder="100000"
             />
             <LabeledInput
               label="Дата возникновения"
               value={occurDate}
-              onChange={setOccurDate}
+              onChange={(v) => {
+                setOccurDate(v);
+                setOverdueError(null);
+              }}
               placeholder="ДД.ММ.ГГГГ"
             />
             <LabeledInput
-              label="Срок исполнения"
+              label="Срок исполнения / дата оплаты"
               value={dueDate}
               onChange={setDueDate}
               placeholder="ДД.ММ.ГГГГ"
@@ -486,8 +492,13 @@ export function ContractDrawer({
               Дней просрочки: <span className="font-medium text-foreground">{computedDays}</span>
             </div>
           )}
+          {overdueError && (
+            <div className="mt-2 flex items-start gap-2 rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 text-xs text-amber-900">
+              <AlertTriangle className="mt-0.5 h-3.5 w-3.5 shrink-0" />
+              {overdueError}
+            </div>
+          )}
           <Button
-            variant="outline"
             className="mt-3 w-full"
             onClick={handleAddOverdue}
             disabled={!amount || !occurDate}
