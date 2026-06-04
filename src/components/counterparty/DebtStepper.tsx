@@ -89,14 +89,21 @@ export function DebtStepper({
                             : ""
                         }`}
                       >
-                        <div
-                          className={`text-sm ${
-                            s.status === "upcoming"
-                              ? "text-muted-foreground"
-                              : "font-medium text-foreground"
-                          }`}
-                        >
-                          {s.title}
+                        <div className="flex flex-wrap items-center gap-2">
+                          <div
+                            className={`text-sm ${
+                              s.status === "upcoming"
+                                ? "text-muted-foreground"
+                                : "font-medium text-foreground"
+                            }`}
+                          >
+                            {s.title}
+                          </div>
+                          {highlightStepId === s.id && s.status === "current" && (
+                            <span className="inline-flex items-center rounded-full border border-emerald-200 bg-emerald-50 px-2 py-0.5 text-[10px] font-medium text-emerald-700">
+                              Обновлено после решения по риску
+                            </span>
+                          )}
                         </div>
                         {s.status === "current" && (
                           <div className="mt-1.5 flex flex-wrap gap-x-4 gap-y-1 text-[11px] text-muted-foreground">
