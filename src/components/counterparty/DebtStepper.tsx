@@ -48,7 +48,7 @@ export function DebtStepper({
         </div>
       )}
 
-      <div className="rounded-xl border border-border bg-white p-5">
+      <div className={`rounded-xl border bg-white p-5 transition-all duration-700 ${containerFlash}`}>
         <div className="space-y-5">
           {stages.map((stage) => {
             const stageSteps = steps.filter((s) => s.stage === stage);
