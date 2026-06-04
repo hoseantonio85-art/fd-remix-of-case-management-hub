@@ -65,6 +65,8 @@ export function CounterpartyModal({
   const [stepAnim, setStepAnim] = useState<
     { direction: "forward" | "backward"; tick: number } | null
   >(null);
+  const [completedFields, setCompletedFields] = useState<CompletedFields>({});
+  const [history, setHistory] = useState<DebtHistoryEntry[]>([]);
 
   useEffect(() => {
     if (counterparty && open) {
@@ -74,6 +76,20 @@ export function CounterpartyModal({
       setStepperError(null);
       setNotification(null);
       setStepAnim(null);
+      setCompletedFields({});
+      const curStep = counterparty.collection.find((s) => s.status === "current");
+      setHistory(
+        curStep
+          ? [
+              {
+                date: curStep.startDate ?? "—",
+                action: "Создан кейс",
+                step: curStep.title,
+                user: "NORM AI",
+              },
+            ]
+          : [],
+      );
     }
   }, [counterparty, open]);
 
