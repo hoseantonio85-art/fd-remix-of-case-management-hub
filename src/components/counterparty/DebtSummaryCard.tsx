@@ -57,12 +57,8 @@ export function DebtSummaryCard({
           const isLast = i === items.length - 1;
           const animateThis = isCurrent && animating;
           const dotCls = isCurrent
-            ? overdue
-              ? "border-amber-500 text-amber-700 bg-white"
-              : "border-rose-400 text-rose-600 bg-white"
-            : isPrev
-              ? "border-emerald-300 bg-emerald-50 text-emerald-700"
-              : "border-border bg-white text-muted-foreground";
+            ? "border-emerald-500 bg-emerald-50 text-emerald-700"
+            : "border-border bg-white text-muted-foreground";
           return (
             <div key={it.step.id} className="relative flex gap-3">
               <div className="flex flex-col items-center">
