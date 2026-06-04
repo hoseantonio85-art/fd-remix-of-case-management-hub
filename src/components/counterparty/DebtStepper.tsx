@@ -12,10 +12,12 @@ export function DebtStepper({
   steps,
   onAdvance,
   error,
+  highlightStepId,
 }: {
   steps: CollectionSubStep[];
   onAdvance?: () => void;
   error?: string | null;
+  highlightStepId?: string | null;
 }) {
   const current = steps.find((s) => s.status === "current");
   return (
