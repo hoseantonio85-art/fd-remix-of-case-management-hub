@@ -15,18 +15,10 @@ import {
   Gauge,
   GraduationCap,
   Headphones,
-  TrendingDown,
-  Scale,
-  UsersRound,
-  ShieldAlert,
-  Ban,
-  AlertTriangle,
-  FileX,
-  LayoutGrid,
-  type LucideIcon,
 } from "lucide-react";
 import { counterparties, type Counterparty, type RiskType } from "@/lib/mock-data";
 import { CounterpartyModal } from "@/components/counterparty/CounterpartyModal";
+import { riskMeta, allChipMeta, riskOrder } from "@/components/counterparty/risk-meta";
 
 type CategoryKey = "risk" | "overdue_risk" | "no_risk" | "overdue";
 
