@@ -1,13 +1,15 @@
-import { AlertTriangle, Info, Sparkles } from "lucide-react";
+import { AlertTriangle, Info } from "lucide-react";
 import type { CollectionSubStep } from "@/lib/mock-data";
+
+export type StepAnim = { direction: "forward" | "backward"; tick: number } | null;
 
 export function DebtSummaryCard({
   steps,
-  highlightStepId,
+  stepAnim,
   onOpenDetails,
 }: {
   steps: CollectionSubStep[];
-  highlightStepId?: string | null;
+  stepAnim?: StepAnim;
   onOpenDetails: () => void;
 }) {
   const currentIdx = steps.findIndex((s) => s.status === "current");
@@ -21,50 +23,41 @@ export function DebtSummaryCard({
     steps.slice(0, 3).forEach((s) => items.push({ step: s, kind: "next" }));
   }
 
-  const currentStep = currentIdx !== -1 ? steps[currentIdx] : null;
-  const highlighted = !!(highlightStepId && currentStep && currentStep.id === highlightStepId);
+  const animating = !!stepAnim;
+  const isForward = stepAnim?.direction === "forward";
+  const flashClass = animating
+    ? isForward
+      ? "border-emerald-300 bg-emerald-50/40 shadow-[0_0_0_4px_rgba(16,185,129,0.08)]"
+      : "border-slate-300 bg-slate-50/60 shadow-[0_0_0_4px_rgba(100,116,139,0.08)]"
+    : "border-border bg-white";
 
   return (
     <div
-      className={`rounded-2xl border bg-white p-5 transition-colors ${
-        highlighted ? "border-emerald-300 ring-1 ring-emerald-100" : "border-border"
-      }`}
+      className={`rounded-2xl border p-5 transition-all duration-700 ${flashClass}`}
     >
-      <div className="mb-1 flex items-center gap-1.5">
+      <div className="mb-4 flex items-center gap-1.5">
         <h3 className="text-sm font-semibold">Работа с задолженностью</h3>
         <Info className="h-3.5 w-3.5 text-muted-foreground" />
-        {highlighted && (
-          <span className="ml-auto inline-flex items-center gap-1 rounded-full border border-emerald-200 bg-emerald-50 px-2 py-0.5 text-[10px] font-medium text-emerald-700">
-            <Sparkles className="h-3 w-3" /> Новый этап
-          </span>
-        )}
       </div>
-      {highlighted && (
-        <div className="mb-3 text-[11px] text-emerald-700">
-          Обновлено после подтверждения риска
-        </div>
-      )}
-      {!highlighted && <div className="mb-3" />}
 
       <div className="space-y-0">
         {items.map((it, i) => {
           const isCurrent = it.kind === "current";
           const overdue = isCurrent && it.step.overdue;
           const isLast = i === items.length - 1;
-          const isHighlightedItem = isCurrent && highlighted;
+          const animateThis = isCurrent && animating;
           return (
             <div key={it.step.id} className="relative flex gap-3">
               <div className="flex flex-col items-center">
                 <div
-                  className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-full border-2 text-[11px] font-semibold ${
+                  key={`dot-${stepAnim?.tick ?? "static"}-${i}`}
+                  className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-full border-2 text-[11px] font-semibold transition-transform duration-500 ${
                     isCurrent
-                      ? isHighlightedItem
-                        ? "border-emerald-500 bg-emerald-50 text-emerald-700"
-                        : overdue
-                          ? "border-amber-500 text-amber-700"
-                          : "border-rose-400 text-rose-600"
+                      ? overdue
+                        ? "border-amber-500 text-amber-700"
+                        : "border-rose-400 text-rose-600"
                       : "border-border text-muted-foreground"
-                  }`}
+                  } ${animateThis ? "scale-110" : "scale-100"}`}
                 >
                   {i + 1}
                 </div>
@@ -72,9 +65,10 @@ export function DebtSummaryCard({
               </div>
               <div className={`flex-1 ${isLast ? "" : "pb-4"}`}>
                 <div
+                  key={`title-${it.step.id}-${isCurrent ? stepAnim?.tick ?? "static" : "static"}`}
                   className={`text-sm leading-tight ${
                     isCurrent ? "font-semibold text-foreground" : "text-muted-foreground"
-                  }`}
+                  } ${animateThis ? "animate-fade-in" : ""}`}
                 >
                   {it.step.title}
                 </div>

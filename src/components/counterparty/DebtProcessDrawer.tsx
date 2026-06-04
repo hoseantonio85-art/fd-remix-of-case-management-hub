@@ -3,17 +3,18 @@ import { ArrowRight } from "lucide-react";
 import type { CollectionSubStep } from "@/lib/mock-data";
 import { DebtStepper } from "./DebtStepper";
 import { InModalDrawer } from "./InModalDrawer";
+import type { StepAnim } from "./DebtSummaryCard";
 
 export function DebtProcessDrawer({
   steps,
-  highlightStepId,
+  stepAnim,
   open,
   onOpenChange,
   onAdvance,
   error,
 }: {
   steps: CollectionSubStep[];
-  highlightStepId?: string | null;
+  stepAnim?: StepAnim;
   open: boolean;
   onOpenChange: (o: boolean) => void;
   onAdvance: () => void;
@@ -28,7 +29,7 @@ export function DebtProcessDrawer({
         </p>
       </div>
       <div className="px-6 pb-6 pt-2 space-y-4">
-        <DebtStepper steps={steps} highlightStepId={highlightStepId} error={error} />
+        <DebtStepper steps={steps} stepAnim={stepAnim} error={error} />
         <Button className="w-full" variant="secondary" onClick={onAdvance}>
           <ArrowRight className="mr-2 h-4 w-4" /> Перевести на следующий этап
         </Button>

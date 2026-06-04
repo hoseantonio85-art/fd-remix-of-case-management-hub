@@ -13,7 +13,7 @@ import {
   CheckCircle2,
   Info as InfoIcon,
 } from "lucide-react";
-import { pickFurthestStepTitle } from "./collection-mapping";
+
 
 import type {
   Counterparty,
@@ -57,7 +57,9 @@ export function CounterpartyModal({
   const [notification, setNotification] = useState<
     { tone: "success" | "info"; text: string } | null
   >(null);
-  const [updatedStepId, setUpdatedStepId] = useState<string | null>(null);
+  const [stepAnim, setStepAnim] = useState<
+    { direction: "forward" | "backward"; tick: number } | null
+  >(null);
 
   useEffect(() => {
     if (counterparty && open) {
@@ -66,9 +68,16 @@ export function CounterpartyModal({
       setSteps(counterparty.collection.map((s) => ({ ...s })));
       setStepperError(null);
       setNotification(null);
-      setUpdatedStepId(null);
+      setStepAnim(null);
     }
   }, [counterparty, open]);
+
+  // Auto-clear the highlight after the animation window.
+  useEffect(() => {
+    if (!stepAnim) return;
+    const t = setTimeout(() => setStepAnim(null), 1400);
+    return () => clearTimeout(t);
+  }, [stepAnim]);
 
   const pending = useMemo(() => risks.filter((r) => r.status === "pending"), [risks]);
   const verification = useMemo(() => risks.filter((r) => r.status === "verification"), [risks]);
@@ -107,7 +116,33 @@ export function CounterpartyModal({
     setDrawerOpen(true);
   };
 
+  const moveCurrentStep = (delta: 1 | -1) => {
+    setSteps((prev) => {
+      const curIdx = prev.findIndex((s) => s.status === "current");
+      if (curIdx === -1) return prev;
+      const targetIdx = Math.max(0, Math.min(prev.length - 1, curIdx + delta));
+      if (targetIdx === curIdx) return prev;
+      return prev.map((s, i) => {
+        if (i < targetIdx) return { ...s, status: "done" as const, overdue: false };
+        if (i === targetIdx)
+          return {
+            ...s,
+            status: "current" as const,
+            startDate: new Date().toLocaleDateString("ru-RU"),
+            sla: s.sla ?? "7 дней",
+            plannedDate:
+              s.plannedDate ?? new Date(Date.now() + 7 * 86400000).toLocaleDateString("ru-RU"),
+            overdue: false,
+            nextAction: s.nextAction ?? "Запланировать следующее действие",
+          };
+        return { ...s, status: "upcoming" as const };
+      });
+    });
+  };
+
   const handleSave = (riskId: string, payload: RiskSavePayload) => {
+    const prevStatus = risks.find((r) => r.id === riskId)?.status;
+
     setRisks((prev) =>
       prev.map((r) => {
         if (r.id !== riskId) return r;
@@ -147,56 +182,67 @@ export function CounterpartyModal({
       }),
     );
 
-    if (payload.kind === "dismiss") {
-      setNotification({
-        tone: "info",
-        text: "Риск снят. Этап работы с задолженностью не изменился.",
-      });
-      return;
-    }
     if (payload.kind === "verify") {
       setNotification({
         tone: "info",
-        text: "Сигнал отправлен на дополнительную проверку. Этап взыскания не изменился.",
+        text: "Сигнал отправлен на проверку. Этап работы с задолженностью не изменился.",
       });
       return;
     }
 
-    // confirm: try to advance collection process
-    setSteps((prev) => {
-      const titles = prev.map((s) => s.title);
-      const target = pickFurthestStepTitle(payload.measures, titles);
-      const currentIdx = prev.findIndex((s) => s.status === "current");
-      const targetIdx = target ? titles.indexOf(target) : -1;
-      if (target == null || targetIdx === -1 || targetIdx <= currentIdx) {
+    if (payload.kind === "dismiss") {
+      if (prevStatus === "confirmed") {
+        moveCurrentStep(-1);
+        setStepAnim({ direction: "backward", tick: Date.now() });
+        setTimeout(() => {
+          setSteps((cur) => {
+            const c = cur.find((s) => s.status === "current");
+            setNotification({
+              tone: "info",
+              text: c
+                ? `Риск снят. Этап работы с задолженностью возвращен: ${c.title}`
+                : "Риск снят.",
+            });
+            return cur;
+          });
+        }, 0);
+      } else {
+        setNotification({
+          tone: "info",
+          text: "Риск снят. Этап работы с задолженностью не изменился.",
+        });
+      }
+      return;
+    }
+
+    // confirm
+    if (prevStatus === "confirmed") {
+      setSteps((cur) => {
+        const c = cur.find((s) => s.status === "current");
         setNotification({
           tone: "success",
-          text: "Риск подтвержден. Этап работы с задолженностью не изменился.",
+          text: c
+            ? `Решение по риску обновлено. Текущий этап: ${c.title}`
+            : "Решение по риску обновлено.",
         });
-        return prev;
-      }
-      const next = prev.map((s, i) => {
-        if (i < targetIdx) return { ...s, status: "done" as const, overdue: false };
-        if (i === targetIdx)
-          return {
-            ...s,
-            status: "current" as const,
-            startDate: new Date().toLocaleDateString("ru-RU"),
-            sla: s.sla ?? "7 дней",
-            plannedDate:
-              s.plannedDate ?? new Date(Date.now() + 7 * 86400000).toLocaleDateString("ru-RU"),
-            overdue: false,
-            nextAction: s.nextAction ?? "Запланировать следующее действие",
-          };
-        return { ...s, status: "upcoming" as const };
+        return cur;
       });
-      setUpdatedStepId(next[targetIdx].id);
-      setNotification({
-        tone: "success",
-        text: `Риск подтвержден. Новый этап работы с задолженностью: ${target}`,
+      return;
+    }
+    moveCurrentStep(1);
+    setStepAnim({ direction: "forward", tick: Date.now() });
+    setTimeout(() => {
+      setSteps((cur) => {
+        const c = cur.find((s) => s.status === "current");
+        setNotification({
+          tone: "success",
+          text: c
+            ? `Риск подтвержден. Этап работы с задолженностью изменен: ${c.title}`
+            : "Риск подтвержден.",
+        });
+        return cur;
       });
-      return next;
-    });
+    }, 0);
   };
 
   const advanceStage = () => {
@@ -526,7 +572,7 @@ export function CounterpartyModal({
             <aside className="space-y-4 lg:sticky lg:top-4 lg:self-start lg:mt-[40px]">
               <DebtSummaryCard
                 steps={steps}
-                highlightStepId={updatedStepId}
+                stepAnim={stepAnim}
                 onOpenDetails={() => setDebtDrawerOpen(true)}
               />
             </aside>
@@ -537,7 +583,7 @@ export function CounterpartyModal({
         {/* In-modal drawers */}
         <DebtProcessDrawer
           steps={steps}
-          highlightStepId={updatedStepId}
+          stepAnim={stepAnim}
           open={debtDrawerOpen}
           onOpenChange={setDebtDrawerOpen}
           onAdvance={advanceStage}

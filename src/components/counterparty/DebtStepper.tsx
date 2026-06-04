@@ -1,5 +1,6 @@
 import { Check, AlertTriangle } from "lucide-react";
 import type { CollectionSubStep } from "@/lib/mock-data";
+import type { StepAnim } from "./DebtSummaryCard";
 
 const stages = [
   "Досудебное урегулирование",
@@ -12,14 +13,21 @@ export function DebtStepper({
   steps,
   onAdvance,
   error,
-  highlightStepId,
+  stepAnim,
 }: {
   steps: CollectionSubStep[];
   onAdvance?: () => void;
   error?: string | null;
-  highlightStepId?: string | null;
+  stepAnim?: StepAnim;
 }) {
   const current = steps.find((s) => s.status === "current");
+  const animating = !!stepAnim;
+  const isForward = stepAnim?.direction === "forward";
+  const containerFlash = animating
+    ? isForward
+      ? "border-emerald-300 shadow-[0_0_0_4px_rgba(16,185,129,0.08)]"
+      : "border-slate-300 shadow-[0_0_0_4px_rgba(100,116,139,0.08)]"
+    : "border-border";
   return (
     <section>
       <div className="mb-3 flex items-center justify-between gap-2">
@@ -40,7 +48,7 @@ export function DebtStepper({
         </div>
       )}
 
-      <div className="rounded-xl border border-border bg-white p-5">
+      <div className={`rounded-xl border bg-white p-5 transition-all duration-700 ${containerFlash}`}>
         <div className="space-y-5">
           {stages.map((stage) => {
             const stageSteps = steps.filter((s) => s.stage === stage);
@@ -63,18 +71,22 @@ export function DebtStepper({
                   </div>
                 </div>
                 <div className="ml-1 space-y-1.5 border-l border-border pl-5">
-                  {stageSteps.map((s) => (
+                  {stageSteps.map((s) => {
+                    const isCurrent = s.status === "current";
+                    const animateThis = isCurrent && animating;
+                    return (
                     <div key={s.id} className="relative">
                       <div className="absolute -left-[26px] top-1.5">
                         {s.status === "done" ? (
                           <div className="flex h-4 w-4 items-center justify-center rounded-full bg-primary text-primary-foreground">
                             <Check className="h-2.5 w-2.5" />
                           </div>
-                        ) : s.status === "current" ? (
+                        ) : isCurrent ? (
                           <div
-                            className={`h-4 w-4 rounded-full border-2 ${
+                            key={`cur-${stepAnim?.tick ?? "static"}-${s.id}`}
+                            className={`h-4 w-4 rounded-full border-2 transition-transform duration-500 ${
                               s.overdue ? "border-amber-500 bg-amber-100" : "border-primary bg-primary/20"
-                            }`}
+                            } ${animateThis ? "scale-125" : "scale-100"}`}
                           />
                         ) : (
                           <div className="h-4 w-4 rounded-full border-2 border-border bg-white" />
@@ -82,30 +94,24 @@ export function DebtStepper({
                       </div>
                       <div
                         className={`rounded-md px-2.5 py-1.5 ${
-                          s.status === "current"
+                          isCurrent
                             ? s.overdue
                               ? "border border-amber-300 bg-amber-50/50"
                               : "border border-primary/20 bg-primary/5"
                             : ""
                         }`}
                       >
-                        <div className="flex flex-wrap items-center gap-2">
-                          <div
-                            className={`text-sm ${
-                              s.status === "upcoming"
-                                ? "text-muted-foreground"
-                                : "font-medium text-foreground"
-                            }`}
-                          >
-                            {s.title}
-                          </div>
-                          {highlightStepId === s.id && s.status === "current" && (
-                            <span className="inline-flex items-center rounded-full border border-emerald-200 bg-emerald-50 px-2 py-0.5 text-[10px] font-medium text-emerald-700">
-                              Обновлено после решения по риску
-                            </span>
-                          )}
+                        <div
+                          key={`t-${s.id}-${isCurrent ? stepAnim?.tick ?? "static" : "static"}`}
+                          className={`text-sm ${
+                            s.status === "upcoming"
+                              ? "text-muted-foreground"
+                              : "font-medium text-foreground"
+                          } ${animateThis ? "animate-fade-in" : ""}`}
+                        >
+                          {s.title}
                         </div>
-                        {s.status === "current" && (
+                        {isCurrent && (
                           <div className="mt-1.5 flex flex-wrap gap-x-4 gap-y-1 text-[11px] text-muted-foreground">
                             {s.startDate && <span>Старт: <b className="text-foreground">{s.startDate}</b></span>}
                             {s.sla && <span>SLA: <b className="text-foreground">{s.sla}</b></span>}
@@ -123,7 +129,8 @@ export function DebtStepper({
                         )}
                       </div>
                     </div>
-                  ))}
+                    );
+                  })}
                 </div>
               </div>
             );
