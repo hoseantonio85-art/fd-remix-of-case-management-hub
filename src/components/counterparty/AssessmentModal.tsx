@@ -331,7 +331,7 @@ export function AssessmentModal({
               {/* Groups — left, row 2 */}
               <section className="order-3 lg:col-start-1 lg:row-start-2">
                 <h3 className="mb-2 text-sm font-semibold">Группы оценки</h3>
-                <div className="grid grid-cols-1 gap-2.5 sm:grid-cols-2">
+                <div className="grid grid-cols-1 gap-2.5">
                   {assessment.groups.map((g) => {
                     const counts = groupCounts(g);
                     const t = toneStyles[g.tone];
