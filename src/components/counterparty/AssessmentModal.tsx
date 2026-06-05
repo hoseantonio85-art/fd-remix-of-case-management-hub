@@ -1,9 +1,10 @@
 import { useEffect, useRef, useState } from "react";
+import * as DialogPrimitive from "@radix-ui/react-dialog";
 import { X, Sparkles, CheckCircle2, AlertTriangle, Download, ChevronRight, Info, RefreshCw, Loader2 } from "lucide-react";
-import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
+import { cn } from "@/lib/utils";
 import {
   type Assessment,
   type AssessmentGroup,
@@ -14,11 +15,30 @@ import { AssessmentGroupDrawer } from "./AssessmentGroupDrawer";
 
 export type AssessmentStatus = "pending" | "confirmed" | "disagreed" | "updated";
 
-const statusMeta: Record<AssessmentStatus, { label: string; cls: string }> = {
-  pending: { label: "Требует подтверждения", cls: "bg-amber-100 text-amber-900" },
-  confirmed: { label: "Подтверждена", cls: "bg-emerald-100 text-emerald-800" },
-  disagreed: { label: "Не согласовано", cls: "bg-slate-200 text-slate-800" },
-  updated: { label: "Обновлена", cls: "bg-primary/10 text-primary" },
+const statusMeta: Record<
+  AssessmentStatus,
+  { label: string; chip: string; headerBg: string }
+> = {
+  pending: {
+    label: "Требует подтверждения",
+    chip: "bg-amber-100 text-amber-900",
+    headerBg: "bg-gradient-to-b from-amber-50 to-white",
+  },
+  confirmed: {
+    label: "Подтверждена",
+    chip: "bg-emerald-100 text-emerald-800",
+    headerBg: "bg-gradient-to-b from-emerald-50 to-white",
+  },
+  disagreed: {
+    label: "Не согласовано",
+    chip: "bg-orange-100 text-orange-900",
+    headerBg: "bg-gradient-to-b from-orange-50 to-white",
+  },
+  updated: {
+    label: "Обновлена",
+    chip: "bg-sky-100 text-sky-900",
+    headerBg: "bg-gradient-to-b from-sky-50 to-white",
+  },
 };
 
 const REASONS = [
