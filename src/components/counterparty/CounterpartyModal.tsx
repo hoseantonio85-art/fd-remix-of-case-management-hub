@@ -34,7 +34,7 @@ import { stepMetaByTitle } from "@/lib/debt-process";
 import { getToneForTag, toneStyles } from "./header-theme";
 import { riskMeta } from "./risk-meta";
 import { AssistantSummaryCard } from "./AssistantSummaryCard";
-import { AssessmentModal } from "./AssessmentModal";
+import { AssessmentModal, type AssessmentStatus, type Disagreement } from "./AssessmentModal";
 import { buildAssessment, type Assessment } from "@/lib/assessment-data";
 
 const priorityBadge: Record<string, { label: string; cls: string }> = {
