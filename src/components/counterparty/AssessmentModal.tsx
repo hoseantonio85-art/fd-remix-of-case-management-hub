@@ -453,8 +453,9 @@ export function AssessmentModal({
             onOpenChange={(o) => !o && setGroupDrawer(null)}
           />
         </div>
-      </DialogContent>
-    </Dialog>
+        </DialogPrimitive.Content>
+      </DialogPrimitive.Portal>
+    </DialogPrimitive.Root>
   );
 }
 
