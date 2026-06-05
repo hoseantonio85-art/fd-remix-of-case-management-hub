@@ -1,4 +1,4 @@
-import { Sparkles, ChevronRight, RefreshCw, Loader2, CheckCircle2, AlertTriangle, RotateCw } from "lucide-react";
+import { Sparkles, ChevronRight, CheckCircle2, AlertTriangle, RotateCw } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import type { AssessmentStatus, Disagreement } from "./AssessmentModal";
 
