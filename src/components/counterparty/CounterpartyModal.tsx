@@ -805,6 +805,18 @@ export function CounterpartyModal({
         onOpenChange={setAssessmentOpen}
         status={assessmentStatus}
         disagreement={assessmentDisagreement}
+        defaultInn={counterparty.inn}
+        running={assessmentRunning}
+        onRun={(inn) => {
+          setAssessmentRunning(true);
+          setTimeout(() => {
+            setAssessment(buildAssessment(counterparty.name, inn, "manual"));
+            setAssessmentStatus("updated");
+            setAssessmentConfirmedAt(undefined);
+            setAssessmentDisagreement(null);
+            setAssessmentRunning(false);
+          }, 1200);
+        }}
         onConfirm={() => {
           setAssessmentStatus("confirmed");
           setAssessmentConfirmedAt(new Date().toLocaleDateString("ru-RU"));
