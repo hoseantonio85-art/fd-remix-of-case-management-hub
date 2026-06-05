@@ -307,13 +307,9 @@ export function AssessmentModal({
                             <span className={`mt-1.5 h-2 w-2 shrink-0 rounded-full ${toneStyles[c.tone].dot}`} />
                             <div className="min-w-0 flex-1">
                               <div className="text-xs leading-snug text-foreground">{c.text}</div>
-                              {(c.date || c.label) && (
-                                <div className="mt-0.5 text-[10px] text-muted-foreground">
-                                  {c.date}
-                                  {c.date && c.label && " · "}
-                                  {c.label}
-                                </div>
-                              )}
+                              <div className="mt-0.5 text-[10px] text-muted-foreground">
+                                {toneLabel[c.tone]}
+                              </div>
                             </div>
                           </li>
                         ))}
