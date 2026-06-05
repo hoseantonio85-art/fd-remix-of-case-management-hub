@@ -510,14 +510,25 @@ export function CounterpartyModal({
                   setAssessment(
                     buildAssessment(counterparty.name, counterparty.inn, "manual"),
                   );
-                  setAssessmentUpdatedLabel("Оценка обновлена только что");
+                  setAssessmentStatus("updated");
+                  setAssessmentConfirmedAt(undefined);
+                  setAssessmentDisagreement(null);
                   setAssessmentRunning(false);
                   setAssessmentOpen(true);
                 }, 1200);
               }}
               running={assessmentRunning}
-              lastUpdatedLabel={assessmentUpdatedLabel}
+              status={assessmentStatus}
+              confirmedAt={assessmentConfirmedAt}
+              confirmedBy={ASSESSMENT_USER}
+              disagreement={assessmentDisagreement}
+              sourceLabel={
+                assessment?.source === "manual"
+                  ? "Запущено пользователем"
+                  : "Автоматический мониторинг"
+              }
             />
+
           </div>
 
           <div className="grid grid-cols-1 gap-6 bg-white px-6 py-6 lg:grid-cols-[minmax(0,1fr)_320px]">
