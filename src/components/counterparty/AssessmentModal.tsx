@@ -262,95 +262,118 @@ export function AssessmentModal({
               </div>
             )}
 
-            {/* Assistant summary */}
-            <div className="rounded-2xl border border-border bg-white p-4">
-              <div className="flex items-start gap-3">
-                <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary">
-                  <Sparkles className="h-4 w-4" />
-                </div>
-                <div className="min-w-0 flex-1">
-                  <div className="text-[11px] font-medium uppercase tracking-wide text-muted-foreground">
-                    NORM AI · Резюме оценки
-                  </div>
-                  <p className="mt-1 text-sm leading-snug text-foreground">{assessment.summary}</p>
-                  <p className="mt-2 text-[11px] text-muted-foreground">
-                    Выявленные критерии могут быть использованы как основание для сигналов риска.
-                  </p>
-                </div>
-              </div>
-            </div>
-
-            {/* What changed */}
-            <section>
-              <h3 className="mb-2 text-sm font-semibold">Что изменилось за последний период</h3>
-              <div className="rounded-xl border border-border bg-white">
-                {assessment.changes.length === 0 ? (
-                  <div className="p-4 text-sm text-muted-foreground">
-                    За последний период новых факторов не обнаружено
-                  </div>
-                ) : (
-                  <ul className="divide-y divide-border">
-                    {assessment.changes.map((c, i) => (
-                      <li key={i} className="flex items-center gap-2.5 px-4 py-2.5 text-sm">
-                        <span className={`h-2 w-2 shrink-0 rounded-full ${toneStyles[c.tone].dot}`} />
-                        <span className="text-foreground">{c.text}</span>
-                      </li>
-                    ))}
-                  </ul>
-                )}
-              </div>
-            </section>
-
-            {/* Groups */}
-            <section>
-              <h3 className="mb-2 text-sm font-semibold">Группы оценки</h3>
-              <div className="grid grid-cols-1 gap-2.5 sm:grid-cols-2">
-                {assessment.groups.map((g) => {
-                  const counts = groupCounts(g);
-                  const t = toneStyles[g.tone];
-                  const isPositive = g.id === "positive";
-                  const groupStatus =
-                    counts.detected > 0 && !isPositive
-                      ? "Требует внимания"
-                      : isPositive && counts.detected > 0
-                        ? "Подтверждено частично"
-                        : "Без замечаний";
-                  return (
-                    <button
-                      key={g.id}
-                      onClick={() => setGroupDrawer(g)}
-                      className={`group flex items-start gap-3 rounded-xl border border-border border-l-4 ${t.border} bg-white p-3.5 text-left transition hover:bg-muted/30`}
-                    >
-                      <div className="min-w-0 flex-1">
-                        <div className="text-sm font-medium text-foreground">{g.title}</div>
-                        <div className="mt-0.5 line-clamp-2 text-[11px] text-muted-foreground">
-                          {g.description}
-                        </div>
-                        <div className="mt-2 text-[11px] text-muted-foreground">
-                          {g.total} {pluralCriteria(g.total)}
-                          {" · "}
-                          <span className={counts.detected > 0 ? t.iconText : ""}>
-                            {isPositive
-                              ? `${counts.detected} подтверждено`
-                              : `${counts.detected} выявлено`}
-                          </span>
-                          {" · "}
-                          {isPositive
-                            ? `${counts.review + counts.clear} не подтверждено`
-                            : `${counts.clear} без замечаний`}
-                        </div>
-                        <div className="mt-2">
-                          <span className={`inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-medium ${t.chip}`}>
-                            {groupStatus}
-                          </span>
-                        </div>
+            <div className="grid gap-5 lg:grid-cols-[minmax(0,1fr)_320px]">
+              {/* Assistant summary — left, row 1 */}
+              <div className="order-1 lg:col-start-1 lg:row-start-1">
+                <div className="rounded-2xl border border-border bg-white p-4">
+                  <div className="flex items-start gap-3">
+                    <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary">
+                      <Sparkles className="h-4 w-4" />
+                    </div>
+                    <div className="min-w-0 flex-1">
+                      <div className="text-[11px] font-medium uppercase tracking-wide text-muted-foreground">
+                        NORM AI · Резюме оценки
                       </div>
-                      <ChevronRight className="mt-1 h-4 w-4 shrink-0 text-muted-foreground transition group-hover:text-foreground" />
-                    </button>
-                  );
-                })}
+                      <p className="mt-1 text-sm leading-snug text-foreground">{assessment.summary}</p>
+                      <p className="mt-2 text-[11px] text-muted-foreground">
+                        Выявленные критерии могут быть использованы как основание для сигналов риска.
+                      </p>
+                    </div>
+                  </div>
+                </div>
               </div>
-            </section>
+
+              {/* What changed — right, spans both rows */}
+              <aside className="order-2 lg:col-start-2 lg:row-span-2 lg:row-start-1">
+                <div className="rounded-2xl border border-border bg-white p-4 lg:sticky lg:top-0">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <div className="text-sm font-semibold text-foreground">Что изменилось</div>
+                      <div className="text-[11px] text-muted-foreground">За последний период</div>
+                    </div>
+                    <span className="inline-flex h-6 min-w-6 items-center justify-center rounded-full bg-muted px-1.5 text-[11px] font-medium text-muted-foreground">
+                      {assessment.changes.length}
+                    </span>
+                  </div>
+                  <div className="mt-3">
+                    {assessment.changes.length === 0 ? (
+                      <div className="rounded-lg border border-dashed border-border px-3 py-4 text-center text-xs text-muted-foreground">
+                        За последний период новых факторов не обнаружено
+                      </div>
+                    ) : (
+                      <ul className="divide-y divide-border">
+                        {assessment.changes.map((c, i) => (
+                          <li key={i} className="flex items-start gap-2.5 py-2.5 first:pt-0 last:pb-0">
+                            <span className={`mt-1.5 h-2 w-2 shrink-0 rounded-full ${toneStyles[c.tone].dot}`} />
+                            <div className="min-w-0 flex-1">
+                              <div className="text-xs leading-snug text-foreground">{c.text}</div>
+                              {(c.date || c.label) && (
+                                <div className="mt-0.5 text-[10px] text-muted-foreground">
+                                  {c.date}
+                                  {c.date && c.label && " · "}
+                                  {c.label}
+                                </div>
+                              )}
+                            </div>
+                          </li>
+                        ))}
+                      </ul>
+                    )}
+                  </div>
+                </div>
+              </aside>
+
+              {/* Groups — left, row 2 */}
+              <section className="order-3 lg:col-start-1 lg:row-start-2">
+                <h3 className="mb-2 text-sm font-semibold">Группы оценки</h3>
+                <div className="grid grid-cols-1 gap-2.5 sm:grid-cols-2">
+                  {assessment.groups.map((g) => {
+                    const counts = groupCounts(g);
+                    const t = toneStyles[g.tone];
+                    const isPositive = g.id === "positive";
+                    const groupStatus =
+                      counts.detected > 0 && !isPositive
+                        ? "Требует внимания"
+                        : isPositive && counts.detected > 0
+                          ? "Подтверждено частично"
+                          : "Без замечаний";
+                    return (
+                      <button
+                        key={g.id}
+                        onClick={() => setGroupDrawer(g)}
+                        className={`group flex items-start gap-3 rounded-xl border border-border border-l-4 ${t.border} bg-white p-3.5 text-left transition hover:bg-muted/30`}
+                      >
+                        <div className="min-w-0 flex-1">
+                          <div className="text-sm font-medium text-foreground">{g.title}</div>
+                          <div className="mt-0.5 line-clamp-2 text-[11px] text-muted-foreground">
+                            {g.description}
+                          </div>
+                          <div className="mt-2 text-[11px] text-muted-foreground">
+                            {g.total} {pluralCriteria(g.total)}
+                            {" · "}
+                            <span className={counts.detected > 0 ? t.iconText : ""}>
+                              {isPositive
+                                ? `${counts.detected} подтверждено`
+                                : `${counts.detected} выявлено`}
+                            </span>
+                            {" · "}
+                            {isPositive
+                              ? `${counts.review + counts.clear} не подтверждено`
+                              : `${counts.clear} без замечаний`}
+                          </div>
+                          <div className="mt-2">
+                            <span className={`inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-medium ${t.chip}`}>
+                              {groupStatus}
+                            </span>
+                          </div>
+                        </div>
+                        <ChevronRight className="mt-1 h-4 w-4 shrink-0 text-muted-foreground transition group-hover:text-foreground" />
+                      </button>
+                    );
+                  })}
+                </div>
+              </section>
+            </div>
 
             {savedDisagreement && (
               <section className="rounded-xl border border-border bg-slate-50/60 p-3.5">
