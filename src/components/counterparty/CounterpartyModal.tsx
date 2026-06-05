@@ -88,7 +88,9 @@ export function CounterpartyModal({
       setStepAnim(null);
       setCompletedFields({});
       setAssessment(buildAssessment(counterparty.name, counterparty.inn, "auto"));
-      setAssessmentUpdatedLabel(undefined);
+      setAssessmentStatus("pending");
+      setAssessmentConfirmedAt(undefined);
+      setAssessmentDisagreement(null);
       setAssessmentOpen(false);
       setAssessmentRunning(false);
       const curStep = counterparty.collection.find((s) => s.status === "current");
