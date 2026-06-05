@@ -27,21 +27,29 @@ const REASONS = [
   "Другое",
 ];
 
+export type Disagreement = { reason: string; text: string };
+
 export function AssessmentModal({
   assessment,
   open,
   onOpenChange,
+  status,
+  disagreement,
+  onConfirm,
+  onDisagree,
 }: {
   assessment: Assessment | null;
   open: boolean;
   onOpenChange: (o: boolean) => void;
+  status: AssessmentStatus;
+  disagreement: Disagreement | null;
+  onConfirm: () => void;
+  onDisagree: (d: Disagreement) => void;
 }) {
-  const [status, setStatus] = useState<AssessmentStatus>("pending");
   const [notice, setNotice] = useState<{ tone: "success" | "info"; text: string } | null>(null);
   const [disagreeOpen, setDisagreeOpen] = useState(false);
   const [disagreeText, setDisagreeText] = useState("");
   const [disagreeReason, setDisagreeReason] = useState(REASONS[0]);
-  const [savedDisagreement, setSavedDisagreement] = useState<{ reason: string; text: string } | null>(null);
   const [groupDrawer, setGroupDrawer] = useState<AssessmentGroup | null>(null);
 
   if (!assessment) return null;
@@ -49,9 +57,10 @@ export function AssessmentModal({
   const meta = statusMeta[status];
   const sourceLabel =
     assessment.source === "auto" ? "Автоматический мониторинг" : "Запущено пользователем";
+  const savedDisagreement = disagreement;
 
   const handleConfirm = () => {
-    setStatus("confirmed");
+    onConfirm();
     setNotice({
       tone: "success",
       text: "Оценка подтверждена. Результаты зафиксированы в карточке контрагента.",
@@ -60,15 +69,16 @@ export function AssessmentModal({
 
   const handleSaveDisagree = () => {
     if (!disagreeText.trim()) return;
-    setSavedDisagreement({ reason: disagreeReason, text: disagreeText.trim() });
-    setStatus("disagreed");
+    onDisagree({ reason: disagreeReason, text: disagreeText.trim() });
     setDisagreeOpen(false);
+    setDisagreeText("");
     setNotice({ tone: "info", text: "Комментарий сохранён" });
   };
 
   const handleDownload = () => {
     setNotice({ tone: "info", text: "Отчёт по оценке скачан" });
   };
+
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>

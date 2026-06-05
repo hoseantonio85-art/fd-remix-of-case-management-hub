@@ -34,7 +34,7 @@ import { stepMetaByTitle } from "@/lib/debt-process";
 import { getToneForTag, toneStyles } from "./header-theme";
 import { riskMeta } from "./risk-meta";
 import { AssistantSummaryCard } from "./AssistantSummaryCard";
-import { AssessmentModal } from "./AssessmentModal";
+import { AssessmentModal, type AssessmentStatus, type Disagreement } from "./AssessmentModal";
 import { buildAssessment, type Assessment } from "@/lib/assessment-data";
 
 const priorityBadge: Record<string, { label: string; cls: string }> = {
@@ -73,7 +73,10 @@ export function CounterpartyModal({
   const [assessmentOpen, setAssessmentOpen] = useState(false);
   const [assessment, setAssessment] = useState<Assessment | null>(null);
   const [assessmentRunning, setAssessmentRunning] = useState(false);
-  const [assessmentUpdatedLabel, setAssessmentUpdatedLabel] = useState<string | undefined>(undefined);
+  const [assessmentStatus, setAssessmentStatus] = useState<AssessmentStatus>("pending");
+  const [assessmentConfirmedAt, setAssessmentConfirmedAt] = useState<string | undefined>(undefined);
+  const [assessmentDisagreement, setAssessmentDisagreement] = useState<Disagreement | null>(null);
+  const ASSESSMENT_USER = "Михайлова Екатерина";
 
   useEffect(() => {
     if (counterparty && open) {
@@ -85,7 +88,9 @@ export function CounterpartyModal({
       setStepAnim(null);
       setCompletedFields({});
       setAssessment(buildAssessment(counterparty.name, counterparty.inn, "auto"));
-      setAssessmentUpdatedLabel(undefined);
+      setAssessmentStatus("pending");
+      setAssessmentConfirmedAt(undefined);
+      setAssessmentDisagreement(null);
       setAssessmentOpen(false);
       setAssessmentRunning(false);
       const curStep = counterparty.collection.find((s) => s.status === "current");
@@ -505,14 +510,25 @@ export function CounterpartyModal({
                   setAssessment(
                     buildAssessment(counterparty.name, counterparty.inn, "manual"),
                   );
-                  setAssessmentUpdatedLabel("Оценка обновлена только что");
+                  setAssessmentStatus("updated");
+                  setAssessmentConfirmedAt(undefined);
+                  setAssessmentDisagreement(null);
                   setAssessmentRunning(false);
                   setAssessmentOpen(true);
                 }, 1200);
               }}
               running={assessmentRunning}
-              lastUpdatedLabel={assessmentUpdatedLabel}
+              status={assessmentStatus}
+              confirmedAt={assessmentConfirmedAt}
+              confirmedBy={ASSESSMENT_USER}
+              disagreement={assessmentDisagreement}
+              sourceLabel={
+                assessment?.source === "manual"
+                  ? "Запущено пользователем"
+                  : "Автоматический мониторинг"
+              }
             />
+
           </div>
 
           <div className="grid grid-cols-1 gap-6 bg-white px-6 py-6 lg:grid-cols-[minmax(0,1fr)_320px]">
@@ -801,7 +817,19 @@ export function CounterpartyModal({
         assessment={assessment}
         open={assessmentOpen}
         onOpenChange={setAssessmentOpen}
+        status={assessmentStatus}
+        disagreement={assessmentDisagreement}
+        onConfirm={() => {
+          setAssessmentStatus("confirmed");
+          setAssessmentConfirmedAt(new Date().toLocaleDateString("ru-RU"));
+          setAssessmentDisagreement(null);
+        }}
+        onDisagree={(d) => {
+          setAssessmentDisagreement(d);
+          setAssessmentStatus("disagreed");
+        }}
       />
+
     </Dialog>
 
   );
