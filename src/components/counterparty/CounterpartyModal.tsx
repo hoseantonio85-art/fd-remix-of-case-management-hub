@@ -33,6 +33,9 @@ import {
 import { stepMetaByTitle } from "@/lib/debt-process";
 import { getToneForTag, toneStyles } from "./header-theme";
 import { riskMeta } from "./risk-meta";
+import { AssistantSummaryCard } from "./AssistantSummaryCard";
+import { AssessmentModal } from "./AssessmentModal";
+import { buildAssessment, type Assessment } from "@/lib/assessment-data";
 
 const priorityBadge: Record<string, { label: string; cls: string }> = {
   high: { label: "Высокий приоритет", cls: "bg-amber-100 text-amber-900" },
