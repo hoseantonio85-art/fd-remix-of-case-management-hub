@@ -256,7 +256,7 @@ export function AssessmentModal({
               <div className="order-1 lg:col-start-1 lg:row-start-1">
                 <div className="rounded-2xl border border-border bg-white p-4">
                   <div className="flex items-start gap-3">
-                    <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary">
+                    <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-slate-100 text-slate-600">
                       <Sparkles className="h-4 w-4" />
                     </div>
                     <div className="min-w-0 flex-1">
