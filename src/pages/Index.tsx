@@ -15,10 +15,17 @@ import {
   Gauge,
   GraduationCap,
   Headphones,
+  Loader2,
+  X,
 } from "lucide-react";
 import { counterparties, type Counterparty, type RiskType } from "@/lib/mock-data";
 import { CounterpartyModal } from "@/components/counterparty/CounterpartyModal";
 import { riskMeta, allChipMeta, riskOrder } from "@/components/counterparty/risk-meta";
+import { AssessmentModal, type AssessmentStatus, type Disagreement } from "@/components/counterparty/AssessmentModal";
+import { buildAssessment, type Assessment } from "@/lib/assessment-data";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Dialog, DialogContent } from "@/components/ui/dialog";
 
 type CategoryKey = "risk" | "overdue_risk" | "no_risk" | "overdue";
 
