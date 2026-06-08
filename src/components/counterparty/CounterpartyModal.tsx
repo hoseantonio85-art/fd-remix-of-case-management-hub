@@ -36,6 +36,7 @@ import { riskMeta } from "./risk-meta";
 import { AssistantSummaryCard } from "./AssistantSummaryCard";
 import { AssessmentModal, type AssessmentStatus, type Disagreement } from "./AssessmentModal";
 import { buildAssessment, type Assessment } from "@/lib/assessment-data";
+import { RegistrationInfoWidget, defaultOgrn } from "./RegistrationInfoWidget";
 
 const priorityBadge: Record<string, { label: string; cls: string }> = {
   high: { label: "Высокий приоритет", cls: "bg-amber-100 text-amber-900" },
