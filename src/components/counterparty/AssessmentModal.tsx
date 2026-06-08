@@ -134,7 +134,10 @@ export function AssessmentModal({
     <DialogPrimitive.Root open={open} onOpenChange={onOpenChange}>
       <DialogPrimitive.Portal>
         <DialogPrimitive.Overlay className="fixed inset-0 z-50 bg-slate-900/10 backdrop-blur-sm data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0" />
-        <DialogPrimitive.Content className="fixed left-1/2 top-1/2 z-50 grid h-[calc(100dvh-32px)] max-h-[calc(100dvh-32px)] w-[96vw] max-w-5xl -translate-x-1/2 -translate-y-1/2 gap-0 overflow-hidden rounded-3xl border bg-white p-0 shadow-lg duration-200 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 sm:rounded-3xl">
+        <DialogPrimitive.Content
+          style={{ width: "1320px", maxWidth: "calc(100vw - 32px)", maxHeight: "calc(100dvh - 32px)" }}
+          className="fixed left-1/2 top-1/2 z-50 flex max-h-[calc(100dvh-32px)] -translate-x-1/2 -translate-y-1/2 flex-col gap-0 overflow-hidden rounded-3xl border bg-white p-0 shadow-lg duration-200 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 sm:rounded-3xl"
+        >
         <div className="relative flex h-full flex-col">
           {/* Header */}
           <div className={cn("relative border-b border-border px-7 pt-6 pb-5", meta.headerBg)}>
