@@ -46,7 +46,6 @@ export function AssessmentGroupDrawer({
           <Stat
             label="Требуют внимания"
             value={counts.attention}
-            tone={counts.attention > 0 ? "text-amber-700" : undefined}
           />
           <Stat label="Без замечаний" value={counts.clear} />
         </div>

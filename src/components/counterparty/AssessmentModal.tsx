@@ -342,14 +342,8 @@ export function AssessmentModal({
                 <div className="grid grid-cols-1 gap-2.5">
                   {assessment.groups.map((g) => {
                     const counts = groupCounts(g);
-                    const t = toneStyles[g.tone];
                     const hasAttention = counts.attention > 0;
                     const hasInfo = counts.info > 0;
-                    const groupStatus = hasAttention
-                      ? "Требует внимания"
-                      : hasInfo
-                        ? "Информационные совпадения"
-                        : "Без замечаний";
                     const middlePart = hasAttention
                       ? `${counts.attention} требуют внимания`
                       : hasInfo
@@ -359,7 +353,7 @@ export function AssessmentModal({
                       <button
                         key={g.id}
                         onClick={() => setGroupDrawer(g)}
-                        className={`group flex items-start gap-3 rounded-xl border border-border border-l-4 ${t.border} bg-white p-3.5 text-left transition hover:bg-muted/30`}
+                        className="group flex items-start gap-3 rounded-xl border border-border bg-white p-3.5 text-left transition hover:bg-muted/30"
                       >
                         <div className="min-w-0 flex-1">
                           <div className="text-sm font-medium text-foreground">{g.title}</div>
@@ -371,16 +365,11 @@ export function AssessmentModal({
                             {middlePart && (
                               <>
                                 {" · "}
-                                <span className={hasAttention ? t.iconText : ""}>{middlePart}</span>
+                                {middlePart}
                               </>
                             )}
                             {" · "}
                             {`${counts.clear} без замечаний`}
-                          </div>
-                          <div className="mt-2">
-                            <span className={`inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-medium ${t.chip}`}>
-                              {groupStatus}
-                            </span>
                           </div>
                         </div>
                         <ChevronRight className="mt-1 h-4 w-4 shrink-0 text-muted-foreground transition group-hover:text-foreground" />
