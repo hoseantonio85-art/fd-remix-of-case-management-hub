@@ -1,14 +1,62 @@
-export type CriterionStatus = "detected" | "review" | "clear";
+export type AssessmentTagCategory = "attention" | "info" | "clear";
+
+export type AssessmentTagColor = "red" | "orange" | "green" | "blue" | "gray";
+
+export type AssessmentTag =
+  | "Критичный риск"
+  | "Менее 6 месяцев"
+  | "Выявлен долг"
+  | "91% (Повышен)"
+  | "Не найдено"
+  | "Соответствует"
+  | "Не найдены"
+  | "Без изменений"
+  | "Ограничений нет"
+  | "Не найден"
+  | "Риски отсутствуют"
+  | "Не обнаружено"
+  | "Совпадение (Инфо)"
+  | "Негатива: 0"
+  | "Негатива: 2";
+
+export const tagMeta: Record<
+  AssessmentTag,
+  { color: AssessmentTagColor; category: AssessmentTagCategory }
+> = {
+  "Критичный риск": { color: "red", category: "attention" },
+  "Менее 6 месяцев": { color: "orange", category: "attention" },
+  "Выявлен долг": { color: "orange", category: "attention" },
+  "91% (Повышен)": { color: "orange", category: "attention" },
+  "Негатива: 2": { color: "gray", category: "attention" },
+  "Совпадение (Инфо)": { color: "blue", category: "info" },
+  "Негатива: 0": { color: "gray", category: "clear" },
+  "Не найдено": { color: "green", category: "clear" },
+  "Соответствует": { color: "green", category: "clear" },
+  "Не найдены": { color: "green", category: "clear" },
+  "Без изменений": { color: "green", category: "clear" },
+  "Ограничений нет": { color: "green", category: "clear" },
+  "Не найден": { color: "green", category: "clear" },
+  "Риски отсутствуют": { color: "green", category: "clear" },
+  "Не обнаружено": { color: "green", category: "clear" },
+};
+
+export const tagColorClass: Record<AssessmentTagColor, string> = {
+  red: "bg-red-50 text-red-600",
+  orange: "bg-amber-50 text-amber-600",
+  green: "bg-emerald-50 text-emerald-600",
+  blue: "bg-sky-50 text-sky-600",
+  gray: "bg-slate-100 text-slate-500",
+};
 
 export type AssessmentCriterion = {
   number: number;
   title: string;
-  status: CriterionStatus;
+  tag: AssessmentTag;
   comment?: string;
   source?: string;
 };
 
-export type AssessmentGroupId = "critical" | "approval" | "potential" | "positive";
+export type AssessmentGroupId = "legal" | "management" | "finance" | "court";
 
 export type AssessmentGroup = {
   id: AssessmentGroupId;
@@ -37,140 +85,90 @@ export type Assessment = {
   groups: AssessmentGroup[];
 };
 
-const critical: AssessmentGroup = {
-  id: "critical",
-  title: "Критические маркеры",
-  description: "Факторы, которые могут блокировать сотрудничество",
-  total: 15,
+const legal: AssessmentGroup = {
+  id: "legal",
+  title: "Юридический статус и правоспособность",
+  description: "Проверка статуса ЮЛ, регистрации, ограничений и права заключать договор",
   tone: "rose",
+  total: 10,
   criteria: [
-    {
-      number: 1,
-      title: "ЮЛ ликвидировано / находится в процессе ликвидации или реорганизации",
-      status: "detected",
-      comment: "Стоп-фактор, требуется согласование ГД",
-      source: "ЕГРЮЛ",
-    },
-    {
-      number: 2,
-      title: "ЮЛ находится в процедуре банкротства",
-      status: "clear",
-    },
-    {
-      number: 3,
-      title: "Найден в реестре недобросовестных поставщиков",
-      status: "detected",
-      comment: "Стоп-фактор, требуется согласование ГД",
-      source: "ФАС",
-    },
-    {
-      number: 4,
-      title: "Недостоверные сведения о руководителе или учредителе",
-      status: "detected",
-      comment: "Стоп-фактор, требуется согласование ГД",
-      source: "ЕГРЮЛ",
-    },
-    {
-      number: 5,
-      title: "Недостоверный адрес по ЕГРЮЛ",
-      status: "detected",
-      comment: "Стоп-фактор, требуется согласование ГД",
-      source: "ЕГРЮЛ",
-    },
-    {
-      number: 6,
-      title: "Ограничения на операции по банковским счетам, установленные ФНС",
-      status: "detected",
-      comment: "Стоп-фактор, требуется согласование ГД",
-      source: "ФНС",
-    },
-    {
-      number: 7,
-      title: "Иная негативная информация о деловой репутации",
-      status: "detected",
-      comment: "Требуется верификация комплаенс-службой",
-    },
-    { number: 8, title: "Дисквалификация руководителя", status: "clear" },
-    { number: 9, title: "Запись о массовом руководителе", status: "clear" },
-    { number: 10, title: "Запись о массовом учредителе", status: "clear" },
-    { number: 11, title: "Адрес массовой регистрации", status: "clear" },
-    { number: 12, title: "Нахождение в санкционных списках", status: "clear" },
-    { number: 13, title: "Связь с организациями в стоп-листе холдинга", status: "clear" },
-    { number: 14, title: "Возбуждено уголовное дело в отношении руководителя", status: "clear" },
-    { number: 15, title: "Исключение из ЕГРЮЛ по решению ФНС", status: "clear" },
+    { number: 1, title: "ЮЛ ликвидировано / в процессе ликвидации / реорганизации путём присоединения", tag: "Критичный риск", source: "ЕГРЮЛ" },
+    { number: 2, title: "ЮЛ в процедуре банкротства / банкрот / подавало заявление", tag: "Не найдено" },
+    { number: 3, title: "Деятельность приостановлена по КоАП РФ", tag: "Не найдено" },
+    { number: 4, title: "Решение о приостановлении деятельности или оспаривание", tag: "Не найдено" },
+    { number: 5, title: "Ограничения по счетам от ФНС", tag: "Ограничений нет", source: "ФНС" },
+    { number: 6, title: "Недостоверный адрес в ЕГРЮЛ", tag: "Соответствует", source: "ЕГРЮЛ" },
+    { number: 7, title: "Адрес массовой регистрации, кроме БЦ", tag: "Не найден" },
+    { number: 8, title: "Смена юрадреса в течение года", tag: "Без изменений" },
+    { number: 9, title: "С даты регистрации <6 месяцев", tag: "Менее 6 месяцев" },
+    { number: 10, title: "Отсутствие нужных ОКВЭД под договор / ТЗ", tag: "Соответствует" },
   ],
 };
 
-const approval: AssessmentGroup = {
-  id: "approval",
-  title: "Маркеры для согласования",
-  description: "Факторы, которые требуют проверки перед сотрудничеством",
-  total: 11,
+const management: AssessmentGroup = {
+  id: "management",
+  title: "Руководство и бенефициары",
+  description: "Проверка руководителей, учредителей, связей и изменений в управлении",
   tone: "amber",
+  total: 11,
   criteria: [
-    {
-      number: 1,
-      title: "Налоговый спор в суде",
-      status: "detected",
-      comment: "Требуется согласование с юридическим департаментом",
-      source: "Картотека арбитражных дел",
-    },
-    {
-      number: 2,
-      title: "Претензии или санкции со стороны правоохранительных / налоговых органов",
-      status: "detected",
-      comment: "Требуется согласование с комплаенс",
-    },
-    { number: 3, title: "Открытые исполнительные производства", status: "review", comment: "Уточнить статус у ответственного" },
-    { number: 4, title: "Судебные споры на крупные суммы", status: "clear" },
-    { number: 5, title: "Признаки фирмы-однодневки", status: "clear" },
-    { number: 6, title: "Аффилированность с проблемными контрагентами", status: "clear" },
-    { number: 7, title: "Отсутствие отчётности за последний период", status: "clear" },
-    { number: 8, title: "Резкое снижение выручки", status: "clear" },
-    { number: 9, title: "Отрицательные чистые активы", status: "clear" },
-    { number: 10, title: "Просроченная задолженность перед бюджетом", status: "clear" },
-    { number: 11, title: "Задолженность по заработной плате", status: "clear" },
+    { number: 1, title: "ФИО руководителей в реестре дисквалифицированных лиц", tag: "Не найдены" },
+    { number: 2, title: "Недостоверные сведения о руководителе или учредителе по ФНС", tag: "Соответствует", source: "ФНС" },
+    { number: 3, title: "Банкротство физлица, руководителя или учредителя, за 12 месяцев", tag: "Не найдено" },
+    { number: 4, title: "Судимость руководителя или учредителя за экономические преступления", tag: "Не обнаружено" },
+    { number: 5, title: "Среди учредителей / руководителей найдены иностранные лица", tag: "Совпадение (Инфо)" },
+    { number: 6, title: "Одно лицо = учредитель и руководитель", tag: "Совпадение (Инфо)" },
+    { number: 7, title: ">10 ЮЛ с тем же руководителем", tag: "Негатива: 0" },
+    { number: 8, title: ">10 ЮЛ с тем же учредителем-физлицом", tag: "Негатива: 0" },
+    { number: 9, title: "Смена руководителя в течение года", tag: "Без изменений" },
+    { number: 10, title: "Смена управляющей компании в течение года", tag: "Без изменений" },
+    { number: 11, title: "Отсутствие маркеров из I–III групп", tag: "Риски отсутствуют" },
   ],
 };
 
-const potential: AssessmentGroup = {
-  id: "potential",
-  title: "Потенциальные маркеры",
-  description: "Косвенные признаки неблагополучной деловой репутации",
-  total: 14,
+const finance: AssessmentGroup = {
+  id: "finance",
+  title: "Финансы и налоги",
+  description: "Проверка налоговой дисциплины, долгов, выручки и финансовой устойчивости",
   tone: "slate",
+  total: 10,
   criteria: [
-    { number: 1, title: "Смена руководителя в течение года", status: "detected", source: "ЕГРЮЛ" },
-    { number: 2, title: "Смена юридического адреса", status: "detected", source: "ЕГРЮЛ" },
-    { number: 3, title: "Высокая доля вычитаемого НДС", status: "detected", comment: "Свыше 95%" },
-    { number: 4, title: "Уставной капитал не превышает 50 тысяч рублей", status: "detected" },
-    { number: 5, title: "Одно физлицо является учредителем и руководителем", status: "detected" },
-    { number: 6, title: "Малая численность сотрудников", status: "review" },
-    { number: 7, title: "Отсутствие сайта / контактной информации", status: "review" },
-    { number: 8, title: "Регистрация менее года назад", status: "clear" },
-    { number: 9, title: "Частая смена учредителей", status: "clear" },
-    { number: 10, title: "Отсутствие лицензий по ОКВЭД", status: "clear" },
-    { number: 11, title: "Отсутствие имущества", status: "clear" },
-    { number: 12, title: "Отрицательная динамика налоговых платежей", status: "clear" },
-    { number: 13, title: "Низкая налоговая нагрузка", status: "clear" },
-    { number: 14, title: "Признаки технической компании", status: "clear" },
+    { number: 1, title: "Не сдаёт налоговую отчётность >1 года", tag: "Не найдено" },
+    { number: 2, title: "Неоплаченная налоговая задолженность", tag: "Выявлен долг", source: "ФНС" },
+    { number: 3, title: "Доля вычитаемого НДС >89%", tag: "91% (Повышен)" },
+    { number: 4, title: "Обязательства >30% выручки", tag: "Соответствует" },
+    { number: 5, title: "Снижение выручки >50%", tag: "Не обнаружено" },
+    { number: 6, title: "Численность недостаточна для договора", tag: "Соответствует" },
+    { number: 7, title: "Уставной капитал ≤50 тыс. руб.", tag: "Соответствует" },
+    { number: 8, title: "С даты регистрации прошло 12 месяцев", tag: "Соответствует" },
+    { number: 9, title: "Положительный опыт с компаниями холдинга", tag: "Соответствует" },
+    { number: 10, title: "Госконтракты за 12 месяцев при выручке >100 млн руб.", tag: "Соответствует" },
   ],
 };
 
-const positive: AssessmentGroup = {
-  id: "positive",
-  title: "Позитивные маркеры",
-  description: "Факторы, подтверждающие отсутствие негативной информации",
-  total: 3,
+const court: AssessmentGroup = {
+  id: "court",
+  title: "Судебная нагрузка и репутация",
+  description: "Проверка судебных, исполнительных и репутационных факторов",
   tone: "emerald",
+  total: 12,
   criteria: [
-    { number: 1, title: "Отсутствие маркеров из I–III групп", status: "review", comment: "Не подтверждено: выявлены критические маркеры" },
-    { number: 2, title: "Положительный опыт взаимодействия с компаниями холдинга", status: "detected", comment: "Подтверждён: 3 закрытых договора без претензий" },
-    { number: 3, title: "Наличие госконтрактов", status: "review", comment: "Не подтверждено" },
+    { number: 1, title: "Списки терроризма / экстремизма", tag: "Не найден" },
+    { number: 2, title: "Список иноагентов", tag: "Не найден" },
+    { number: 3, title: "Ст. 19.28 КоАП — незаконное вознаграждение", tag: "Не обнаружено" },
+    { number: 4, title: "Реестр недобросовестных поставщиков", tag: "Не найдено", source: "ФАС" },
+    { number: 5, title: "Исполнительные производства >10% выручки", tag: "Негатива: 2" },
+    { number: 6, title: "Сумма арбитражных дел ответчиком значительная", tag: "Негатива: 2" },
+    { number: 7, title: "Требования к ответчику >10% выручки", tag: "Соответствует" },
+    { number: 8, title: "Налоговый спор в суде, ответчик", tag: "Не найдено" },
+    { number: 9, title: "Банкротство физлица-ИП за 12 месяцев", tag: "Не найдено" },
+    { number: 10, title: "Претензии / санкции от госорганов", tag: "Не обнаружено" },
+    { number: 11, title: "Иная негативная репутационная информация", tag: "Не обнаружено" },
+    { number: 12, title: "3+ фактора из III группы", tag: "Не обнаружено" },
   ],
 };
 
-export const defaultGroups: AssessmentGroup[] = [critical, approval, potential, positive];
+export const defaultGroups: AssessmentGroup[] = [legal, management, finance, court];
 
 export function buildAssessment(
   counterpartyName: string,
@@ -185,7 +183,7 @@ export function buildAssessment(
     nextCheck: source === "auto" ? "завтра" : undefined,
     source,
     summary:
-      "По результатам оценки выявлено 6 критических критериев, 2 критерия требуют согласования и 5 потенциальных маркеров. Основные причины внимания: ограничения ФНС, недостоверные сведения и изменения регистрационных данных.",
+      "По результатам оценки выявлены критические факторы по юридическому статусу, повышенная доля вычитаемого НДС и налоговая задолженность. Также есть информационные совпадения по учредителям и активность в исполнительных производствах.",
     changes: [
       { text: "Появились ограничения ФНС по банковским счетам", tone: "rose" },
       { text: "Обнаружен новый налоговый спор", tone: "amber" },
@@ -197,10 +195,16 @@ export function buildAssessment(
 }
 
 export function groupCounts(g: AssessmentGroup) {
-  const detected = g.criteria.filter((c) => c.status === "detected").length;
-  const review = g.criteria.filter((c) => c.status === "review").length;
-  const clear = g.criteria.filter((c) => c.status === "clear").length;
-  return { detected, review, clear };
+  let attention = 0;
+  let info = 0;
+  let clear = 0;
+  for (const c of g.criteria) {
+    const cat = tagMeta[c.tag].category;
+    if (cat === "attention") attention++;
+    else if (cat === "info") info++;
+    else clear++;
+  }
+  return { attention, info, clear };
 }
 
 export const toneStyles: Record<

@@ -9,9 +9,10 @@ import {
   type AssessmentGroup,
   type AssessmentCriterion,
   groupCounts,
-  toneStyles,
+  tagMeta,
+  tagColorClass,
 } from "@/lib/assessment-data";
-import { AlertTriangle, HelpCircle, CheckCircle2 } from "lucide-react";
+import { AlertTriangle, Info, CheckCircle2 } from "lucide-react";
 
 export function AssessmentGroupDrawer({
   group,
@@ -24,14 +25,13 @@ export function AssessmentGroupDrawer({
 }) {
   if (!group) return null;
   const counts = groupCounts(group);
-  const t = toneStyles[group.tone];
-  const detected = group.criteria.filter((c) => c.status === "detected");
-  const review = group.criteria.filter((c) => c.status === "review");
-  const clear = group.criteria.filter((c) => c.status === "clear");
+  const attention = group.criteria.filter((c) => tagMeta[c.tag].category === "attention");
+  const info = group.criteria.filter((c) => tagMeta[c.tag].category === "info");
+  const clear = group.criteria.filter((c) => tagMeta[c.tag].category === "clear");
 
   const defaultOpen: string[] = [];
-  if (detected.length) defaultOpen.push("detected");
-  if (review.length) defaultOpen.push("review");
+  if (attention.length) defaultOpen.push("attention");
+  if (info.length) defaultOpen.push("info");
 
   return (
     <InModalDrawer open={open} onOpenChange={onOpenChange}>
@@ -44,35 +44,32 @@ export function AssessmentGroupDrawer({
         <div className="mt-3 grid grid-cols-3 gap-2">
           <Stat label="Всего" value={group.total} />
           <Stat
-            label={group.id === "positive" ? "Подтверждено" : "Выявлено"}
-            value={counts.detected}
-            tone={counts.detected > 0 ? t.iconText : undefined}
+            label="Требуют внимания"
+            value={counts.attention}
+            tone={counts.attention > 0 ? "text-amber-700" : undefined}
           />
-          <Stat
-            label={group.id === "positive" ? "Не подтверждено" : "Без замечаний"}
-            value={group.id === "positive" ? counts.review + counts.clear : counts.clear}
-          />
+          <Stat label="Без замечаний" value={counts.clear} />
         </div>
       </div>
 
       <div className="flex-1 px-6 py-4">
         <Accordion type="multiple" defaultValue={defaultOpen} className="space-y-2">
-          {detected.length > 0 && (
+          {attention.length > 0 && (
             <Section
-              value="detected"
-              title={group.id === "positive" ? "Подтверждены" : "Выявлены"}
-              count={detected.length}
-              icon={<AlertTriangle className="h-3.5 w-3.5 text-rose-600" />}
-              items={detected}
+              value="attention"
+              title="Требуют внимания"
+              count={attention.length}
+              icon={<AlertTriangle className="h-3.5 w-3.5 text-amber-600" />}
+              items={attention}
             />
           )}
-          {review.length > 0 && (
+          {info.length > 0 && (
             <Section
-              value="review"
-              title="Требуют проверки"
-              count={review.length}
-              icon={<HelpCircle className="h-3.5 w-3.5 text-slate-500" />}
-              items={review}
+              value="info"
+              title="Информационные совпадения"
+              count={info.length}
+              icon={<Info className="h-3.5 w-3.5 text-sky-600" />}
+              items={info}
             />
           )}
           {clear.length > 0 && (
@@ -133,21 +130,18 @@ function Section({
 }
 
 function CriterionRow({ c }: { c: AssessmentCriterion }) {
-  const statusMeta: Record<AssessmentCriterion["status"], { label: string; cls: string }> = {
-    detected: { label: "Выявлен", cls: "bg-rose-50 text-rose-700" },
-    review: { label: "Требует проверки", cls: "bg-slate-100 text-slate-700" },
-    clear: { label: "Без замечаний", cls: "bg-emerald-50 text-emerald-700" },
-  };
-  const m = statusMeta[c.status];
+  const color = tagMeta[c.tag].color;
   return (
     <div className="rounded-lg border border-border bg-white p-3">
       <div className="flex items-start gap-3">
         <div className="text-[11px] font-medium text-muted-foreground">{c.number}.</div>
         <div className="min-w-0 flex-1">
           <div className="text-sm font-medium leading-snug text-foreground">{c.title}</div>
-          <div className="mt-1 flex flex-wrap items-center gap-x-2 gap-y-1">
-            <span className={`rounded-full px-2 py-0.5 text-[10px] font-medium ${m.cls}`}>
-              {m.label}
+          <div className="mt-2 flex flex-wrap items-center gap-x-2 gap-y-1">
+            <span
+              className={`inline-flex h-8 items-center rounded-full px-4 text-[12px] font-semibold ${tagColorClass[color]}`}
+            >
+              {c.tag}
             </span>
             {c.source && (
               <span className="text-[11px] text-muted-foreground">Источник: {c.source}</span>
