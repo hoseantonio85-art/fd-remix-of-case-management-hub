@@ -193,10 +193,6 @@ export function AssessmentModal({
                 </div>
               </div>
             </div>
-            <div className="mt-5 grid grid-cols-1 gap-3 sm:grid-cols-2">
-              <LimitCard label="Расходные сделки" sublabel="Лимит аванса" value="2,5 млн ₽" />
-              <LimitCard label="Доходные сделки" sublabel="Лимит дебиторской задолженности" value="4,8 млн ₽" />
-            </div>
           </div>
 
 
