@@ -139,7 +139,7 @@ export function AssessmentModal({
           style={{ width: "1320px", maxWidth: "calc(100vw - 32px)", maxHeight: "calc(100dvh - 32px)" }}
           className="fixed left-1/2 top-1/2 z-50 flex max-h-[calc(100dvh-32px)] -translate-x-1/2 -translate-y-1/2 flex-col gap-0 overflow-hidden rounded-3xl border bg-white p-0 shadow-lg duration-200 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 sm:rounded-3xl"
         >
-        <div className="relative flex h-full flex-col">
+        <div className="relative flex min-h-0 flex-1 flex-col">
           {/* Header */}
           <div className={cn("relative border-b border-border px-5 pt-6 pb-6 lg:px-10", meta.headerBg)}>
             <div className="absolute right-5 top-5 flex items-center gap-2">
@@ -183,7 +183,7 @@ export function AssessmentModal({
           </div>
 
           {/* Body */}
-          <div className="flex-1 space-y-5 overflow-y-auto bg-white px-5 py-6 lg:px-10">
+          <div className="min-h-0 flex-1 space-y-5 overflow-y-auto bg-white px-5 py-6 lg:px-10">
             {notice && (
               <div
                 className={`flex items-start gap-2.5 rounded-xl border px-3.5 py-3 text-sm ${
@@ -399,7 +399,7 @@ export function AssessmentModal({
           </div>
 
           {/* Footer actions */}
-          <div className="border-t border-border bg-white px-5 py-4 lg:px-10">
+          <div className="shrink-0 border-t border-border bg-white px-5 py-4 lg:px-10">
             <div className="flex flex-col gap-3 sm:flex-row">
               <Button
                 onClick={handleConfirm}
