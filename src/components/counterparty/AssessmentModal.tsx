@@ -517,6 +517,9 @@ function HeaderStat({ label, value, accent }: { label: string; value: number; ac
       </div>
     </div>
   );
+}
+
+
 
 function pluralCriteria(n: number) {
   const mod10 = n % 10;
