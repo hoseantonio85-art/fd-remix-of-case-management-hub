@@ -203,7 +203,7 @@ export function groupCounts(g: AssessmentGroup) {
 }
 
 export const toneStyles: Record<
-  AssessmentGroup["tone"],
+  "rose" | "amber" | "slate" | "emerald",
   { dot: string; border: string; iconBg: string; iconText: string; chip: string }
 > = {
   rose: {
