@@ -35,7 +35,7 @@ export function AssessmentGroupDrawer({
 
   return (
     <InModalDrawer open={open} onOpenChange={onOpenChange}>
-      <div className="border-b border-border px-6 pt-6 pb-4">
+      <div className="px-6 pt-6 pb-4">
         <div className="text-[11px] font-medium uppercase tracking-wide text-muted-foreground">
           Группа критериев
         </div>
