@@ -4,6 +4,12 @@ import { cn } from "@/lib/utils";
 import { largeModalContentClass } from "@/lib/modal-styles";
 import { Button } from "@/components/ui/button";
 import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
+import {
   ShieldCheck,
   ChevronRight,
   ChevronDown,
@@ -471,19 +477,27 @@ export function CounterpartyModal({
                   <span className={`inline-flex w-fit items-center rounded-full px-2.5 py-1 text-[11px] font-medium ${styles.badge}`}>
                     {counterparty.tag}
                   </span>
-                  {getCounterpartyProblemIndicators(counterparty).map((k) => {
-                    const m = problemIndicatorMeta[k];
-                    const Icon = m.icon;
-                    return (
-                      <span
-                        key={k}
-                        title={m.label}
-                        className={`inline-flex h-7 w-7 items-center justify-center rounded-full border ${m.activeBorder} ${m.activeBg}`}
-                      >
-                        <Icon className={`h-3.5 w-3.5 ${m.iconColor}`} />
-                      </span>
-                    );
-                  })}
+                  <TooltipProvider delayDuration={150}>
+                    {getCounterpartyProblemIndicators(counterparty).map((k) => {
+                      const m = problemIndicatorMeta[k];
+                      const Icon = m.icon;
+                      return (
+                        <Tooltip key={k}>
+                          <TooltipTrigger asChild>
+                            <span
+                              aria-label={m.label}
+                              className={`inline-flex h-7 w-7 cursor-help items-center justify-center rounded-full border ${m.activeBorder} ${m.activeBg} transition hover:brightness-95`}
+                            >
+                              <Icon className={`h-3.5 w-3.5 ${m.iconColor}`} />
+                            </span>
+                          </TooltipTrigger>
+                          <TooltipContent side="bottom">
+                            <p className="text-xs">{m.label}</p>
+                          </TooltipContent>
+                        </Tooltip>
+                      );
+                    })}
+                  </TooltipProvider>
                 </div>
                 <h2 className="mt-3 text-2xl font-semibold tracking-tight text-foreground">{counterparty.name}</h2>
                 <div className="mt-1 text-sm text-muted-foreground">
