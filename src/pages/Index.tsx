@@ -461,6 +461,24 @@ export default function Index() {
             {/* Список дебиторов */}
             <h2 className="mb-3 text-xl font-semibold">Список дебиторов</h2>
 
+            {processStage && (
+              <div className="mb-3 flex flex-wrap items-center gap-2">
+                <span className="inline-flex items-center gap-1.5 rounded-full border border-primary/30 bg-primary/5 px-3 py-1 text-xs font-medium text-primary">
+                  Процесс: {processMeta[processStage].label}
+                  <button
+                    onClick={() => applyProcessStage(null)}
+                    className="ml-0.5 rounded-full p-0.5 hover:bg-primary/10"
+                    aria-label="Снять процесс"
+                  >
+                    <X className="h-3 w-3" />
+                  </button>
+                </span>
+                <span className="text-[11px] text-muted-foreground">
+                  Проблемы показаны в рамках выбранного процесса
+                </span>
+              </div>
+            )}
+
             {showRiskChips && (
               <div className="mb-5 flex flex-wrap gap-2">
                 {(["all", ...riskOrder] as RiskChipKey[]).map((key) => {
