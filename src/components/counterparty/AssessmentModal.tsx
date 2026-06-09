@@ -41,6 +41,11 @@ const statusMeta: Record<
     chip: "bg-sky-100 text-sky-900",
     headerBg: "bg-gradient-to-b from-sky-50 via-sky-50/40 to-transparent",
   },
+  review: {
+    label: "На пересмотре",
+    chip: "bg-violet-100 text-violet-900",
+    headerBg: "bg-gradient-to-b from-violet-50 via-violet-50/40 to-transparent",
+  },
 };
 
 const toneLabel: Record<"rose" | "amber" | "slate" | "emerald", string> = {
