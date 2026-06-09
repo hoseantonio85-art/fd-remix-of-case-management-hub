@@ -29,6 +29,25 @@ import { Input } from "@/components/ui/input";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { ProcessFilterDrawer } from "@/components/counterparty/ProcessFilterDrawer";
 import { processMeta, processOrder } from "@/lib/process-meta";
+import { toast } from "sonner";
+
+function buildNewCounterparty(inn: string, today: string): Counterparty {
+  return {
+    id: `manual-${inn}-${Date.now()}`,
+    name: "ООО «Новый контрагент»",
+    inn,
+    tag: "На оценке",
+    status: "no_risk",
+    totalDebt: "0,0 млн. ₽",
+    overdueDebt: "0,0 млн. ₽",
+    overdueAmountNum: 0,
+    lastUpdate: today,
+    contracts: [],
+    risks: [],
+    collection: [],
+    processStage: "monitoring",
+  };
+}
 
 
 type CategoryKey = "risk" | "overdue_risk" | "no_risk" | "overdue";
