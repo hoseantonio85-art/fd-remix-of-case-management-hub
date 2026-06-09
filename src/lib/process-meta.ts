@@ -30,7 +30,7 @@ export const processMeta: Record<ProcessStage, ProcessMeta> = {
     icon: Eye,
     allowedCategories: ["no_risk"],
     accentBg: "bg-emerald-50",
-    accentText: "text-emerald-700",
+    accentText: "text-emerald-600",
     accentBorder: "border-emerald-200",
     selectedBorder: "border-emerald-400",
     selectedBg: "bg-emerald-50/60",
