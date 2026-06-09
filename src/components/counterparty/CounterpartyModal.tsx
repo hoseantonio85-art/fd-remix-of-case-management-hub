@@ -657,23 +657,27 @@ export function CounterpartyModal({
               <SectionTitle title="Договоры" count={contracts.length} muted />
               <div className="overflow-hidden rounded-xl border border-border bg-white">
                 {contracts.map((c, i) => {
-                  const overdue = c.overdue > 0;
+                  const amount = toFiniteNumber(c.amount);
+                  const debt = toFiniteNumber(c.debt);
+                  const overdueAmount = toFiniteNumber(c.overdue);
+                  const overdueDays = toFiniteNumber(c.overdueDays);
+                  const overdue = overdueAmount > 0;
                   return (
                     <button
-                      key={c.id}
+                      key={c.id ?? i}
                       onClick={() => setContractDrawer(c)}
                       className={`flex w-full items-center gap-4 px-4 py-3 text-left transition hover:bg-muted/40 ${
                         i > 0 ? "border-t border-border" : ""
                       }`}
                     >
                       <div className="grid min-w-0 flex-1 grid-cols-2 gap-3 sm:grid-cols-5">
-                        <Cell label="Договор" value={c.number} sub={`от ${c.date}`} />
-                        <Cell label="Сумма" value={`${c.amount.toFixed(1)} млн. ₽`} />
-                        <Cell label="Задолженность" value={`${c.debt.toFixed(1)} млн. ₽`} />
+                        <Cell label="Договор" value={c.number ?? "—"} sub={`от ${c.date ?? "—"}`} />
+                        <Cell label="Сумма" value={`${amount.toFixed(1)} млн. ₽`} />
+                        <Cell label="Задолженность" value={`${debt.toFixed(1)} млн. ₽`} />
                         <Cell
                           label="Просрочено"
-                          value={overdue ? `${c.overdue.toFixed(1)} млн. ₽` : "нет"}
-                          sub={overdue ? `${c.overdueDays} дн.` : undefined}
+                          value={overdue ? `${overdueAmount.toFixed(1)} млн. ₽` : "нет"}
+                          sub={overdue ? `${overdueDays} дн.` : undefined}
                           accent={overdue}
                         />
                         <Cell label="Этап" value={c.collectionStage ?? "—"} />
