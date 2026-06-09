@@ -371,18 +371,17 @@ export default function Index() {
 
   const riskCounts = useMemo(() => {
     const map: Record<string, number> = { all: byCategory.length };
-    for (const c of byCategory) {
-      const types = new Set(c.risks.map((r) => r.type));
-      types.forEach((t) => {
-        map[t] = (map[t] ?? 0) + 1;
-      });
+    for (const chip of problemChips) {
+      map[chip.key] = byCategory.filter(chip.matches).length;
     }
     return map;
   }, [byCategory]);
 
   const filtered = useMemo(() => {
     if (!showRiskChips || riskFilter === "all") return byCategory;
-    return byCategory.filter((c) => c.risks.some((r) => r.type === riskFilter));
+    const chip = problemChips.find((c) => c.key === riskFilter);
+    if (!chip) return byCategory;
+    return byCategory.filter(chip.matches);
   }, [byCategory, riskFilter, showRiskChips]);
 
   // Donut data:
