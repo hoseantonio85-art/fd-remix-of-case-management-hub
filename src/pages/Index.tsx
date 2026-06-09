@@ -29,6 +29,25 @@ import { Input } from "@/components/ui/input";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { ProcessFilterDrawer } from "@/components/counterparty/ProcessFilterDrawer";
 import { processMeta, processOrder } from "@/lib/process-meta";
+import { toast } from "sonner";
+
+function buildNewCounterparty(inn: string, today: string): Counterparty {
+  return {
+    id: `manual-${inn}-${Date.now()}`,
+    name: "ООО «Новый контрагент»",
+    inn,
+    tag: "На оценке",
+    status: "no_risk",
+    totalDebt: "0,0 млн. ₽",
+    overdueDebt: "0,0 млн. ₽",
+    overdueAmountNum: 0,
+    lastUpdate: today,
+    contracts: [],
+    risks: [],
+    collection: [],
+    processStage: "monitoring",
+  };
+}
 
 
 type CategoryKey = "risk" | "overdue_risk" | "no_risk" | "overdue";
@@ -228,19 +247,36 @@ export default function Index() {
   const [manualAssessmentOpen, setManualAssessmentOpen] = useState(false);
   const [manualStatus, setManualStatus] = useState<AssessmentStatus>("updated");
   const [manualDisagreement, setManualDisagreement] = useState<Disagreement | null>(null);
+  // Manual assessment flow (CTA «Оценить контрагента»)
+  const [addedCounterparties, setAddedCounterparties] = useState<Counterparty[]>([]);
+  const [manualFlowTarget, setManualFlowTarget] = useState<Counterparty | null>(null);
+  const [manualFlowIsNew, setManualFlowIsNew] = useState(false);
+  const [manualFlowCpOpen, setManualFlowCpOpen] = useState(false);
 
+  const allCounterparties = useMemo(
+    () => [...addedCounterparties, ...counterparties],
+    [addedCounterparties],
+  );
 
   const handleStartAssessment = () => {
-    const inn = runInn.trim();
-    if (!inn) {
+    const innRaw = runInn.trim();
+    if (!innRaw) {
       setRunError("Введите ИНН контрагента");
+      return;
+    }
+    if (!/^\d{10}(\d{2})?$/.test(innRaw)) {
+      setRunError("ИНН должен содержать 10 или 12 цифр");
       return;
     }
     setRunError(null);
     setRunLoading(true);
     setTimeout(() => {
       const today = new Date().toLocaleDateString("ru-RU");
-      setManualAssessment(buildAssessment("Новый контрагент", inn, "manual", today));
+      const existing = allCounterparties.find((c) => c.inn === innRaw) ?? null;
+      const target: Counterparty = existing ?? buildNewCounterparty(innRaw, today);
+      setManualFlowTarget(target);
+      setManualFlowIsNew(!existing);
+      setManualAssessment(buildAssessment(target.name, innRaw, "manual", today));
       setManualStatus("updated");
       setManualDisagreement(null);
       setRunLoading(false);
@@ -250,17 +286,52 @@ export default function Index() {
     }, 1500);
   };
 
+  const handleManualAssessmentOpenChange = (o: boolean) => {
+    setManualAssessmentOpen(o);
+    if (!o) {
+      setManualDisagreement(null);
+      if (manualFlowTarget) {
+        // Manual flow: chain to CounterpartyModal
+        setManualFlowCpOpen(true);
+      }
+    }
+  };
+
+  const handleManualFlowCpOpenChange = (o: boolean) => {
+    setManualFlowCpOpen(o);
+    if (!o && manualFlowTarget) {
+      const inn = manualFlowTarget.inn;
+      if (manualFlowIsNew) {
+        setAddedCounterparties((prev) =>
+          prev.some((c) => c.inn === inn) ? prev : [manualFlowTarget, ...prev],
+        );
+        toast.success("Контрагент добавлен в список", {
+          description: `Оценка сохранена по ИНН ${inn}`,
+        });
+      } else {
+        toast("Контрагент уже есть в списке", {
+          description: `ИНН ${inn} найден в рабочем списке`,
+        });
+      }
+      // cleanup
+      setManualFlowTarget(null);
+      setManualFlowIsNew(false);
+      setManualAssessment(null);
+    }
+  };
+
+
 
   const processCounts = useMemo(() => {
     const map = { monitoring: 0, risk_confirmation: 0, settlement: 0, writeoff: 0 } as Record<ProcessStage, number>;
-    for (const c of counterparties) map[c.processStage]++;
+    for (const c of allCounterparties) map[c.processStage]++;
     return map;
-  }, []);
+  }, [allCounterparties]);
 
   const byProcess = useMemo(() => {
-    if (!processStage) return counterparties;
-    return counterparties.filter((c) => c.processStage === processStage);
-  }, [processStage]);
+    if (!processStage) return allCounterparties;
+    return allCounterparties.filter((c) => c.processStage === processStage);
+  }, [processStage, allCounterparties]);
 
   const allowedCategories = useMemo(() => {
     if (!processStage) return null;
@@ -659,7 +730,7 @@ export default function Index() {
             <div className="min-w-0 flex-1">
               <div className="text-sm font-semibold text-foreground">Оценить контрагента</div>
               <p className="mt-0.5 text-[12px] text-muted-foreground">
-                Агент проверит контрагента по 43 критериям благонадёжности. Укажите ИНН.
+                Введите ИНН, чтобы запустить проверку благонадёжности
               </p>
             </div>
             <button
@@ -670,25 +741,38 @@ export default function Index() {
               <X className="h-4 w-4" />
             </button>
           </div>
-          <div className="px-5 py-4">
-            <label className="text-[11px] font-medium text-muted-foreground">ИНН для оценки</label>
-            <Input
-              value={runInn}
-              onChange={(e) => {
-                setRunInn(e.target.value);
-                if (runError) setRunError(null);
-              }}
-              placeholder="Введите ИНН контрагента"
-              className="mt-1 bg-white"
-              disabled={runLoading}
-              onKeyDown={(e) => {
-                if (e.key === "Enter") handleStartAssessment();
-              }}
-            />
-            {runError && (
-              <div className="mt-2 text-[12px] text-rose-600">{runError}</div>
-            )}
-          </div>
+          {runLoading ? (
+            <div className="flex items-start gap-3 px-5 py-6">
+              <Loader2 className="mt-0.5 h-5 w-5 shrink-0 animate-spin text-primary" />
+              <div className="min-w-0">
+                <div className="text-sm font-medium text-foreground">
+                  Запускаю оценку контрагента
+                </div>
+                <p className="mt-1 text-[12px] text-muted-foreground">
+                  Проверяю регистрационные данные, финансовые маркеры и судебную нагрузку
+                </p>
+              </div>
+            </div>
+          ) : (
+            <div className="px-5 py-4">
+              <label className="text-[11px] font-medium text-muted-foreground">ИНН</label>
+              <Input
+                value={runInn}
+                onChange={(e) => {
+                  setRunInn(e.target.value);
+                  if (runError) setRunError(null);
+                }}
+                placeholder="Введите ИНН контрагента"
+                className="mt-1 bg-white"
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") handleStartAssessment();
+                }}
+              />
+              {runError && (
+                <div className="mt-2 text-[12px] text-rose-600">{runError}</div>
+              )}
+            </div>
+          )}
           <div className="flex justify-end gap-2 border-t border-border px-5 py-3">
             <Button
               variant="ghost"
@@ -718,12 +802,7 @@ export default function Index() {
       <AssessmentModal
         assessment={manualAssessment}
         open={manualAssessmentOpen}
-        onOpenChange={(o) => {
-          setManualAssessmentOpen(o);
-          if (!o) {
-            setManualDisagreement(null);
-          }
-        }}
+        onOpenChange={handleManualAssessmentOpenChange}
         status={manualStatus}
         disagreement={manualDisagreement}
         defaultInn={manualAssessment?.inn}
@@ -732,6 +811,12 @@ export default function Index() {
           setManualDisagreement(d);
           setManualStatus("disagreed");
         }}
+      />
+
+      <CounterpartyModal
+        counterparty={manualFlowTarget}
+        open={manualFlowCpOpen}
+        onOpenChange={handleManualFlowCpOpenChange}
       />
 
       <ProcessFilterDrawer
