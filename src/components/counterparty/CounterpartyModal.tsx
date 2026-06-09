@@ -495,7 +495,14 @@ export function CounterpartyModal({
                 </span>
                 <h2 className="mt-3 text-2xl font-semibold tracking-tight text-foreground">{counterparty.name}</h2>
                 <div className="mt-1 text-sm text-muted-foreground">
-                  ИНН {counterparty.inn} · ОГРН {defaultOgrn}
+                  ИНН {counterparty.inn} · ОГРН {defaultOgrn} ·{" "}
+                  <button
+                    type="button"
+                    onClick={() => setRegistrationOpen(true)}
+                    className="cursor-pointer text-primary transition hover:underline"
+                  >
+                    Подробнее
+                  </button>
                 </div>
                 <div className="mt-5">
                   <AssistantSummaryCard
