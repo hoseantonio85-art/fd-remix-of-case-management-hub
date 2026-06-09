@@ -504,20 +504,6 @@ export function CounterpartyModal({
                     Подробнее
                   </button>
                 </div>
-                <div className="mt-5">
-                  <AssistantSummaryCard
-                    onOpen={() => setAssessmentOpen(true)}
-                    status={assessmentStatus}
-                    confirmedAt={assessmentConfirmedAt}
-                    confirmedBy={ASSESSMENT_USER}
-                    disagreement={assessmentDisagreement}
-                    sourceLabel={
-                      assessment?.source === "manual"
-                        ? "Запущено пользователем"
-                        : "Автоматический мониторинг"
-                    }
-                  />
-                </div>
               </div>
             );
           })()}
