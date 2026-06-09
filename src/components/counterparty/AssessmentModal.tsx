@@ -89,6 +89,7 @@ export function AssessmentModal({
   const [groupDrawer, setGroupDrawer] = useState<AssessmentGroup | null>(null);
   const [runOpen, setRunOpen] = useState(false);
   const [runInn, setRunInn] = useState(defaultInn ?? "");
+  const [registrationOpen, setRegistrationOpen] = useState(false);
   const wasRunning = useRef(false);
 
   useEffect(() => {
