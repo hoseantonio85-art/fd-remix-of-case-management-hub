@@ -492,6 +492,14 @@ export function AssessmentModal({
             open={!!groupDrawer}
             onOpenChange={(o) => !o && setGroupDrawer(null)}
           />
+
+          <RegistrationInfoDrawer
+            open={registrationOpen}
+            onOpenChange={setRegistrationOpen}
+            counterpartyName={assessment.counterpartyName}
+            inn={assessment.inn}
+            ogrn={defaultOgrn}
+          />
         </div>
         </DialogPrimitive.Content>
       </DialogPrimitive.Portal>
