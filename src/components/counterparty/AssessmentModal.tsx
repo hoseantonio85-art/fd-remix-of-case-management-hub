@@ -88,11 +88,16 @@ export function AssessmentModal({
   onDisagree: (d: Disagreement) => void;
 }) {
   const [notice, setNotice] = useState<{ tone: "success" | "info"; text: string } | null>(null);
-  const [disagreeOpen, setDisagreeOpen] = useState(false);
-  const [disagreeText, setDisagreeText] = useState("");
-  const [disagreeReason, setDisagreeReason] = useState(REASONS[0]);
   const [groupDrawer, setGroupDrawer] = useState<AssessmentGroup | null>(null);
   const [registrationOpen, setRegistrationOpen] = useState(false);
+
+  // Disagreement (review) inline flow
+  const [disagreeOpen, setDisagreeOpen] = useState(false);
+  const [disagreeGroupIds, setDisagreeGroupIds] = useState<string[]>([]);
+  const [disagreeComment, setDisagreeComment] = useState("");
+  const [disagreeSubmitted, setDisagreeSubmitted] = useState(false);
+  const [disagreeEditMode, setDisagreeEditMode] = useState(false);
+  const disagreeRef = useRef<HTMLDivElement>(null);
 
   // In-modal reassessment (separate from main-screen flow that asks INN).
   const [isReassessmentRunning, setIsReassessmentRunning] = useState(false);
