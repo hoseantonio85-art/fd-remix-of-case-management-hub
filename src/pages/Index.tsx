@@ -387,21 +387,24 @@ export default function Index() {
 
   const toggleTile = (key: CategoryKey) => {
     if (allowedCategories && !allowedCategories.has(key)) return;
+    // Manual click on an allowed tile while a process is active → drop process context
+    // but preserve the resulting manual selection.
+    if (processStage) {
+      const next = new Set(selectedTiles);
+      if (next.has(key)) next.delete(key);
+      else next.add(key);
+      setProcessStage(null);
+      setSelectedTiles(next);
+      setRiskFilter("all");
+      return;
+    }
     setSelectedTiles((prev) => {
       const next = new Set(prev);
       if (next.has(key)) {
-        // Cannot remove the last selected tile while a process is active
-        if (allowedCategories && next.size === 1) return prev;
         next.delete(key);
       } else {
-        if (allowedCategories) {
-          // multi-select within process
-          next.add(key);
-        } else {
-          // single-select like before
-          next.clear();
-          next.add(key);
-        }
+        next.clear();
+        next.add(key);
       }
       return next;
     });
