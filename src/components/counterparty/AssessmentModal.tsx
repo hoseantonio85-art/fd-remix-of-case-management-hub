@@ -257,82 +257,43 @@ export function AssessmentModal({
               </div>
             )}
 
-            {runOpen && onRun && (
-              <div className="rounded-xl border border-border bg-slate-50/60 p-4">
-                <div className="flex items-start gap-3">
-                  <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-border bg-white text-muted-foreground">
-                    <RefreshCw className="h-4 w-4" />
-                  </div>
-                  <div className="min-w-0 flex-1">
-                    <div className="text-sm font-semibold text-foreground">Запустить новую оценку</div>
-                    <p className="mt-0.5 text-[11px] text-muted-foreground">
-                      Агент проверит контрагента по 43 критериям благонадёжности. Можно указать любой ИНН.
-                    </p>
-                    <div className="mt-3 flex flex-col gap-2 sm:flex-row sm:items-end">
-                      <div className="flex-1">
-                        <label className="text-[11px] font-medium text-muted-foreground">
-                          ИНН для оценки
-                        </label>
-                        <Input
-                          value={runInn}
-                          onChange={(e) => setRunInn(e.target.value)}
-                          placeholder="ИНН"
-                          className="mt-1 bg-white"
-                          disabled={running}
-                        />
-                      </div>
-                      <div className="flex gap-2">
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => setRunOpen(false)}
-                          disabled={running}
-                        >
-                          Отмена
-                        </Button>
-                        <Button
-                          size="sm"
-                          onClick={() => runInn.trim() && onRun(runInn.trim())}
-                          disabled={running || !runInn.trim()}
-                        >
-                          {running ? (
-                            <>
-                              <Loader2 className="h-3.5 w-3.5 animate-spin" /> Запуск…
-                            </>
-                          ) : (
-                            "Запустить"
-                          )}
-                        </Button>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            )}
-
             <div className="grid gap-y-5 gap-x-5 lg:grid-cols-[minmax(0,1fr)_320px] lg:gap-x-12">
               {/* What changed — right column */}
               <aside className="order-2 lg:col-start-2 lg:row-start-1">
 
                 <div className="space-y-3 lg:sticky lg:top-0">
-                  <div className="rounded-2xl border border-border bg-white p-4">
+                  <div
+                    className={cn(
+                      "rounded-2xl border p-4 transition-colors duration-500",
+                      highlightedChanges
+                        ? "border-emerald-300 bg-emerald-50/40"
+                        : "border-border bg-white",
+                    )}
+                  >
                     <div className="flex items-center justify-between">
                       <div>
                         <div className="text-sm font-semibold text-foreground">Что изменилось</div>
-                        <div className="text-[11px] text-muted-foreground">За последний период</div>
+                        <div className="text-[11px] text-muted-foreground">
+                          {reassessmentCompleted
+                            ? "Появились новые изменения по 3 критериям"
+                            : "За последний период"}
+                        </div>
                       </div>
                       <span className="inline-flex h-6 min-w-6 items-center justify-center rounded-full bg-muted px-1.5 text-[11px] font-medium text-muted-foreground">
-                        {assessment.changes.length}
+                        {assessment.changes.length + extraChanges.length}
                       </span>
                     </div>
                     <div className="mt-3">
-                      {assessment.changes.length === 0 ? (
+                      {assessment.changes.length + extraChanges.length === 0 ? (
                         <div className="rounded-lg border border-dashed border-border px-3 py-4 text-center text-xs text-muted-foreground">
                           За последний период новых факторов не обнаружено
                         </div>
                       ) : (
                         <ul className="divide-y divide-border">
-                          {assessment.changes.map((c, i) => {
+                          {[
+                            ...extraChanges.map((c) => ({ ...c, fresh: true })),
+                            ...assessment.changes.map((c) => ({ ...c, fresh: false })),
+                          ].map((c, i) => {
                             const Ico = changeIcon[c.tone];
                             const cls = changeIconClass[c.tone];
                             return (
@@ -344,6 +305,7 @@ export function AssessmentModal({
                                   <div className="text-xs leading-snug text-foreground">{c.text}</div>
                                   <div className="mt-0.5 text-[10px] text-muted-foreground">
                                     {toneLabel[c.tone]}
+                                    {c.fresh && " · только что"}
                                   </div>
                                 </div>
                               </li>
@@ -353,26 +315,73 @@ export function AssessmentModal({
                       )}
                     </div>
                   </div>
-                  {onRun && (
-                    <Button
-                      variant="outline"
-                      onClick={() => setRunOpen((v) => !v)}
-                      disabled={running}
-                      className="h-11 w-full rounded-full border bg-white text-sm font-medium"
-                    >
-                      {running ? (
-                        <>
-                          <Loader2 className="h-4 w-4 animate-spin" /> Запуск…
-                        </>
-                      ) : (
-                        <>
-                          <RefreshCw className="h-4 w-4" /> Запустить новую оценку
-                        </>
+
+                  {(isReassessmentRunning || reassessmentCompleted) && (
+                    <div className="rounded-2xl border border-border bg-white p-4">
+                      <div className="flex items-center gap-2">
+                        {isReassessmentRunning ? (
+                          <Loader2 className="h-4 w-4 animate-spin text-primary" />
+                        ) : (
+                          <CheckCircle2 className="h-4 w-4 text-emerald-600" />
+                        )}
+                        <div className="text-sm font-semibold text-foreground">
+                          {isReassessmentRunning ? "Оценка запущена" : "Оценка обновлена"}
+                        </div>
+                      </div>
+                      <p className="mt-1.5 text-[11px] leading-snug text-muted-foreground">
+                        {isReassessmentRunning
+                          ? `Проверяю данные по ИНН ${assessment.inn}: регистрационные сведения, налоговые маркеры и судебную нагрузку.`
+                          : "Появились новые изменения по 3 критериям. Проверьте блок «Что изменилось»."}
+                      </p>
+                      {isReassessmentRunning && (
+                        <ul className="mt-3 space-y-1.5">
+                          {[
+                            "Регистрационные данные",
+                            "Финансы и налоги",
+                            "Судебная нагрузка",
+                          ].map((label, idx) => {
+                            const done = progressStep > idx;
+                            const active = progressStep === idx;
+                            return (
+                              <li key={label} className="flex items-center gap-2 text-[11px]">
+                                {done ? (
+                                  <CheckCircle2 className="h-3.5 w-3.5 text-emerald-600" />
+                                ) : active ? (
+                                  <Loader2 className="h-3.5 w-3.5 animate-spin text-primary" />
+                                ) : (
+                                  <span className="h-3.5 w-3.5 rounded-full border border-border" />
+                                )}
+                                <span className={cn(done ? "text-foreground" : "text-muted-foreground")}>
+                                  {label}
+                                </span>
+                              </li>
+                            );
+                          })}
+                        </ul>
                       )}
-                    </Button>
+                    </div>
                   )}
+
+                  <Button
+                    variant="outline"
+                    onClick={handleRerunAssessment}
+                    disabled={isReassessmentRunning}
+                    className="h-11 w-full rounded-full border bg-white text-sm font-medium"
+                  >
+                    {isReassessmentRunning ? (
+                      <>
+                        <Loader2 className="h-4 w-4 animate-spin" /> Обновляю оценку
+                      </>
+                    ) : (
+                      <>
+                        <RefreshCw className="h-4 w-4" />
+                        {reassessmentCompleted ? "Запустить повторно" : "Запустить новую оценку"}
+                      </>
+                    )}
+                  </Button>
                 </div>
               </aside>
+
 
               {/* Groups — left, row 2 */}
               <section className="order-3 lg:col-start-1 lg:row-start-1 space-y-5">
