@@ -517,21 +517,18 @@ export default function Index() {
               <div className="grid grid-cols-1 gap-6 lg:grid-cols-[1fr_auto]">
                 <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
                   {tiles.map((t) => {
-                    const isActive = filter === t.key;
+                    const isActive = selectedTiles.has(t.key);
                     const disabled = !!allowedCategories && !allowedCategories.has(t.key);
+                    const dimmed = selectedTiles.size > 0 && !isActive && !disabled;
                     return (
                       <button
                         key={t.key}
                         disabled={disabled}
-                        onClick={() => {
-                          if (disabled) return;
-                          setFilter(isActive ? null : t.key);
-                          setRiskFilter("all");
-                        }}
+                        onClick={() => toggleTile(t.key)}
                         className={`rounded-2xl px-4 py-4 text-left transition ${
                           isActive
                             ? `${t.bg.replace("/60", "")} ring-2 ${t.ring} shadow-md brightness-105 saturate-150`
-                            : `${t.bg} ring-1 ring-inset ring-transparent hover:ring-2 ${filter ? "opacity-60" : ""}`
+                            : `${t.bg} ring-1 ring-inset ring-transparent hover:ring-2 ${dimmed ? "opacity-60" : ""}`
                         } ${disabled ? "!opacity-40 !cursor-not-allowed hover:ring-0" : ""}`}
                       >
                         <div className="flex items-start justify-between gap-2">
@@ -552,7 +549,7 @@ export default function Index() {
 
                 <div className="flex items-center gap-6">
                   <ul className="space-y-2 text-sm">
-                    {(filter ? categoryPalette[filter].segments : defaultSegments).map((s) => (
+                    {donutData.segments.map((s) => (
                       <li key={s.key} className="flex items-center gap-2">
                         <span
                           className="inline-block h-2 w-2 rounded-full"
@@ -562,11 +559,9 @@ export default function Index() {
                       </li>
                     ))}
                   </ul>
-                  <Donut
-                    amount={filter ? categoryPalette[filter].amount : "4,7"}
-                    segments={filter ? categoryPalette[filter].segments : defaultSegments}
-                  />
+                  <Donut amount={donutData.amount} segments={donutData.segments} />
                 </div>
+
               </div>
             </div>
 
