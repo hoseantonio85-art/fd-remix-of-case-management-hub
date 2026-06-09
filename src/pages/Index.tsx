@@ -251,10 +251,26 @@ export default function Index() {
   };
 
 
+  const processCounts = useMemo(() => {
+    const map = { monitoring: 0, risk_confirmation: 0, settlement: 0, writeoff: 0 } as Record<ProcessStage, number>;
+    for (const c of counterparties) map[c.processStage]++;
+    return map;
+  }, []);
+
+  const byProcess = useMemo(() => {
+    if (!processStage) return counterparties;
+    return counterparties.filter((c) => c.processStage === processStage);
+  }, [processStage]);
+
+  const allowedCategories = useMemo(() => {
+    if (!processStage) return null;
+    return new Set(processMeta[processStage].allowedCategories);
+  }, [processStage]);
+
   const byCategory = useMemo(() => {
-    if (!filter) return counterparties;
-    return counterparties.filter((c) => c.status === filter);
-  }, [filter]);
+    if (!filter) return byProcess;
+    return byProcess.filter((c) => c.status === filter);
+  }, [byProcess, filter]);
 
   const showRiskChips = filter !== "no_risk" && filter !== "overdue";
 
@@ -273,6 +289,15 @@ export default function Index() {
     if (!showRiskChips || riskFilter === "all") return byCategory;
     return byCategory.filter((c) => c.risks.some((r) => r.type === riskFilter));
   }, [byCategory, riskFilter, showRiskChips]);
+
+  const applyProcessStage = (stage: ProcessStage | null) => {
+    setProcessStage(stage);
+    if (stage && filter && !processMeta[stage].allowedCategories.includes(filter)) {
+      setFilter(null);
+      setRiskFilter("all");
+    }
+  };
+
 
   return (
     <div className="min-h-screen bg-white">
