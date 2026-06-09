@@ -35,17 +35,13 @@ import {
 import { stepMetaByTitle } from "@/lib/debt-process";
 import { getToneForTag, toneStyles } from "./header-theme";
 import { riskMeta } from "./risk-meta";
+import { getCounterpartyProblemIndicators, problemIndicatorMeta } from "@/lib/problem-indicators";
 import { ResolutionCard } from "./ResolutionCard";
 import { AssessmentModal, type AssessmentStatus, type Disagreement } from "./AssessmentModal";
 import { buildAssessment, type Assessment } from "@/lib/assessment-data";
 import { defaultOgrn } from "./RegistrationInfoWidget";
 import { RegistrationInfoDrawer } from "./RegistrationInfoDrawer";
 
-const priorityBadge: Record<string, { label: string; cls: string }> = {
-  high: { label: "Высокий приоритет", cls: "bg-amber-100 text-amber-900" },
-  medium: { label: "Средний приоритет", cls: "bg-amber-50 text-amber-800" },
-  low: { label: "Низкий приоритет", cls: "bg-muted text-muted-foreground" },
-};
 
 export function CounterpartyModal({
   counterparty,
@@ -64,7 +60,7 @@ export function CounterpartyModal({
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [contractDrawer, setContractDrawer] = useState<Contract | null>(null);
   const [stepperError, setStepperError] = useState<string | null>(null);
-  const [showAllPending, setShowAllPending] = useState(false);
+  
   const [debtDrawerOpen, setDebtDrawerOpen] = useState(false);
   const [notification, setNotification] = useState<
     { tone: "success" | "info"; text: string } | null
@@ -121,7 +117,6 @@ export function CounterpartyModal({
     return () => clearTimeout(t);
   }, [stepAnim]);
 
-  const pending = useMemo(() => risks.filter((r) => r.status === "pending"), [risks]);
   const verification = useMemo(() => risks.filter((r) => r.status === "verification"), [risks]);
   const confirmed = useMemo(() => risks.filter((r) => r.status === "confirmed"), [risks]);
   const dismissed = useMemo(() => risks.filter((r) => r.status === "dismissed"), [risks]);
@@ -129,23 +124,6 @@ export function CounterpartyModal({
   const totalOverdue = contracts.reduce((acc, c) => acc + c.overdue, 0);
   const currentStage = steps.find((s) => s.status === "current");
   const allMeasures = confirmed.flatMap((r) => r.decision?.measures ?? []);
-
-  const sortedPending = useMemo(() => {
-    const typeOrder: Record<string, number> = {
-      "Банкротство / ликвидация": 7,
-      "Уголовное дело": 6,
-      "Ограничения деятельности": 5,
-      "Административные нарушения": 4,
-      "Неисполнение контракта группы": 3,
-      "Ухудшилось финансовое состояние": 2,
-    };
-    const priorityOrder: Record<string, number> = { high: 3, medium: 2, low: 1 };
-    return [...pending].sort((a, b) => {
-      const pDiff = (priorityOrder[b.priority] || 0) - (priorityOrder[a.priority] || 0);
-      if (pDiff !== 0) return pDiff;
-      return (typeOrder[b.type] || 0) - (typeOrder[a.type] || 0);
-    });
-  }, [pending]);
 
   const overdueStartDate = useMemo(() => {
     const dates = contracts
@@ -170,8 +148,6 @@ export function CounterpartyModal({
     [contracts],
   );
 
-  const visiblePending = showAllPending ? sortedPending : sortedPending.slice(0, 2);
-  const hiddenPendingCount = sortedPending.length - visiblePending.length;
 
   if (!counterparty) return null;
 
@@ -491,9 +467,24 @@ export function CounterpartyModal({
                 >
                   <X className="h-4 w-4" />
                 </button>
-                <span className={`inline-flex w-fit items-center rounded-full px-2.5 py-1 text-[11px] font-medium ${styles.badge}`}>
-                  {counterparty.tag}
-                </span>
+                <div className="flex flex-wrap items-center gap-1.5">
+                  <span className={`inline-flex w-fit items-center rounded-full px-2.5 py-1 text-[11px] font-medium ${styles.badge}`}>
+                    {counterparty.tag}
+                  </span>
+                  {getCounterpartyProblemIndicators(counterparty).map((k) => {
+                    const m = problemIndicatorMeta[k];
+                    const Icon = m.icon;
+                    return (
+                      <span
+                        key={k}
+                        title={m.label}
+                        className={`inline-flex h-7 w-7 items-center justify-center rounded-full border ${m.activeBorder} ${m.activeBg}`}
+                      >
+                        <Icon className={`h-3.5 w-3.5 ${m.iconColor}`} />
+                      </span>
+                    );
+                  })}
+                </div>
                 <h2 className="mt-3 text-2xl font-semibold tracking-tight text-foreground">{counterparty.name}</h2>
                 <div className="mt-1 text-sm text-muted-foreground">
                   ИНН {counterparty.inn} · ОГРН {defaultOgrn} ·{" "}
@@ -550,80 +541,6 @@ export function CounterpartyModal({
                 </button>
               </div>
             )}
-            {/* Section: Requires decision */}
-            <section>
-              <SectionTitle title="Требуют решения" count={sortedPending.length} tone="warn" />
-              {sortedPending.length === 0 ? (
-                <EmptyState text="Все сигналы обработаны" />
-              ) : (
-                <div className="space-y-2">
-                  {visiblePending.map((r) => {
-                    const p = priorityBadge[r.priority];
-                    const rm = riskMeta[r.type];
-                    const RIcon = rm?.icon;
-                    return (
-                      <div
-                        key={r.id}
-                        className="group rounded-lg border border-[#E5E7EB] bg-white px-4 py-3 transition hover:bg-muted/30"
-                      >
-                        <div className="flex items-start gap-3">
-                          <div
-                            className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-full border ${rm?.activeBorder ?? "border-amber-200"} ${rm?.activeBg ?? "bg-amber-50"}`}
-                          >
-                            {RIcon && <RIcon className={`h-4 w-4 ${rm.iconColor}`} />}
-                          </div>
-                          <div className="min-w-0 flex-1">
-                            <div className="truncate text-sm font-medium text-foreground">
-                              {r.type}
-                            </div>
-                            <div className="mt-0.5 flex flex-wrap items-center gap-x-1.5 gap-y-0.5 text-[11px] text-muted-foreground">
-                              <span>{r.source}</span>
-                              <span>·</span>
-                              <span>{r.detectedAt}</span>
-                              <span>·</span>
-                              <span className={`rounded-full px-1.5 py-0 text-[10px] font-medium ${p.cls}`}>
-                                {p.label}
-                              </span>
-                            </div>
-                            <div className="mt-1.5 text-xs text-muted-foreground line-clamp-2">
-                              {r.description}
-                            </div>
-                          </div>
-                        </div>
-                        <div className="mt-3 flex flex-wrap items-center gap-1.5">
-                          <Button size="sm" className="h-7 px-2.5 text-xs" onClick={() => openDrawer(r, "confirm")}>
-                            Подтвердить
-                          </Button>
-                          <Button size="sm" variant="outline" className="h-7 px-2.5 text-xs" onClick={() => openDrawer(r, "dismiss")}>
-                            Снять
-                          </Button>
-                          <Button size="sm" variant="ghost" className="h-7 px-2.5 text-xs" onClick={() => openDrawer(r, "verify")}>
-                            На проверку
-                          </Button>
-                        </div>
-                      </div>
-                    );
-                  })}
-                  {hiddenPendingCount > 0 && (
-                    <button
-                      onClick={() => setShowAllPending((s) => !s)}
-                      className="flex w-full items-center justify-center gap-1.5 rounded-lg border border-dashed border-border bg-white py-2 text-xs font-medium text-muted-foreground transition hover:bg-muted/30 hover:text-foreground"
-                    >
-                      {showAllPending ? (
-                        <>
-                          <ChevronDown className="h-4 w-4 rotate-180" /> Скрыть
-                        </>
-                      ) : (
-                        <>
-                          <ChevronDown className="h-4 w-4" /> Показать ещё {hiddenPendingCount} {hiddenPendingCount === 1 ? "сигнал" : hiddenPendingCount < 5 ? "сигнала" : "сигналов"}
-                        </>
-                      )}
-                    </button>
-                  )}
-                </div>
-
-              )}
-            </section>
 
             {/* Section: Decisions */}
             {decidedCount > 0 && (

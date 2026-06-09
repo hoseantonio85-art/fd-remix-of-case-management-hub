@@ -22,6 +22,7 @@ import {
 import { counterparties, type Counterparty, type RiskType, type ProcessStage } from "@/lib/mock-data";
 import { CounterpartyModal } from "@/components/counterparty/CounterpartyModal";
 import { riskMeta, allChipMeta } from "@/components/counterparty/risk-meta";
+import { getCounterpartyProblemIndicators, problemIndicatorMeta } from "@/lib/problem-indicators";
 import { AssessmentModal, type AssessmentStatus, type Disagreement } from "@/components/counterparty/AssessmentModal";
 import { buildAssessment, type Assessment } from "@/lib/assessment-data";
 import { Button } from "@/components/ui/button";
@@ -694,9 +695,7 @@ export default function Index() {
               )}
               {filtered.map((c) => {
                 const stage = c.collection.find((s) => s.status === "current")?.stage ?? "—";
-                const types = Array.from(new Set(c.risks.map((r) => r.type)));
-                const shownIcons = types.slice(0, 3);
-                const restIcons = types.length - shownIcons.length;
+                const indicators = getCounterpartyProblemIndicators(c);
                 return (
                   <button
                     key={c.id}
@@ -719,12 +718,12 @@ export default function Index() {
                             </span>
                           );
                         })()}
-                        {shownIcons.map((t) => {
-                          const m = riskMeta[t];
+                        {indicators.map((k) => {
+                          const m = problemIndicatorMeta[k];
                           const Icon = m.icon;
                           return (
                             <span
-                              key={t}
+                              key={k}
                               title={m.label}
                               className={`inline-flex h-6 w-6 items-center justify-center rounded-full border ${m.activeBorder} ${m.activeBg}`}
                             >
@@ -732,11 +731,6 @@ export default function Index() {
                             </span>
                           );
                         })}
-                        {restIcons > 0 && (
-                          <span className="inline-flex h-6 items-center rounded-full border border-slate-200 bg-slate-50 px-1.5 text-[10px] font-medium text-slate-600">
-                            +{restIcons}
-                          </span>
-                        )}
                       </div>
 
                       <div className="text-sm font-semibold text-foreground">{c.name}</div>
