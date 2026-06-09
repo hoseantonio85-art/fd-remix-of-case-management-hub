@@ -512,6 +512,11 @@ export function CounterpartyModal({
 
           <div className="grid grid-cols-1 gap-y-6 gap-x-6 bg-white px-5 py-6 lg:grid-cols-[minmax(0,1fr)_340px] lg:gap-x-12 lg:px-10">
             <div className="space-y-6 min-w-0">
+            <ResolutionCard
+              title="Рекомендуется не заключать новые сделки"
+              description="По оценке благонадёжности выявлены критичные и финансовые маркеры. До проверки спорных критериев заключение новых сделок нежелательно."
+              onDetailsClick={() => setAssessmentOpen(true)}
+            />
             <div className="grid grid-cols-2 gap-3">
               <DebtCard label="Общая задолженность" value={counterparty.totalDebt} />
               <DebtCard
