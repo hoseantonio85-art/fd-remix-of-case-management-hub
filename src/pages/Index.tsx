@@ -228,19 +228,36 @@ export default function Index() {
   const [manualAssessmentOpen, setManualAssessmentOpen] = useState(false);
   const [manualStatus, setManualStatus] = useState<AssessmentStatus>("updated");
   const [manualDisagreement, setManualDisagreement] = useState<Disagreement | null>(null);
+  // Manual assessment flow (CTA «Оценить контрагента»)
+  const [addedCounterparties, setAddedCounterparties] = useState<Counterparty[]>([]);
+  const [manualFlowTarget, setManualFlowTarget] = useState<Counterparty | null>(null);
+  const [manualFlowIsNew, setManualFlowIsNew] = useState(false);
+  const [manualFlowCpOpen, setManualFlowCpOpen] = useState(false);
 
+  const allCounterparties = useMemo(
+    () => [...addedCounterparties, ...counterparties],
+    [addedCounterparties],
+  );
 
   const handleStartAssessment = () => {
-    const inn = runInn.trim();
-    if (!inn) {
+    const innRaw = runInn.trim();
+    if (!innRaw) {
       setRunError("Введите ИНН контрагента");
+      return;
+    }
+    if (!/^\d{10}(\d{2})?$/.test(innRaw)) {
+      setRunError("ИНН должен содержать 10 или 12 цифр");
       return;
     }
     setRunError(null);
     setRunLoading(true);
     setTimeout(() => {
       const today = new Date().toLocaleDateString("ru-RU");
-      setManualAssessment(buildAssessment("Новый контрагент", inn, "manual", today));
+      const existing = allCounterparties.find((c) => c.inn === innRaw) ?? null;
+      const target: Counterparty = existing ?? buildNewCounterparty(innRaw, today);
+      setManualFlowTarget(target);
+      setManualFlowIsNew(!existing);
+      setManualAssessment(buildAssessment(target.name, innRaw, "manual", today));
       setManualStatus("updated");
       setManualDisagreement(null);
       setRunLoading(false);
@@ -249,6 +266,41 @@ export default function Index() {
       setRunInn("");
     }, 1500);
   };
+
+  const handleManualAssessmentOpenChange = (o: boolean) => {
+    setManualAssessmentOpen(o);
+    if (!o) {
+      setManualDisagreement(null);
+      if (manualFlowTarget) {
+        // Manual flow: chain to CounterpartyModal
+        setManualFlowCpOpen(true);
+      }
+    }
+  };
+
+  const handleManualFlowCpOpenChange = (o: boolean) => {
+    setManualFlowCpOpen(o);
+    if (!o && manualFlowTarget) {
+      const inn = manualFlowTarget.inn;
+      if (manualFlowIsNew) {
+        setAddedCounterparties((prev) =>
+          prev.some((c) => c.inn === inn) ? prev : [manualFlowTarget, ...prev],
+        );
+        toast.success("Контрагент добавлен в список", {
+          description: `Оценка сохранена по ИНН ${inn}`,
+        });
+      } else {
+        toast("Контрагент уже есть в списке", {
+          description: `ИНН ${inn} найден в рабочем списке`,
+        });
+      }
+      // cleanup
+      setManualFlowTarget(null);
+      setManualFlowIsNew(false);
+      setManualAssessment(null);
+    }
+  };
+
 
 
   const processCounts = useMemo(() => {
