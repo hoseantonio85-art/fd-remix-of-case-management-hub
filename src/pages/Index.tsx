@@ -626,12 +626,15 @@ export default function Index() {
               </div>
             )}
 
-            {filter && (
-              <div className="mb-3 flex items-center gap-2 text-xs text-muted-foreground">
-                Фильтр: <b className="text-foreground">{tiles.find((t) => t.key === filter)?.title}</b>
+            {selectedTiles.size > 0 && !processStage && (
+              <div className="mb-3 flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
+                Фильтр:{" "}
+                <b className="text-foreground">
+                  {tiles.filter((t) => selectedTiles.has(t.key)).map((t) => t.title).join(", ")}
+                </b>
                 <button
                   className="rounded-full border border-border bg-white px-2 py-0.5 text-[11px] hover:bg-accent"
-                  onClick={() => setFilter(null)}
+                  onClick={() => setSelectedTiles(new Set())}
                 >
                   Сбросить
                 </button>
