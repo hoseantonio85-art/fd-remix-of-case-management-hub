@@ -259,7 +259,7 @@ export function AssessmentModal({
 
             <div className="flex flex-wrap items-center gap-2">
               <span className={`inline-flex items-center rounded-full px-2.5 py-1 text-[11px] font-medium ${meta.chip}`}>
-                {reassessmentCompleted ? "Обновлена, требует подтверждения" : meta.label}
+                {meta.label}
               </span>
             </div>
             <h2 className="mt-3 text-2xl font-semibold tracking-tight text-foreground">
