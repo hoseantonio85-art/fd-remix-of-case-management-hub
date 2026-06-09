@@ -371,6 +371,15 @@ export default function Index() {
     if (selectedTiles.size === 1) {
       const key = Array.from(selectedTiles)[0] as CategoryKey;
       const cat = categoryPalette[key];
+      // Single no-overdue mode: «Нет риска» and «Риск дефолта» → one solid segment
+      if (key === "no_risk" || key === "risk") {
+        const tile = tiles.find((t) => t.key === key)!;
+        const val = parseFloat(cat.amount.replace(",", "."));
+        return {
+          amount: cat.amount,
+          segments: [{ key: "no_overdue", label: "Без просрочки", value: val, color: tile.dot }],
+        };
+      }
       return { amount: cat.amount, segments: cat.segments };
     }
     // process_categories
