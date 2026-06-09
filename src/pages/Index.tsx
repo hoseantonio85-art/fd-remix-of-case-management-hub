@@ -218,6 +218,8 @@ export default function Index() {
   const [active, setActive] = useState<Counterparty | null>(null);
   const [filter, setFilter] = useState<CategoryKey | null>(null);
   const [riskFilter, setRiskFilter] = useState<RiskChipKey>("all");
+  const [processStage, setProcessStage] = useState<ProcessStage | null>(null);
+  const [processDrawerOpen, setProcessDrawerOpen] = useState(false);
   const [runDialogOpen, setRunDialogOpen] = useState(false);
   const [runInn, setRunInn] = useState("");
   const [runError, setRunError] = useState<string | null>(null);
@@ -226,6 +228,7 @@ export default function Index() {
   const [manualAssessmentOpen, setManualAssessmentOpen] = useState(false);
   const [manualStatus, setManualStatus] = useState<AssessmentStatus>("updated");
   const [manualDisagreement, setManualDisagreement] = useState<Disagreement | null>(null);
+
 
   const handleStartAssessment = () => {
     const inn = runInn.trim();
