@@ -87,9 +87,9 @@ export function CounterpartyModal({
 
   useEffect(() => {
     if (counterparty && open) {
-      setRisks(counterparty.risks.map((r) => ({ ...r })));
-      setContracts(counterparty.contracts.map((c) => ({ ...c, overdueHistory: [...c.overdueHistory] })));
-      setSteps(counterparty.collection.map((s) => ({ ...s })));
+      setRisks((counterparty.risks ?? []).map((r) => ({ ...r })));
+      setContracts((counterparty.contracts ?? []).map((c) => ({ ...c, overdueHistory: [...(c.overdueHistory ?? [])] })));
+      setSteps((counterparty.collection ?? []).map((s) => ({ ...s })));
       setStepperError(null);
       setNotification(null);
       setStepAnim(null);
@@ -100,7 +100,7 @@ export function CounterpartyModal({
       setAssessmentDisagreement(null);
       setAssessmentOpen(false);
       setAssessmentRunning(false);
-      const curStep = counterparty.collection.find((s) => s.status === "current");
+      const curStep = (counterparty.collection ?? []).find((s) => s.status === "current");
       setHistory(
         curStep
           ? [
@@ -113,6 +113,7 @@ export function CounterpartyModal({
             ]
           : [],
       );
+
     }
   }, [counterparty, open]);
 
@@ -478,25 +479,28 @@ export function CounterpartyModal({
                     {counterparty.tag}
                   </span>
                   <TooltipProvider delayDuration={150}>
-                    {getCounterpartyProblemIndicators(counterparty).map((k) => {
-                      const m = problemIndicatorMeta[k];
-                      const Icon = m.icon;
-                      return (
-                        <Tooltip key={k}>
-                          <TooltipTrigger asChild>
-                            <span
-                              aria-label={m.label}
-                              className={`inline-flex h-7 w-7 cursor-help items-center justify-center rounded-full border ${m.activeBorder} ${m.activeBg} transition hover:brightness-95`}
-                            >
-                              <Icon className={`h-3.5 w-3.5 ${m.iconColor}`} />
-                            </span>
-                          </TooltipTrigger>
-                          <TooltipContent side="bottom">
-                            <p className="text-xs">{m.label}</p>
-                          </TooltipContent>
-                        </Tooltip>
-                      );
-                    })}
+                    {getCounterpartyProblemIndicators(counterparty)
+                      .map((k) => ({ k, m: problemIndicatorMeta[k] }))
+                      .filter((x) => x.m && x.m.icon && x.m.label)
+                      .map(({ k, m }) => {
+                        const Icon = m.icon;
+                        return (
+                          <Tooltip key={k}>
+                            <TooltipTrigger asChild>
+                              <span
+                                aria-label={m.label}
+                                title={m.label}
+                                className={`inline-flex h-7 w-7 cursor-help items-center justify-center rounded-full border ${m.activeBorder} ${m.activeBg} transition hover:brightness-95`}
+                              >
+                                <Icon className={`h-3.5 w-3.5 ${m.iconColor}`} />
+                              </span>
+                            </TooltipTrigger>
+                            <TooltipContent side="bottom">
+                              <p className="text-xs">{m.label}</p>
+                            </TooltipContent>
+                          </Tooltip>
+                        );
+                      })}
                   </TooltipProvider>
                 </div>
                 <h2 className="mt-3 text-2xl font-semibold tracking-tight text-foreground">{counterparty.name}</h2>

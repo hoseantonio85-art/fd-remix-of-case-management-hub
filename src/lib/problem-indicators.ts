@@ -1,3 +1,4 @@
+import { AlertTriangle, Scale, FileX, TrendingDown, type LucideIcon } from "lucide-react";
 import type { Counterparty, RiskType } from "@/lib/mock-data";
 import { riskMeta, type RiskMetaItem } from "@/components/counterparty/risk-meta";
 
@@ -13,38 +14,56 @@ const NEGATIVE_RISK_TYPES: RiskType[] = [
   "Административные нарушения",
 ];
 
+const FALLBACK_META: RiskMetaItem = {
+  icon: AlertTriangle,
+  short: "Признак",
+  label: "Признак",
+  iconColor: "text-slate-700",
+  activeBg: "bg-slate-100",
+  activeText: "text-slate-900",
+  activeBorder: "border-slate-300",
+  idleIconColor: "text-slate-500",
+};
+
+function safeMeta(key: RiskType, fallbackIcon: LucideIcon): RiskMetaItem {
+  const m = riskMeta[key];
+  if (m && m.icon) return m;
+  return { ...FALLBACK_META, icon: fallbackIcon };
+}
+
 export const problemIndicatorMeta: Record<
   ProblemIndicatorKey,
   RiskMetaItem & { label: string }
 > = {
   bankruptcy_liquidation: {
-    ...riskMeta["Банкротство / ликвидация"],
+    ...safeMeta("Банкротство / ликвидация", Scale),
     label: "Банкротство / ликвидация",
     short: "Банкротство / ликвидация",
   },
   group_contract_nonperformance: {
-    ...riskMeta["Неисполнение контракта группы"],
+    ...safeMeta("Неисполнение контракта группы", FileX),
     label: "Неисполнение контракта группы",
     short: "Неисполнение контракта группы",
   },
   negative_factors: {
-    ...riskMeta["Ухудшилось финансовое состояние"],
+    ...safeMeta("Ухудшилось финансовое состояние", TrendingDown),
     label: "Наличие негативных факторов",
     short: "Наличие негативных факторов",
   },
 };
 
 export function getCounterpartyProblemIndicators(
-  c: Counterparty,
+  c?: Counterparty | null,
 ): ProblemIndicatorKey[] {
+  if (!c || !Array.isArray(c.risks)) return [];
   const result: ProblemIndicatorKey[] = [];
-  if (c.risks.some((r) => r.type === "Банкротство / ликвидация")) {
+  if (c.risks.some((r) => r?.type === "Банкротство / ликвидация")) {
     result.push("bankruptcy_liquidation");
   }
-  if (c.risks.some((r) => r.type === "Неисполнение контракта группы")) {
+  if (c.risks.some((r) => r?.type === "Неисполнение контракта группы")) {
     result.push("group_contract_nonperformance");
   }
-  if (c.risks.some((r) => NEGATIVE_RISK_TYPES.includes(r.type))) {
+  if (c.risks.some((r) => r?.type && NEGATIVE_RISK_TYPES.includes(r.type))) {
     result.push("negative_factors");
   }
   return result;

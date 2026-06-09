@@ -718,19 +718,21 @@ export default function Index() {
                             </span>
                           );
                         })()}
-                        {indicators.map((k) => {
-                          const m = problemIndicatorMeta[k];
-                          const Icon = m.icon;
-                          return (
-                            <span
-                              key={k}
-                              title={m.label}
-                              className={`inline-flex h-6 w-6 items-center justify-center rounded-full border ${m.activeBorder} ${m.activeBg}`}
-                            >
-                              <Icon className={`h-3.5 w-3.5 ${m.iconColor}`} />
-                            </span>
-                          );
-                        })}
+                        {indicators
+                          .map((k) => ({ k, m: problemIndicatorMeta[k] }))
+                          .filter((x) => x.m && x.m.icon && x.m.label)
+                          .map(({ k, m }) => {
+                            const Icon = m.icon;
+                            return (
+                              <span
+                                key={k}
+                                title={m.label}
+                                className={`inline-flex h-6 w-6 items-center justify-center rounded-full border ${m.activeBorder} ${m.activeBg}`}
+                              >
+                                <Icon className={`h-3.5 w-3.5 ${m.iconColor}`} />
+                              </span>
+                            );
+                          })}
                       </div>
 
                       <div className="text-sm font-semibold text-foreground">{c.name}</div>
