@@ -517,7 +517,7 @@ export default function Index() {
                 }`}
               >
                 <SlidersHorizontal className="h-4 w-4" />
-                Фильтр
+                Фильтр по процессу
                 {processStage && (
                   <span className="ml-0.5 rounded-full bg-primary/15 px-1.5 py-px text-[10px] font-semibold">
                     1
