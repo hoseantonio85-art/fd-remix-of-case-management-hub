@@ -121,6 +121,11 @@ export function AssessmentModal({
       setHighlightedChanges(false);
       setExtraChanges([]);
       setProgressStep(0);
+      setDisagreeOpen(false);
+      setDisagreeGroupIds([]);
+      setDisagreeComment("");
+      setDisagreeSubmitted(false);
+      setDisagreeEditMode(false);
     }
   }, [open, assessment?.inn]);
 
@@ -149,29 +154,62 @@ export function AssessmentModal({
 
   if (!assessment) return null;
 
-  const effectiveStatus: AssessmentStatus = reassessmentCompleted ? "updated" : status;
+  const effectiveStatus: AssessmentStatus = disagreeSubmitted
+    ? "review"
+    : reassessmentCompleted
+      ? "updated"
+      : status;
   const meta = statusMeta[effectiveStatus];
   const baseSourceLabel =
     assessment.source === "auto" ? "Автоматический мониторинг" : "Запущено пользователем";
   const sourceLabel = reassessmentCompleted ? "Запущено пользователем · только что" : baseSourceLabel;
-  const savedDisagreement = disagreement;
 
-
-  const handleConfirm = () => {
-    onConfirm();
-    setNotice({
-      tone: "success",
-      text: "Оценка подтверждена. Результаты зафиксированы в карточке контрагента.",
+  const scrollToDisagree = () => {
+    window.requestAnimationFrame(() => {
+      disagreeRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
     });
   };
 
-  const handleSaveDisagree = () => {
-    if (!disagreeText.trim()) return;
-    onDisagree({ reason: disagreeReason, text: disagreeText.trim() });
-    setDisagreeOpen(false);
-    setDisagreeText("");
-    setNotice({ tone: "info", text: "Комментарий сохранён" });
+  const handleDisagreeClick = () => {
+    if (disagreeSubmitted) {
+      setDisagreeEditMode(true);
+      scrollToDisagree();
+      return;
+    }
+    setDisagreeOpen(true);
+    scrollToDisagree();
   };
+
+  const toggleDisagreeGroup = (id: string) => {
+    setDisagreeGroupIds((prev) =>
+      prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id],
+    );
+  };
+
+  const handleSubmitDisagree = () => {
+    if (disagreeGroupIds.length === 0) return;
+    onDisagree({
+      text: disagreeComment.trim(),
+      groups: disagreeGroupIds,
+    });
+    setDisagreeSubmitted(true);
+    setDisagreeEditMode(false);
+    setDisagreeOpen(true);
+    setNotice({ tone: "info", text: "Замечания отправлены на пересмотр" });
+  };
+
+  const showDisagreeForm =
+    (disagreeOpen && !disagreeSubmitted) || (disagreeSubmitted && disagreeEditMode);
+  const showDisagreeSummary = disagreeSubmitted && !disagreeEditMode;
+
+  const disagreeGroupTitles = useMemo(
+    () =>
+      assessment.groups
+        .filter((g) => disagreeGroupIds.includes(g.id))
+        .map((g) => g.title),
+    [assessment.groups, disagreeGroupIds],
+  );
+
 
   const handleDownload = () => {
     setNotice({ tone: "info", text: "Отчёт по оценке скачан" });
