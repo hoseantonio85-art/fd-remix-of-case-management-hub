@@ -481,7 +481,7 @@ export function CounterpartyModal({
                   <TooltipProvider delayDuration={150}>
                     {getCounterpartyProblemIndicators(counterparty)
                       .map((k) => ({ k, m: problemIndicatorMeta[k] }))
-                      .filter((x) => x.m && x.m.icon && x.m.label)
+                      .filter((x) => Boolean(x.m))
                       .map(({ k, m }) => {
                         const Icon = m.icon;
                         return (

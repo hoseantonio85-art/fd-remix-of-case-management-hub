@@ -27,7 +27,7 @@ const FALLBACK_META: RiskMetaItem = {
 
 function safeMeta(key: RiskType, fallbackIcon: LucideIcon): RiskMetaItem {
   const m = riskMeta[key];
-  if (m && m.icon) return m;
+  if (m) return m;
   return { ...FALLBACK_META, icon: fallbackIcon };
 }
 
