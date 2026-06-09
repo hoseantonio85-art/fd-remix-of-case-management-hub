@@ -235,7 +235,7 @@ type RiskChipKey = "all" | RiskType;
 
 export default function Index() {
   const [active, setActive] = useState<Counterparty | null>(null);
-  const [filter, setFilter] = useState<CategoryKey | null>(null);
+  const [selectedTiles, setSelectedTiles] = useState<Set<CategoryKey>>(new Set());
   const [riskFilter, setRiskFilter] = useState<RiskChipKey>("all");
   const [processStage, setProcessStage] = useState<ProcessStage | null>(null);
   const [processDrawerOpen, setProcessDrawerOpen] = useState(false);
@@ -291,7 +291,6 @@ export default function Index() {
     if (!o) {
       setManualDisagreement(null);
       if (manualFlowTarget) {
-        // Manual flow: chain to CounterpartyModal
         setManualFlowCpOpen(true);
       }
     }
@@ -313,14 +312,11 @@ export default function Index() {
           description: `ИНН ${inn} найден в рабочем списке`,
         });
       }
-      // cleanup
       setManualFlowTarget(null);
       setManualFlowIsNew(false);
       setManualAssessment(null);
     }
   };
-
-
 
   const processCounts = useMemo(() => {
     const map = { monitoring: 0, risk_confirmation: 0, settlement: 0, writeoff: 0 } as Record<ProcessStage, number>;
@@ -339,11 +335,14 @@ export default function Index() {
   }, [processStage]);
 
   const byCategory = useMemo(() => {
-    if (!filter) return byProcess;
-    return byProcess.filter((c) => c.status === filter);
-  }, [byProcess, filter]);
+    if (selectedTiles.size === 0) return byProcess;
+    return byProcess.filter((c) => selectedTiles.has(c.status));
+  }, [byProcess, selectedTiles]);
 
-  const showRiskChips = filter !== "no_risk" && filter !== "overdue";
+  const showRiskChips = !(
+    selectedTiles.size === 1 &&
+    (selectedTiles.has("no_risk") || selectedTiles.has("overdue"))
+  );
 
   const riskCounts = useMemo(() => {
     const map: Record<string, number> = { all: byCategory.length };
@@ -361,13 +360,55 @@ export default function Index() {
     return byCategory.filter((c) => c.risks.some((r) => r.type === riskFilter));
   }, [byCategory, riskFilter, showRiskChips]);
 
+  // Donut data driven entirely by selected tiles
+  const donutData = useMemo(() => {
+    if (selectedTiles.size === 0) {
+      return { amount: "4,7", segments: defaultSegments };
+    }
+    const segs: Segment[] = [];
+    let total = 0;
+    for (const t of tiles) {
+      if (!selectedTiles.has(t.key)) continue;
+      const val = parseFloat(categoryPalette[t.key].amount.replace(",", "."));
+      total += val;
+      segs.push({ key: t.key, label: t.title, value: val, color: t.dot });
+    }
+    return { amount: total.toFixed(1).replace(".", ","), segments: segs };
+  }, [selectedTiles]);
+
+  const toggleTile = (key: CategoryKey) => {
+    if (allowedCategories && !allowedCategories.has(key)) return;
+    setSelectedTiles((prev) => {
+      const next = new Set(prev);
+      if (next.has(key)) {
+        // Cannot remove the last selected tile while a process is active
+        if (allowedCategories && next.size === 1) return prev;
+        next.delete(key);
+      } else {
+        if (allowedCategories) {
+          // multi-select within process
+          next.add(key);
+        } else {
+          // single-select like before
+          next.clear();
+          next.add(key);
+        }
+      }
+      return next;
+    });
+    setRiskFilter("all");
+  };
+
   const applyProcessStage = (stage: ProcessStage | null) => {
     setProcessStage(stage);
-    if (stage && filter && !processMeta[stage].allowedCategories.includes(filter)) {
-      setFilter(null);
-      setRiskFilter("all");
+    if (stage) {
+      setSelectedTiles(new Set(processMeta[stage].allowedCategories));
+    } else {
+      setSelectedTiles(new Set());
     }
+    setRiskFilter("all");
   };
+
 
 
   return (
