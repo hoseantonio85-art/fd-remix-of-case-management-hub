@@ -99,13 +99,12 @@ export function AssessmentModal({
   const [groupDrawer, setGroupDrawer] = useState<AssessmentGroup | null>(null);
   const [registrationOpen, setRegistrationOpen] = useState(false);
 
-  // Disagreement (review) inline flow
-  const [disagreeOpen, setDisagreeOpen] = useState(false);
+  // Disagreement (review) inline flow — checkboxes appear directly on group cards.
+  const [disagreeMode, setDisagreeMode] = useState(false);
   const [disagreeGroupIds, setDisagreeGroupIds] = useState<string[]>([]);
-  const [disagreeComment, setDisagreeComment] = useState("");
+  const [disagreeComments, setDisagreeComments] = useState<Record<string, string>>({});
+  const [disagreeErrors, setDisagreeErrors] = useState<Record<string, boolean>>({});
   const [disagreeSubmitted, setDisagreeSubmitted] = useState(false);
-  const [disagreeEditMode, setDisagreeEditMode] = useState(false);
-  const disagreeRef = useRef<HTMLDivElement>(null);
 
   // In-modal reassessment (separate from main-screen flow that asks INN).
   const [isReassessmentRunning, setIsReassessmentRunning] = useState(false);
@@ -129,11 +128,11 @@ export function AssessmentModal({
       setHighlightedChanges(false);
       setExtraChanges([]);
       setProgressStep(0);
-      setDisagreeOpen(false);
+      setDisagreeMode(false);
       setDisagreeGroupIds([]);
-      setDisagreeComment("");
+      setDisagreeComments({});
+      setDisagreeErrors({});
       setDisagreeSubmitted(false);
-      setDisagreeEditMode(false);
     }
   }, [open, assessment?.inn]);
 
@@ -160,51 +159,62 @@ export function AssessmentModal({
     ];
   };
 
-  const scrollToDisagree = () => {
-    window.requestAnimationFrame(() => {
-      disagreeRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
-    });
-  };
-
   const handleDisagreeClick = () => {
-    if (disagreeSubmitted) {
-      setDisagreeEditMode(true);
-      scrollToDisagree();
-      return;
-    }
-    setDisagreeOpen(true);
-    scrollToDisagree();
+    setDisagreeMode(true);
   };
 
   const toggleDisagreeGroup = (id: string) => {
     setDisagreeGroupIds((prev) =>
       prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id],
     );
+    setDisagreeErrors((prev) => {
+      if (!prev[id]) return prev;
+      const next = { ...prev };
+      delete next[id];
+      return next;
+    });
+  };
+
+  const setGroupComment = (id: string, value: string) => {
+    setDisagreeComments((prev) => ({ ...prev, [id]: value }));
+    if (value.trim()) {
+      setDisagreeErrors((prev) => {
+        if (!prev[id]) return prev;
+        const next = { ...prev };
+        delete next[id];
+        return next;
+      });
+    }
   };
 
   const handleSubmitDisagree = () => {
     if (disagreeGroupIds.length === 0) return;
+    const errors: Record<string, boolean> = {};
+    for (const id of disagreeGroupIds) {
+      if (!(disagreeComments[id] ?? "").trim()) errors[id] = true;
+    }
+    if (Object.keys(errors).length > 0) {
+      setDisagreeErrors(errors);
+      return;
+    }
+    const groupTitleById = new Map((assessment?.groups ?? []).map((g) => [g.id, g.title]));
+    const groupComments: DisagreementGroup[] = disagreeGroupIds.map((id) => ({
+      groupId: id,
+      groupTitle: groupTitleById.get(id) ?? id,
+      comment: (disagreeComments[id] ?? "").trim(),
+    }));
     onDisagree({
-      text: disagreeComment.trim(),
+      text: groupComments.map((g) => `${g.groupTitle}: ${g.comment}`).join("\n"),
       groups: disagreeGroupIds,
+      status: "submitted",
+      groupComments,
+      submittedAt: new Date().toISOString(),
     });
     setDisagreeSubmitted(true);
-    setDisagreeEditMode(false);
-    setDisagreeOpen(true);
+    setDisagreeMode(false);
     setNotice({ tone: "info", text: "Замечания отправлены на пересмотр" });
   };
 
-  const showDisagreeForm =
-    (disagreeOpen && !disagreeSubmitted) || (disagreeSubmitted && disagreeEditMode);
-  const showDisagreeSummary = disagreeSubmitted && !disagreeEditMode;
-
-  const disagreeGroupTitles = useMemo(
-    () =>
-      (assessment?.groups ?? [])
-        .filter((g) => disagreeGroupIds.includes(g.id))
-        .map((g) => g.title),
-    [assessment?.groups, disagreeGroupIds],
-  );
 
   if (!assessment) return null;
 
