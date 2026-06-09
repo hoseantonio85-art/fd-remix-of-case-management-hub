@@ -12,7 +12,8 @@ import {
   toneStyles,
 } from "@/lib/assessment-data";
 import { AssessmentGroupDrawer } from "./AssessmentGroupDrawer";
-import { RegistrationInfoWidget, defaultOgrn } from "./RegistrationInfoWidget";
+import { defaultOgrn } from "./RegistrationInfoWidget";
+import { RegistrationInfoDrawer } from "./RegistrationInfoDrawer";
 
 export type AssessmentStatus = "pending" | "confirmed" | "disagreed" | "updated";
 
