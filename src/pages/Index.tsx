@@ -21,7 +21,7 @@ import {
 } from "lucide-react";
 import { counterparties, type Counterparty, type RiskType, type ProcessStage } from "@/lib/mock-data";
 import { CounterpartyModal } from "@/components/counterparty/CounterpartyModal";
-import { riskMeta, allChipMeta, riskOrder } from "@/components/counterparty/risk-meta";
+import { riskMeta, allChipMeta } from "@/components/counterparty/risk-meta";
 import { AssessmentModal, type AssessmentStatus, type Disagreement } from "@/components/counterparty/AssessmentModal";
 import { buildAssessment, type Assessment } from "@/lib/assessment-data";
 import { Button } from "@/components/ui/button";
