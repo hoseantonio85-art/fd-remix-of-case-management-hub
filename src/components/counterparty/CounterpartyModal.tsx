@@ -36,7 +36,8 @@ import { riskMeta } from "./risk-meta";
 import { AssistantSummaryCard } from "./AssistantSummaryCard";
 import { AssessmentModal, type AssessmentStatus, type Disagreement } from "./AssessmentModal";
 import { buildAssessment, type Assessment } from "@/lib/assessment-data";
-import { RegistrationInfoWidget, defaultOgrn } from "./RegistrationInfoWidget";
+import { defaultOgrn } from "./RegistrationInfoWidget";
+import { RegistrationInfoDrawer } from "./RegistrationInfoDrawer";
 
 const priorityBadge: Record<string, { label: string; cls: string }> = {
   high: { label: "Высокий приоритет", cls: "bg-amber-100 text-amber-900" },
@@ -77,6 +78,7 @@ export function CounterpartyModal({
   const [assessmentStatus, setAssessmentStatus] = useState<AssessmentStatus>("pending");
   const [assessmentConfirmedAt, setAssessmentConfirmedAt] = useState<string | undefined>(undefined);
   const [assessmentDisagreement, setAssessmentDisagreement] = useState<Disagreement | null>(null);
+  const [registrationOpen, setRegistrationOpen] = useState(false);
   const ASSESSMENT_USER = "Михайлова Екатерина";
 
   useEffect(() => {
@@ -493,7 +495,14 @@ export function CounterpartyModal({
                 </span>
                 <h2 className="mt-3 text-2xl font-semibold tracking-tight text-foreground">{counterparty.name}</h2>
                 <div className="mt-1 text-sm text-muted-foreground">
-                  ИНН {counterparty.inn} · ОГРН {defaultOgrn}
+                  ИНН {counterparty.inn} · ОГРН {defaultOgrn} ·{" "}
+                  <button
+                    type="button"
+                    onClick={() => setRegistrationOpen(true)}
+                    className="cursor-pointer text-primary transition hover:underline"
+                  >
+                    Подробнее
+                  </button>
                 </div>
                 <div className="mt-5">
                   <AssistantSummaryCard
@@ -739,7 +748,6 @@ export function CounterpartyModal({
 
             {/* Right column: meta */}
             <aside className="space-y-4 lg:sticky lg:top-4 lg:self-start">
-              <RegistrationInfoWidget />
               <DebtSummaryCard
                 steps={steps}
                 stepAnim={stepAnim}
@@ -804,6 +812,14 @@ export function CounterpartyModal({
               return { ...prev, collectionStage: stages[Math.min(i + 1, stages.length - 1)] || stages[0] };
             });
           }}
+        />
+
+        <RegistrationInfoDrawer
+          open={registrationOpen}
+          onOpenChange={setRegistrationOpen}
+          counterpartyName={counterparty.name}
+          inn={counterparty.inn}
+          ogrn={defaultOgrn}
         />
       </DialogContent>
       <AssessmentModal

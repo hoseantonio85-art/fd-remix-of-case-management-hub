@@ -12,7 +12,8 @@ import {
   toneStyles,
 } from "@/lib/assessment-data";
 import { AssessmentGroupDrawer } from "./AssessmentGroupDrawer";
-import { RegistrationInfoWidget, defaultOgrn } from "./RegistrationInfoWidget";
+import { defaultOgrn } from "./RegistrationInfoWidget";
+import { RegistrationInfoDrawer } from "./RegistrationInfoDrawer";
 
 export type AssessmentStatus = "pending" | "confirmed" | "disagreed" | "updated";
 
@@ -88,6 +89,7 @@ export function AssessmentModal({
   const [groupDrawer, setGroupDrawer] = useState<AssessmentGroup | null>(null);
   const [runOpen, setRunOpen] = useState(false);
   const [runInn, setRunInn] = useState(defaultInn ?? "");
+  const [registrationOpen, setRegistrationOpen] = useState(false);
   const wasRunning = useRef(false);
 
   useEffect(() => {
@@ -176,6 +178,14 @@ export function AssessmentModal({
                   <span>Следующая проверка: {assessment.nextCheck}</span>
                 </>
               )}
+              <span>·</span>
+              <button
+                type="button"
+                onClick={() => setRegistrationOpen(true)}
+                className="cursor-pointer text-primary transition hover:underline"
+              >
+                Подробнее
+              </button>
             </div>
             <div className="mt-5 rounded-2xl border border-border bg-white/75 p-4">
               <div className="flex items-start gap-3">
@@ -281,7 +291,6 @@ export function AssessmentModal({
               <aside className="order-2 lg:col-start-2 lg:row-start-1">
 
                 <div className="space-y-3 lg:sticky lg:top-0">
-                  <RegistrationInfoWidget />
                   <div className="rounded-2xl border border-border bg-white p-4">
                     <div className="flex items-center justify-between">
                       <div>
@@ -482,6 +491,14 @@ export function AssessmentModal({
             group={groupDrawer}
             open={!!groupDrawer}
             onOpenChange={(o) => !o && setGroupDrawer(null)}
+          />
+
+          <RegistrationInfoDrawer
+            open={registrationOpen}
+            onOpenChange={setRegistrationOpen}
+            counterpartyName={assessment.counterpartyName}
+            inn={assessment.inn}
+            ogrn={defaultOgrn}
           />
         </div>
         </DialogPrimitive.Content>
