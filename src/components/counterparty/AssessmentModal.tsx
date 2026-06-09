@@ -87,22 +87,55 @@ export function AssessmentModal({
   const [disagreeText, setDisagreeText] = useState("");
   const [disagreeReason, setDisagreeReason] = useState(REASONS[0]);
   const [groupDrawer, setGroupDrawer] = useState<AssessmentGroup | null>(null);
-  const [runOpen, setRunOpen] = useState(false);
-  const [runInn, setRunInn] = useState(defaultInn ?? "");
   const [registrationOpen, setRegistrationOpen] = useState(false);
-  const wasRunning = useRef(false);
+
+  // In-modal reassessment (separate from main-screen flow that asks INN).
+  const [isReassessmentRunning, setIsReassessmentRunning] = useState(false);
+  const [reassessmentCompleted, setReassessmentCompleted] = useState(false);
+  const [highlightedChanges, setHighlightedChanges] = useState(false);
+  const [extraChanges, setExtraChanges] = useState<{ text: string; tone: "rose" | "amber" | "slate" | "emerald" }[]>([]);
+  const [progressStep, setProgressStep] = useState(0);
+  const reassessTimers = useRef<number[]>([]);
 
   useEffect(() => {
-    setRunInn(defaultInn ?? "");
-  }, [defaultInn, assessment?.counterpartyName]);
+    return () => {
+      reassessTimers.current.forEach((t) => window.clearTimeout(t));
+    };
+  }, []);
 
+  // Reset local rerun state when switching counterparty or closing.
   useEffect(() => {
-    if (wasRunning.current && !running) {
-      setRunOpen(false);
-      setNotice({ tone: "success", text: "Оценка обновлена. Требуется подтверждение." });
+    if (!open) {
+      setIsReassessmentRunning(false);
+      setReassessmentCompleted(false);
+      setHighlightedChanges(false);
+      setExtraChanges([]);
+      setProgressStep(0);
     }
-    wasRunning.current = !!running;
-  }, [running]);
+  }, [open, assessment?.inn]);
+
+  const handleRerunAssessment = () => {
+    if (isReassessmentRunning) return;
+    setIsReassessmentRunning(true);
+    setReassessmentCompleted(false);
+    setProgressStep(0);
+    reassessTimers.current.forEach((t) => window.clearTimeout(t));
+    reassessTimers.current = [
+      window.setTimeout(() => setProgressStep(1), 500),
+      window.setTimeout(() => setProgressStep(2), 1100),
+      window.setTimeout(() => {
+        setIsReassessmentRunning(false);
+        setReassessmentCompleted(true);
+        setHighlightedChanges(true);
+        setExtraChanges([
+          { text: "Обновлены ограничения ФНС по счетам", tone: "rose" },
+          { text: "Изменилась налоговая задолженность", tone: "amber" },
+          { text: "Добавлен новый судебный фактор", tone: "slate" },
+        ]);
+      }, 1800),
+      window.setTimeout(() => setHighlightedChanges(false), 5400),
+    ];
+  };
 
   if (!assessment) return null;
 
