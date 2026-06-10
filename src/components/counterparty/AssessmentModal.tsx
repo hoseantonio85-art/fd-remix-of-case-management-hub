@@ -18,6 +18,7 @@ import { defaultOgrn } from "./RegistrationInfoWidget";
 import { RegistrationInfoDrawer } from "./RegistrationInfoDrawer";
 import { KeyAnomaliesWidget } from "./KeyAnomaliesWidget";
 import { TrustFactorsWidget } from "./TrustFactorsWidget";
+import { AssessmentHistoryEntry, AssessmentHistoryDrawer } from "./AssessmentHistoryDrawer";
 
 export type AssessmentStatus = "pending" | "confirmed" | "disagreed" | "updated" | "review";
 
@@ -108,6 +109,7 @@ export function AssessmentModal({
   
   const [groupDrawer, setGroupDrawer] = useState<AssessmentGroup | null>(null);
   const [registrationOpen, setRegistrationOpen] = useState(false);
+  const [historyOpen, setHistoryOpen] = useState(false);
 
   // Disagreement (review) inline flow — checkboxes appear directly on group cards.
   const [disagreeMode, setDisagreeMode] = useState(false);
@@ -362,6 +364,8 @@ export function AssessmentModal({
                 <div className="space-y-3 lg:sticky lg:top-0">
                   {positive ? <TrustFactorsWidget /> : <KeyAnomaliesWidget />}
 
+                  <AssessmentHistoryEntry positive={positive} onOpen={() => setHistoryOpen(true)} />
+
                   {(isReassessmentRunning || reassessmentCompleted) && (
                     <div className="rounded-2xl border border-border bg-white p-4">
                       <div className="flex items-center gap-2">
@@ -585,6 +589,12 @@ export function AssessmentModal({
             counterpartyName={assessment.counterpartyName}
             inn={assessment.inn}
             ogrn={defaultOgrn}
+          />
+
+          <AssessmentHistoryDrawer
+            open={historyOpen}
+            onOpenChange={setHistoryOpen}
+            positive={positive}
           />
         </div>
         </DialogPrimitive.Content>
