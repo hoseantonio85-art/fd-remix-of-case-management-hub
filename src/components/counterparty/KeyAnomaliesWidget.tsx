@@ -88,8 +88,11 @@ export function KeyAnomaliesWidget() {
           <Info className="h-3.5 w-3.5" />
         </span>
       </div>
+      <p className="mt-1 text-xs text-slate-600">
+        Факторы, которые сильнее всего повлияли на резолюцию оценки.
+      </p>
 
-      <ul className="mt-2.5 space-y-1.5">
+      <ul className="mt-3 space-y-2.5">
         {visible.map((a) => {
           const isOpen = openId === a.id;
           const meta = severityMeta[a.severity];
@@ -100,7 +103,7 @@ export function KeyAnomaliesWidget() {
                 onClick={() => setOpenId(isOpen ? null : a.id)}
                 aria-expanded={isOpen}
                 className={cn(
-                  "w-full rounded-xl border p-3 text-left transition-colors",
+                  "w-full rounded-xl border px-3 py-3 text-left transition-colors",
                   isOpen
                     ? "border-slate-200 bg-slate-50"
                     : "border-slate-100 bg-slate-50/60 hover:bg-slate-50",
@@ -116,10 +119,10 @@ export function KeyAnomaliesWidget() {
                     >
                       {meta.label}
                     </span>
-                    <div className="mt-1 text-[13px] font-medium leading-snug text-foreground">{a.title}</div>
+                    <div className="mt-1.5 text-[13px] font-medium leading-snug text-foreground">{a.title}</div>
                     <div
                       className={cn(
-                        "mt-0.5 text-xs leading-snug text-slate-600",
+                        "mt-1 text-xs leading-5 text-slate-600",
                         !isOpen && "line-clamp-1",
                       )}
                     >
