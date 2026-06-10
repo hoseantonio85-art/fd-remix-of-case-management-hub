@@ -756,24 +756,24 @@ export default function Index() {
                         {c.inn} · {c.contracts.length} дог. · {stage} · изм. {c.lastUpdate}
                       </div>
                     </div>
-                    <div className="hidden shrink-0 grid-cols-2 gap-2 sm:grid sm:w-[260px]">
-                      <div className="min-w-0 rounded-xl border border-slate-100 bg-slate-50 px-3 py-2.5 text-left">
-                        <div className="truncate text-sm font-semibold text-foreground">
+                    <div className="hidden shrink-0 grid-cols-2 gap-3 sm:grid sm:w-[280px]">
+                      <div className="min-w-0 rounded-lg bg-slate-50/70 px-3 py-2.5">
+                        <div className="truncate text-sm font-medium text-foreground">
                           {c.totalDebt}
                         </div>
-                        <div className="mt-0.5 text-[11px] text-muted-foreground">
+                        <div className="mt-1 text-[11px] text-muted-foreground">
                           Задолженность
                         </div>
                       </div>
-                      <div className="min-w-0 rounded-xl border border-slate-100 bg-slate-50 px-3 py-2.5 text-left">
+                      <div className="min-w-0 rounded-lg bg-slate-50/70 px-3 py-2.5">
                         <div
-                          className={`truncate text-sm font-semibold ${
+                          className={`truncate text-sm font-medium ${
                             c.overdueAmountNum > 0 ? "text-rose-600" : "text-muted-foreground"
                           }`}
                         >
                           {c.overdueAmountNum > 0 ? c.overdueDebt : "—"}
                         </div>
-                        <div className="mt-0.5 text-[11px] text-muted-foreground">
+                        <div className="mt-1 text-[11px] text-muted-foreground">
                           Просроченная
                         </div>
                       </div>
