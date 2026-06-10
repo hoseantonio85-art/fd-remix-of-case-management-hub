@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { InModalDrawer } from "./InModalDrawer";
 import {
   type AssessmentGroup,
@@ -20,6 +21,16 @@ export function AssessmentGroupDrawer({
 }) {
   if (!group) return null;
   const counts = groupCounts(group);
+  const [activeFilter, setActiveFilter] = useState<AssessmentCountKind | null>(null);
+
+  const toggleFilter = (kind: AssessmentCountKind) => {
+    setActiveFilter((prev) => (prev === kind ? null : kind));
+  };
+
+  const sortedCriteria = [...group.criteria].sort(sortByPriority);
+  const filteredCriteria = activeFilter
+    ? sortedCriteria.filter((c) => statusFromPassed(c.passed) === activeFilter)
+    : sortedCriteria;
 
   return (
     <InModalDrawer open={open} onOpenChange={onOpenChange}>
@@ -35,24 +46,66 @@ export function AssessmentGroupDrawer({
           {group.criteria.length} {pluralCriteria(group.criteria.length)}
         </div>
 
-        {/* Summary */}
+        {/* Summary filters */}
         <div className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-3">
-          <SummaryStat kind="risk" value={counts.risk} />
-          <SummaryStat kind="clear" value={counts.clear} />
-          <SummaryStat kind="no_data" value={counts.no_data} />
+          <SummaryStat
+            kind="risk"
+            value={counts.risk}
+            isActive={activeFilter === "risk"}
+            onClick={() => toggleFilter("risk")}
+          />
+          <SummaryStat
+            kind="clear"
+            value={counts.clear}
+            isActive={activeFilter === "clear"}
+            onClick={() => toggleFilter("clear")}
+          />
+          <SummaryStat
+            kind="no_data"
+            value={counts.no_data}
+            isActive={activeFilter === "no_data"}
+            onClick={() => toggleFilter("no_data")}
+          />
         </div>
+
+        {/* Active filter indicator */}
+        {activeFilter && (
+          <div className="mt-3 flex items-center justify-between">
+            <span className="text-xs text-slate-500">
+              Показаны: {assessmentCountMeta[activeFilter].label.toLowerCase()}
+            </span>
+            <button
+              onClick={() => setActiveFilter(null)}
+              className="text-xs font-medium text-slate-600 hover:text-slate-900"
+            >
+              Сбросить
+            </button>
+          </div>
+        )}
       </div>
 
       {/* Body — flat list of criteria, no category sections */}
       <div className="px-6 pb-6">
         <div className="space-y-2.5">
-          {group.criteria.map((c) => (
+          {filteredCriteria.map((c) => (
             <CriterionCard key={c.number} c={c} />
           ))}
+          {filteredCriteria.length === 0 && (
+            <div className="rounded-xl border border-dashed border-slate-200 bg-slate-50/50 p-6 text-center">
+              <p className="text-sm text-slate-500">
+                В этой группе нет критериев с таким статусом.
+              </p>
+            </div>
+          )}
         </div>
       </div>
     </InModalDrawer>
   );
+}
+
+function sortByPriority(a: AssessmentCriterion, b: AssessmentCriterion): number {
+  const order = (p: boolean | null) => (p === false ? 0 : p === null ? 1 : 2);
+  return order(a.passed) - order(b.passed);
 }
 
 function pluralCriteria(n: number) {
@@ -63,19 +116,47 @@ function pluralCriteria(n: number) {
   return "критериев";
 }
 
-function SummaryStat({ kind, value }: { kind: AssessmentCountKind; value: number }) {
+const activeCardStyles: Record<AssessmentCountKind, string> = {
+  risk: "ring-1 ring-rose-200 bg-rose-50/40 border-rose-200",
+  clear: "ring-1 ring-emerald-200 bg-emerald-50/40 border-emerald-200",
+  no_data: "ring-1 ring-slate-200 bg-slate-50/40 border-slate-300",
+};
+
+function SummaryStat({
+  kind,
+  value,
+  isActive,
+  onClick,
+}: {
+  kind: AssessmentCountKind;
+  value: number;
+  isActive: boolean;
+  onClick: () => void;
+}) {
   const m = assessmentCountMeta[kind];
   const Ico = m.icon;
+  const activeStyle = activeCardStyles[kind];
   return (
-    <div className="flex min-h-[92px] flex-col justify-between rounded-2xl border border-slate-200 bg-white p-4">
+    <button
+      onClick={onClick}
+      className={`flex min-h-[92px] w-full flex-col justify-between rounded-2xl border p-4 text-left transition-colors ${
+        isActive
+          ? activeStyle
+          : "border-slate-200 bg-white hover:border-slate-300 hover:bg-slate-50/30"
+      }`}
+    >
       <div className="flex items-center justify-between">
         <div className={`flex h-8 w-8 items-center justify-center rounded-full ${m.bg}`}>
           <Ico className={`h-4 w-4 ${m.icon_color}`} />
         </div>
-        <div className="text-2xl font-semibold leading-none text-slate-900">{value}</div>
+        <div className={`text-2xl font-semibold leading-none ${isActive ? m.num : "text-slate-900"}`}>
+          {value}
+        </div>
       </div>
-      <div className="mt-3 text-xs leading-snug text-slate-500">{m.label}</div>
-    </div>
+      <div className={`mt-3 text-xs leading-snug ${isActive ? "text-slate-700" : "text-slate-500"}`}>
+        {m.label}
+      </div>
+    </button>
   );
 }
 
