@@ -221,7 +221,7 @@ export function AssessmentModal({
     });
     setDisagreeSubmitted(true);
     setDisagreeMode(false);
-    setNotice({ tone: "info", text: "Замечания отправлены на пересмотр" });
+    toast("Замечания отправлены на пересмотр");
   };
 
 
