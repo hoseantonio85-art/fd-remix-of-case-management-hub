@@ -220,17 +220,6 @@ export function AssessmentHistoryEntry({
   onOpen: () => void;
 }) {
   const versions = positive ? positiveVersions : negativeVersions;
-  const accent = positive
-    ? {
-        wrap: "bg-emerald-50/50 border-emerald-100 hover:bg-emerald-50",
-        line: "bg-emerald-200",
-        iconWrap: "bg-emerald-100 text-emerald-700",
-      }
-    : {
-        wrap: "bg-rose-50/40 border-rose-100 hover:bg-rose-50/70",
-        line: "bg-rose-200",
-        iconWrap: "bg-rose-100 text-rose-700",
-      };
 
   const handleDownloadAll = (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -248,25 +237,21 @@ export function AssessmentHistoryEntry({
           onOpen();
         }
       }}
-      className={cn(
-        "group relative flex w-full cursor-pointer items-center gap-3 overflow-hidden rounded-2xl border p-3 text-left transition",
-        accent.wrap,
-      )}
+      className="group flex w-full cursor-pointer items-center gap-3 rounded-2xl border border-violet-100 bg-violet-50/70 p-3 text-left transition hover:bg-violet-50"
     >
-      <span className={cn("absolute inset-y-2 left-0 w-[3px] rounded-full", accent.line)} />
-      <span className={cn("ml-1 flex h-9 w-9 shrink-0 items-center justify-center rounded-full", accent.iconWrap)}>
+      <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-violet-100 text-violet-700">
         <FileClock className="h-4 w-4" />
       </span>
       <span className="min-w-0 flex-1">
-        <span className="block text-sm font-semibold text-foreground">История оценки</span>
-        <span className="block text-[11px] text-muted-foreground">
+        <span className="block text-sm font-semibold text-violet-950">История оценки</span>
+        <span className="block text-[11px] text-violet-700/80">
           {versions.length} версии · можно скачать отчёты и сравнения
         </span>
       </span>
       <button
         type="button"
         onClick={handleDownloadAll}
-        className="inline-flex h-7 shrink-0 items-center gap-1 rounded-full bg-white/80 px-2.5 text-[11px] font-medium text-foreground/80 ring-1 ring-inset ring-slate-200 transition hover:bg-white hover:text-foreground"
+        className="inline-flex h-7 shrink-0 items-center gap-1 rounded-full bg-white/80 px-2.5 text-[11px] font-medium text-violet-700 ring-1 ring-inset ring-violet-200 transition hover:bg-white"
         aria-label="Скачать всю историю оценки"
       >
         <Download className="h-3 w-3" /> Скачать
