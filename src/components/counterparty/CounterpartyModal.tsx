@@ -703,10 +703,11 @@ export function CounterpartyModal({
         disagreement={assessmentDisagreement}
         defaultInn={counterparty.inn}
         running={assessmentRunning}
+        positive={counterparty.status === "no_risk"}
         onRun={(inn) => {
           setAssessmentRunning(true);
           setTimeout(() => {
-            setAssessment(buildAssessment(counterparty.name, inn, "manual"));
+            setAssessment(buildAssessment(counterparty.name, inn, "manual", undefined, counterparty.status === "no_risk" ? "positive" : "negative"));
             setAssessmentStatus("updated");
             setAssessmentConfirmedAt(undefined);
             setAssessmentDisagreement(null);
