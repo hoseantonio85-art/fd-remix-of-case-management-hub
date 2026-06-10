@@ -88,10 +88,6 @@ export function KeyAnomaliesWidget() {
           <Info className="h-3.5 w-3.5" />
         </span>
       </div>
-      <p className="mt-1 text-xs text-slate-600">
-        Факторы, которые сильнее всего повлияли на резолюцию оценки.
-      </p>
-
       <ul className="mt-3 space-y-2.5">
         {visible.map((a) => {
           const isOpen = openId === a.id;
