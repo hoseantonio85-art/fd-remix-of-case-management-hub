@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import * as DialogPrimitive from "@radix-ui/react-dialog";
-import { X, ArrowLeft, CheckCircle2, Download, ChevronRight, Info, RefreshCw, Loader2, Flame, Zap, Send } from "lucide-react";
+import { X, ArrowLeft, CheckCircle2, ChevronRight, Info, RefreshCw, Loader2, Flame, Zap, Send } from "lucide-react";
 import { toast } from "sonner";
 import { NormAssistantIcon } from "./NormAssistantIcon";
 import { Button } from "@/components/ui/button";
@@ -264,9 +264,6 @@ export function AssessmentModal({
   const sourceLabel = reassessmentCompleted ? "Запущено пользователем · только что" : baseSourceLabel;
 
 
-  const handleDownload = () => {
-    toast.success("Отчёт скачан");
-  };
 
 
   return (
@@ -412,23 +409,6 @@ export function AssessmentModal({
                     </div>
                   )}
 
-                  <Button
-                    variant="outline"
-                    onClick={handleRerunAssessment}
-                    disabled={isReassessmentRunning}
-                    className="h-11 w-full rounded-full border bg-white text-sm font-medium"
-                  >
-                    {isReassessmentRunning ? (
-                      <>
-                        <Loader2 className="h-4 w-4 animate-spin" /> Обновляю оценку
-                      </>
-                    ) : (
-                      <>
-                        <RefreshCw className="h-4 w-4" />
-                        {reassessmentCompleted ? "Запустить повторно" : "Запустить новую оценку"}
-                      </>
-                    )}
-                  </Button>
                 </div>
               </aside>
 
@@ -567,10 +547,20 @@ export function AssessmentModal({
               )}
               <Button
                 variant="outline"
-                onClick={handleDownload}
+                onClick={handleRerunAssessment}
+                disabled={isReassessmentRunning}
                 className="h-12 flex-1 rounded-full text-sm font-medium"
               >
-                <Download className="h-4 w-4" /> Скачать
+                {isReassessmentRunning ? (
+                  <>
+                    <Loader2 className="h-4 w-4 animate-spin" /> Обновляю оценку
+                  </>
+                ) : (
+                  <>
+                    <RefreshCw className="h-4 w-4" />
+                    {reassessmentCompleted ? "Запустить повторно" : "Запустить новую оценку"}
+                  </>
+                )}
               </Button>
             </div>
           </div>
