@@ -911,6 +911,7 @@ export default function Index() {
         assessment={manualAssessment}
         open={manualAssessmentOpen}
         onOpenChange={handleManualAssessmentOpenChange}
+        onBack={handleManualAssessmentBack}
         onCloseFlow={handleManualFlowCloseAll}
         status={manualStatus}
         disagreement={manualDisagreement}
