@@ -756,22 +756,26 @@ export default function Index() {
                         {c.inn} · {c.contracts.length} дог. · {stage} · изм. {c.lastUpdate}
                       </div>
                     </div>
-                    <div className="hidden shrink-0 text-right sm:block">
-                      <div className="text-[10px] uppercase tracking-wide text-muted-foreground">
-                        Задолженность
+                    <div className="hidden shrink-0 grid-cols-2 gap-2 sm:grid sm:w-[260px]">
+                      <div className="min-w-0 rounded-xl border border-slate-100 bg-slate-50 px-3 py-2.5 text-left">
+                        <div className="truncate text-sm font-semibold text-foreground">
+                          {c.totalDebt}
+                        </div>
+                        <div className="mt-0.5 text-[11px] text-muted-foreground">
+                          Задолженность
+                        </div>
                       </div>
-                      <div className="text-sm font-semibold">{c.totalDebt}</div>
-                    </div>
-                    <div className="hidden shrink-0 text-right sm:block">
-                      <div className="text-[10px] uppercase tracking-wide text-muted-foreground">
-                        Просроченная
-                      </div>
-                      <div
-                        className={`text-sm font-semibold ${
-                          c.overdueAmountNum > 0 ? "text-rose-600" : "text-muted-foreground"
-                        }`}
-                      >
-                        {c.overdueAmountNum > 0 ? c.overdueDebt : "—"}
+                      <div className="min-w-0 rounded-xl border border-slate-100 bg-slate-50 px-3 py-2.5 text-left">
+                        <div
+                          className={`truncate text-sm font-semibold ${
+                            c.overdueAmountNum > 0 ? "text-rose-600" : "text-muted-foreground"
+                          }`}
+                        >
+                          {c.overdueAmountNum > 0 ? c.overdueDebt : "—"}
+                        </div>
+                        <div className="mt-0.5 text-[11px] text-muted-foreground">
+                          Просроченная
+                        </div>
                       </div>
                     </div>
                   </button>
