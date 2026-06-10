@@ -21,6 +21,7 @@ import {
 } from "lucide-react";
 import { counterparties, type Counterparty, type RiskType, type ProcessStage } from "@/lib/mock-data";
 import { CounterpartyModal } from "@/components/counterparty/CounterpartyModal";
+import { CounterpartyStatusBadge } from "@/components/counterparty/CounterpartyStatusBadge";
 import { riskMeta, allChipMeta } from "@/components/counterparty/risk-meta";
 import { getCounterpartyProblemIndicators, problemIndicatorMeta } from "@/lib/problem-indicators";
 import { AssessmentModal, type AssessmentStatus, type Disagreement } from "@/components/counterparty/AssessmentModal";
@@ -705,18 +706,13 @@ export default function Index() {
                     <div className="flex min-w-0 flex-1 flex-col gap-1.5">
                       <div className="flex flex-wrap items-center gap-1.5">
                         {(() => {
-                          const catMeta: Record<CategoryKey, { label: string; cls: string }> = {
-                            risk: { label: "Риск дефолта", cls: "bg-[#FBF1D6] border-[#E9C657]/60 text-[#8B6B14]" },
-                            no_risk: { label: "Нет риска", cls: "bg-[#D6F0E2] border-[#5BC48C]/60 text-[#1E6B43]" },
-                            overdue_risk: { label: "Просрочено с риском дефолта", cls: "bg-[#FBE3D6] border-[#E89669]/60 text-[#8B4A1F]" },
-                            overdue: { label: "Просрочено", cls: "bg-[#FBE9D6] border-[#EDB05A]/60 text-[#8B5A14]" },
+                          const catLabel: Record<CategoryKey, string> = {
+                            risk: "Риск дефолта",
+                            no_risk: "Нет риска",
+                            overdue_risk: "Просрочено с риском дефолта",
+                            overdue: "Просрочено",
                           };
-                          const cm = catMeta[c.status];
-                          return (
-                            <span className={`inline-flex items-center rounded-md border px-2 py-0.5 text-[11px] font-medium ${cm.cls}`}>
-                              {cm.label}
-                            </span>
-                          );
+                          return <CounterpartyStatusBadge tag={catLabel[c.status]} />;
                         })()}
                         {indicators
                           .map((k) => ({ k, m: problemIndicatorMeta[k] }))
