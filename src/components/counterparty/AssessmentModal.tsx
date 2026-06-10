@@ -607,11 +607,11 @@ export function AssessmentModal({
 function LimitCard({ label, sublabel, value }: { label: string; sublabel: string; value: string }) {
   return (
     <div className="rounded-xl border border-border bg-white px-4 py-3">
-      <div className="flex items-baseline gap-2">
-        <div className="text-xl font-semibold text-foreground">{value}</div>
-        <div className="text-xs text-muted-foreground leading-tight">{sublabel}</div>
+      <div className="text-xs text-muted-foreground">{label}</div>
+      <div className="mt-1 flex items-baseline gap-2">
+        <span className="text-lg font-semibold text-foreground">{value}</span>
+        <span className="text-xs text-muted-foreground leading-tight">{sublabel}</span>
       </div>
-      <div className="mt-1 text-sm font-medium text-foreground">{label}</div>
     </div>
   );
 }
