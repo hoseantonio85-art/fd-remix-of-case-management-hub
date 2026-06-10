@@ -251,17 +251,17 @@ const problemChips: { key: Exclude<RiskChipKey, "all">; meta: typeof riskMeta[Ri
   {
     key: "bankruptcy",
     meta: { ...riskMeta["Банкротство / ликвидация"], label: "Банкротство / ликвидация", short: "Банкротство / ликвидация" },
-    matches: (c) => c.risks.some((r) => r.type === "Банкротство / ликвидация"),
+    matches: (c) => c.status !== "no_risk" && c.risks.some((r) => r.type === "Банкротство / ликвидация"),
   },
   {
     key: "group",
     meta: { ...riskMeta["Неисполнение контракта группы"], label: "Неисполнение контракта группы", short: "Неисполнение контракта группы" },
-    matches: (c) => c.risks.some((r) => r.type === "Неисполнение контракта группы"),
+    matches: (c) => c.status !== "no_risk" && c.risks.some((r) => r.type === "Неисполнение контракта группы"),
   },
   {
     key: "negative",
     meta: { ...riskMeta["Ухудшилось финансовое состояние"], label: "Наличие негативных факторов", short: "Наличие негативных факторов" },
-    matches: (c) => c.risks.some((r) => NEGATIVE_RISK_TYPES.includes(r.type)),
+    matches: (c) => c.status !== "no_risk" && c.risks.some((r) => NEGATIVE_RISK_TYPES.includes(r.type)),
   },
 ];
 
