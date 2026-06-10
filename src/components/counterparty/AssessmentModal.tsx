@@ -17,6 +17,7 @@ import { AssessmentGroupDrawer } from "./AssessmentGroupDrawer";
 import { defaultOgrn } from "./RegistrationInfoWidget";
 import { RegistrationInfoDrawer } from "./RegistrationInfoDrawer";
 import { KeyAnomaliesWidget } from "./KeyAnomaliesWidget";
+import { TrustFactorsWidget } from "./TrustFactorsWidget";
 
 export type AssessmentStatus = "pending" | "confirmed" | "disagreed" | "updated" | "review";
 
@@ -359,7 +360,7 @@ export function AssessmentModal({
               <aside className="order-2 lg:col-start-2 lg:row-start-1">
 
                 <div className="space-y-3 lg:sticky lg:top-0">
-                  {!positive && <KeyAnomaliesWidget />}
+                  {positive ? <TrustFactorsWidget /> : <KeyAnomaliesWidget />}
 
                   {(isReassessmentRunning || reassessmentCompleted) && (
                     <div className="rounded-2xl border border-border bg-white p-4">
