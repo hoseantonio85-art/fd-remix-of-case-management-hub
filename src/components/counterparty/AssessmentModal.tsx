@@ -17,6 +17,7 @@ import { AssessmentGroupDrawer } from "./AssessmentGroupDrawer";
 import { defaultOgrn } from "./RegistrationInfoWidget";
 import { RegistrationInfoDrawer } from "./RegistrationInfoDrawer";
 import { KeyAnomaliesWidget } from "./KeyAnomaliesWidget";
+import { TrustFactorsWidget } from "./TrustFactorsWidget";
 
 export type AssessmentStatus = "pending" | "confirmed" | "disagreed" | "updated" | "review";
 
