@@ -456,8 +456,9 @@ export function AssessmentModal({
                           "rounded-lg border bg-white transition",
                           disagreeMode && checked
                             ? "border-primary/30 bg-primary/5"
-                            : "border-border",
+                            : "border-slate-100",
                         )}
+
                       >
                         <div
                           role="button"
@@ -620,13 +621,24 @@ import { assessmentCountMeta, type AssessmentCountKind } from "./assessment-coun
 function CountPill({ kind, count }: { kind: AssessmentCountKind; count: number }) {
   const m = assessmentCountMeta[kind];
   const Ico = m.icon;
+  const label =
+    kind === "risk"
+      ? count === 1
+        ? "риск"
+        : "риска"
+      : kind === "clear"
+        ? "без нарушений"
+        : "нет данных";
   return (
-    <span className={`inline-flex h-6 items-center gap-1 rounded-full px-2.5 text-xs font-semibold ${m.bg}`}>
+    <span className={`inline-flex h-6 items-center gap-1 rounded-full px-2.5 text-xs font-medium ${m.bg}`}>
       <Ico className={`h-3.5 w-3.5 ${m.icon_color}`} />
-      <span className={`leading-none ${m.num}`}>{count}</span>
+      <span className={`leading-none ${m.num}`}>
+        <span className="font-semibold">{count}</span> {label}
+      </span>
     </span>
   );
 }
+
 
 const changeIcon: Record<"rose" | "amber" | "slate" | "emerald", typeof Flame> = {
   rose: Flame,

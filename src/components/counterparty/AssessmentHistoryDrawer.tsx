@@ -220,25 +220,61 @@ export function AssessmentHistoryEntry({
   onOpen: () => void;
 }) {
   const versions = positive ? positiveVersions : negativeVersions;
+  const accent = positive
+    ? {
+        wrap: "bg-emerald-50/50 border-emerald-100 hover:bg-emerald-50",
+        line: "bg-emerald-200",
+        iconWrap: "bg-emerald-100 text-emerald-700",
+      }
+    : {
+        wrap: "bg-rose-50/40 border-rose-100 hover:bg-rose-50/70",
+        line: "bg-rose-200",
+        iconWrap: "bg-rose-100 text-rose-700",
+      };
+
+  const handleDownloadAll = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    toast.success("История оценки скачана");
+  };
+
   return (
-    <button
-      type="button"
+    <div
+      role="button"
+      tabIndex={0}
       onClick={onOpen}
-      className="flex w-full items-center gap-3 rounded-2xl border border-border bg-white p-3 text-left transition hover:bg-slate-50"
+      onKeyDown={(e) => {
+        if (e.key === "Enter" || e.key === " ") {
+          e.preventDefault();
+          onOpen();
+        }
+      }}
+      className={cn(
+        "group relative flex w-full cursor-pointer items-center gap-3 overflow-hidden rounded-2xl border p-3 text-left transition",
+        accent.wrap,
+      )}
     >
-      <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-slate-100 text-slate-600">
+      <span className={cn("absolute inset-y-2 left-0 w-[3px] rounded-full", accent.line)} />
+      <span className={cn("ml-1 flex h-9 w-9 shrink-0 items-center justify-center rounded-full", accent.iconWrap)}>
         <FileClock className="h-4 w-4" />
       </span>
       <span className="min-w-0 flex-1">
         <span className="block text-sm font-semibold text-foreground">История оценки</span>
         <span className="block text-[11px] text-muted-foreground">
-          {versions.length} версии · последнее обновление сегодня
+          {versions.length} версии · можно скачать отчёты и сравнения
         </span>
       </span>
-      <span className="text-[11px] font-medium text-muted-foreground">Открыть ›</span>
-    </button>
+      <button
+        type="button"
+        onClick={handleDownloadAll}
+        className="inline-flex h-7 shrink-0 items-center gap-1 rounded-full bg-white/80 px-2.5 text-[11px] font-medium text-foreground/80 ring-1 ring-inset ring-slate-200 transition hover:bg-white hover:text-foreground"
+        aria-label="Скачать всю историю оценки"
+      >
+        <Download className="h-3 w-3" /> Скачать
+      </button>
+    </div>
   );
 }
+
 
 export function AssessmentHistoryDrawer({
   open,

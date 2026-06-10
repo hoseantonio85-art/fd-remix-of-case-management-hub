@@ -23,38 +23,39 @@ const anomalies: Anomaly[] = [
     id: "a1",
     title: "Критический дефицит ресурсов",
     severity: "block",
-    short: "ССЧ — 11 человек при выручке 150,5 млн ₽, основные средства — 0 ₽.",
+    short: "11 сотрудников при выручке 150,5 млн ₽.",
     full: "При заявленной годовой выручке 150,5 млн ₽ среднесписочная численность сотрудников составляет всего 11 человек, а строка баланса «Основные средства» равна 0 ₽. В сочетании с недостоверностью адреса это подтверждает высокий риск фирмы-пустышки.",
   },
   {
     id: "a2",
     title: "Аномалия структуры баланса",
     severity: "block",
-    short: "Чистый убыток превышает официальную выручку за неполный год деятельности.",
+    short: "Убыток превышает выручку за период.",
     full: "Глубокий чистый убыток за первый неполный год деятельности составил 13 243 000 ₽, что превышает официальную выручку организации 11 361 000 ₽ на 16%. Это указывает на существенную диспропорцию финансовой модели.",
   },
   {
     id: "a3",
     title: "Аномалия графа собственности",
     severity: "block",
-    short: "Связанные лица ранее участвовали в компаниях, закрытых ФНС из-за долгов и недостоверных данных.",
+    short: "Связанные лица были в компаниях, закрытых ФНС.",
     full: "По данным ФНС, Калашов В. П. ранее владел и руководил организациями в Ивановской и Ленинградской областях, которые были принудительно закрыты налоговой службой из-за долгов и недостоверных данных. Наблюдается повторение негативного исторического паттерна на новом активе.",
   },
   {
     id: "a4",
     title: "Корпоративная миграция и стартап-контроль",
     severity: "amplify",
-    short: "Компания моложе года, при этом уже зафиксирована частая смена ответственных лиц.",
+    short: "Молодая компания с частой сменой ответственных лиц.",
     full: "Возраст компании — 9 месяцев. В истории ЕГРЮЛ зафиксирована высокая скорость смены ответственных лиц и заявителей с момента регистрации в сентябре 2025 года. Это усиливает риск нестабильности корпоративного контроля.",
   },
   {
     id: "a5",
     title: "Структура баланса",
     severity: "context",
-    short: "Высокая доля заемных обязательств при небольшой доле собственного капитала.",
+    short: "Высокая доля заёмных обязательств.",
     full: "Наблюдается высокая доля заемных обязательств в структуре баланса: высокая кредиторская задолженность при относительно небольшой доле собственного капитала. Для рекламного бизнеса, работающего по агентской модели, это может быть допустимой отраслевой нормой, но в связке с другими аномалиями усиливает общий риск.",
   },
 ];
+
 
 const VISIBLE_COUNT = 2;
 const DESCRIPTION = "Факторы, которые повлияли на резолюцию «Не заключать сделки».";
@@ -75,7 +76,7 @@ export function KeyAnomaliesWidget() {
   };
 
   return (
-    <div className="rounded-2xl border border-border bg-white p-4">
+    <div className="rounded-2xl border border-slate-100 bg-white p-4">
       <div className="flex items-center gap-1.5">
         <div className="text-sm font-semibold text-foreground">Ключевые аномалии</div>
         <span
@@ -100,7 +101,9 @@ export function KeyAnomaliesWidget() {
                 aria-expanded={isOpen}
                 className={cn(
                   "w-full rounded-xl border p-3 text-left transition-colors",
-                  isOpen ? "border-foreground/20 bg-muted/40" : "border-border bg-white hover:bg-muted/30",
+                  isOpen
+                    ? "border-slate-200 bg-slate-50"
+                    : "border-slate-100 bg-slate-50/60 hover:bg-slate-50",
                 )}
               >
                 <div className="flex items-start gap-2">
@@ -113,8 +116,15 @@ export function KeyAnomaliesWidget() {
                     >
                       {meta.label}
                     </span>
-                    <div className="mt-1 text-sm font-medium text-foreground">{a.title}</div>
-                    <div className="mt-0.5 text-xs leading-snug text-muted-foreground">{a.short}</div>
+                    <div className="mt-1 text-sm font-semibold leading-snug text-foreground">{a.title}</div>
+                    <div
+                      className={cn(
+                        "mt-0.5 text-xs leading-snug text-muted-foreground",
+                        !isOpen && "line-clamp-1",
+                      )}
+                    >
+                      {a.short}
+                    </div>
                     {isOpen && (
                       <div className="mt-2 text-xs leading-relaxed text-foreground/80">{a.full}</div>
                     )}
@@ -131,6 +141,7 @@ export function KeyAnomaliesWidget() {
           );
         })}
       </ul>
+
 
       {hiddenCount > 0 && (
         <button
