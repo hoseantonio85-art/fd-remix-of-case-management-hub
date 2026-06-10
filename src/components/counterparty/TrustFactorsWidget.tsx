@@ -45,7 +45,7 @@ const DESCRIPTION = "Признаки, которые подтверждают �
 
 export function TrustFactorsWidget() {
   return (
-    <div className="rounded-2xl border border-border bg-white p-4">
+    <div className="rounded-2xl border border-slate-100 bg-white p-4">
       <div className="flex items-center gap-1.5">
         <div className="text-sm font-semibold text-foreground">Факторы доверия</div>
         <span
@@ -61,15 +61,16 @@ export function TrustFactorsWidget() {
       <ul className="mt-2.5 space-y-1.5">
         {factors.map((f) => (
           <li key={f.id}>
-            <div className="w-full rounded-xl border border-border bg-white p-3 text-left">
+            <div className="w-full rounded-xl border border-slate-100 bg-slate-50/60 p-3 text-left">
               <span
                 className={`inline-flex h-5 items-center rounded-full px-2 text-[11px] font-medium ${toneChip[f.tone]}`}
               >
                 {f.tag}
               </span>
-              <div className="mt-1 text-sm font-medium text-foreground">{f.title}</div>
-              <div className="mt-0.5 text-xs leading-snug text-muted-foreground">{f.text}</div>
+              <div className="mt-1 text-sm font-semibold leading-snug text-foreground">{f.title}</div>
+              <div className="mt-0.5 line-clamp-1 text-xs leading-snug text-muted-foreground">{f.text}</div>
             </div>
+
           </li>
         ))}
       </ul>
