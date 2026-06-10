@@ -3,13 +3,8 @@ import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { cn } from "@/lib/utils";
 import { largeModalContentClass } from "@/lib/modal-styles";
 import {
-  ShieldCheck,
   ChevronRight,
   ChevronDown,
-  Pencil,
-  XCircle,
-  Clock,
-  Calendar,
   X,
   CheckCircle2,
   Info as InfoIcon,
