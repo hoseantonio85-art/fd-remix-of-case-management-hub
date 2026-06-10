@@ -284,9 +284,6 @@ export function AssessmentModal({
                   <Sparkles className="h-6 w-6" />
                 </div>
                 <div className="min-w-0 flex-1">
-                  <div className="text-[11px] font-medium uppercase tracking-wide text-muted-foreground">
-                    Вывод NORM AI
-                  </div>
                   <div className="mt-1 text-lg font-semibold text-slate-900">
                     Обоснование оценки
                   </div>
@@ -296,7 +293,7 @@ export function AssessmentModal({
                     </div>
                   )}
                   <p className="mt-2 text-sm leading-snug text-muted-foreground">
-                    У контрагента выявлена официальная метка ФНС о недостоверности сведений ЕГРЮЛ и признаки отсутствия по адресу регистрации. Эти факторы перевешивают положительные финансовые показатели и создают высокий налоговый и юридический риск для сделки.
+                    Компания имеет критически значимые риски: за последние 6 месяцев сменились собственники или директор, оперативное погашение краткосрочных обязательств невозможно, а также активы сформированы в основном за счёт привлечённых средств.
                   </p>
                 </div>
               </div>
