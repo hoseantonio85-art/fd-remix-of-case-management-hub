@@ -104,7 +104,7 @@ export function AssessmentModal({
   onCloseFlow?: () => void;
   positive?: boolean;
 }) {
-  const [notice, setNotice] = useState<{ tone: "success" | "info"; text: string } | null>(null);
+  
   const [groupDrawer, setGroupDrawer] = useState<AssessmentGroup | null>(null);
   const [registrationOpen, setRegistrationOpen] = useState(false);
 
