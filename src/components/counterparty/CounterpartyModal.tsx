@@ -770,6 +770,11 @@ export function CounterpartyModal({
         assessment={assessment}
         open={assessmentOpen}
         onOpenChange={setAssessmentOpen}
+        onBack={() => setAssessmentOpen(false)}
+        onCloseFlow={() => {
+          setAssessmentOpen(false);
+          onOpenChange(false);
+        }}
         status={assessmentStatus}
         disagreement={assessmentDisagreement}
         defaultInn={counterparty.inn}
