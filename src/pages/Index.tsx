@@ -61,6 +61,7 @@ const tiles: {
   amount: string;
   count: string;
   bg: string;
+  activeBg: string;
   pctBg: string;
   ring: string;
   dot: string;
@@ -72,8 +73,9 @@ const tiles: {
     amount: "1,3 млн. ₽",
     count: "5 деб.",
     bg: "bg-[#FBF1D6]/60",
+    activeBg: "bg-amber-100",
     pctBg: "bg-[#F4E1A1]/70 text-[#8B6B14]",
-    ring: "ring-[#E9C657]",
+    ring: "ring-amber-300",
     dot: "#E9C657",
   },
   {
@@ -82,10 +84,11 @@ const tiles: {
     pct: "10 %",
     amount: "1,4 млн. ₽",
     count: "5 деб.",
-    bg: "bg-[#FBE3D6]/60",
-    pctBg: "bg-[#F5C9B0]/70 text-[#8B4A1F]",
-    ring: "ring-[#E89669]",
-    dot: "#E89669",
+    bg: "bg-rose-50",
+    activeBg: "bg-rose-100",
+    pctBg: "bg-rose-200/70 text-rose-900",
+    ring: "ring-rose-300",
+    dot: "#E11D48",
   },
   {
     key: "no_risk",
@@ -94,8 +97,9 @@ const tiles: {
     amount: "1,2 млн. ₽",
     count: "5 деб.",
     bg: "bg-[#D6F0E2]/60",
+    activeBg: "bg-emerald-100",
     pctBg: "bg-[#A6E0BE]/70 text-[#1E6B43]",
-    ring: "ring-[#5BC48C]",
+    ring: "ring-emerald-300",
     dot: "#5BC48C",
   },
   {
@@ -105,8 +109,9 @@ const tiles: {
     amount: "1,2 млн. ₽",
     count: "5 деб.",
     bg: "bg-[#FBE9D6]/60",
+    activeBg: "bg-orange-100",
     pctBg: "bg-[#F6D2A2]/70 text-[#8B5A14]",
-    ring: "ring-[#EDB05A]",
+    ring: "ring-orange-300",
     dot: "#EDB05A",
   },
 ];
@@ -603,7 +608,7 @@ export default function Index() {
                         onClick={() => toggleTile(t.key)}
                         className={`rounded-2xl px-4 py-4 text-left transition ${
                           isActive
-                            ? `${t.bg} ring-2 ${t.ring} shadow-md saturate-150`
+                            ? `${t.activeBg} ring-1 ring-inset ${t.ring} shadow-sm`
                             : `${t.bg} ring-1 ring-inset ring-transparent hover:ring-2 ${dimmed ? "opacity-60" : ""}`
                         } ${disabled ? "!opacity-40 !cursor-not-allowed hover:ring-0" : ""}`}
                       >
