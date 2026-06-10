@@ -474,7 +474,14 @@ export function CounterpartyModal({
         <div className="relative flex flex-col">
           {/* Header */}
           {(() => {
-            const tone = getToneForTag(counterparty.tag);
+            const categoryLabel: Record<Counterparty["status"], string> = {
+              no_risk: "Нет риска",
+              risk: "Риск дефолта",
+              overdue: "Просрочено",
+              overdue_risk: "Просрочено с риском дефолта",
+            };
+            const tagLabel = categoryLabel[counterparty.status];
+            const tone = getToneForTag(tagLabel);
             const styles = toneStyles[tone];
             return (
               <div className={`relative px-5 pt-6 pb-6 lg:px-10 ${styles.gradient}`}>
@@ -487,7 +494,7 @@ export function CounterpartyModal({
                 </button>
                 <div className="flex flex-wrap items-center gap-1.5">
                   <span className={`inline-flex w-fit items-center rounded-full px-2.5 py-1 text-[11px] font-medium ${styles.badge}`}>
-                    {counterparty.tag}
+                    {tagLabel}
                   </span>
                   {problemIndicators.map((item) => {
                     const Icon = item.Icon;
