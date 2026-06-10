@@ -456,8 +456,9 @@ export function AssessmentModal({
                           "rounded-lg border bg-white transition",
                           disagreeMode && checked
                             ? "border-primary/30 bg-primary/5"
-                            : "border-border",
+                            : "border-slate-100",
                         )}
+
                       >
                         <div
                           role="button"
