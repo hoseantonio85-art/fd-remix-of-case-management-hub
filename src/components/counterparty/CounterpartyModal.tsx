@@ -91,7 +91,7 @@ export function CounterpartyModal({
       setNotification(null);
       setStepAnim(null);
       setCompletedFields({});
-      setAssessment(buildAssessment(counterparty.name, counterparty.inn, "auto"));
+      setAssessment(buildAssessment(counterparty.name, counterparty.inn, "auto", undefined, counterparty.status === "no_risk" ? "positive" : "negative"));
       setAssessmentStatus("pending");
       setAssessmentConfirmedAt(undefined);
       setAssessmentDisagreement(null);
