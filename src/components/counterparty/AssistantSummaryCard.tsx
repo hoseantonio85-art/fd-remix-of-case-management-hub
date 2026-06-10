@@ -1,5 +1,6 @@
 import { Sparkles, ChevronRight, CheckCircle2, AlertTriangle, RotateCw } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { NormAssistantIcon } from "./NormAssistantIcon";
 import type { AssessmentStatus, Disagreement } from "./AssessmentModal";
 
 type StateMeta = {
@@ -76,13 +77,10 @@ export function AssistantSummaryCard({
   sourceLabel?: string;
 }) {
   const m = stateMeta[status];
-  const Icon = m.Icon;
   return (
     <div className={`rounded-2xl border ${m.borderCls} bg-white p-4 shadow-sm`}>
       <div className="flex items-start gap-3">
-        <div className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-full ${m.iconBg} ${m.iconText}`}>
-          <Icon className="h-4 w-4" />
-        </div>
+        <NormAssistantIcon size="sm" />
         <div className="min-w-0 flex-1">
           <div className="flex flex-wrap items-center gap-2">
             <div className="text-[11px] font-medium uppercase tracking-wide text-muted-foreground">
