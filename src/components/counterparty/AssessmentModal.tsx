@@ -353,7 +353,7 @@ export function AssessmentModal({
                       <p className="mt-1.5 text-[11px] leading-snug text-muted-foreground">
                         {isReassessmentRunning
                           ? `Проверяю данные по ИНН ${assessment.inn}: регистрационные сведения, налоговые маркеры и судебную нагрузку.`
-                          : "Появились новые изменения по 3 критериям. Проверьте блок «Что изменилось»."}
+                          : "Появились новые изменения по 3 критериям. Проверьте ключевые аномалии."}
                       </p>
                       {isReassessmentRunning && (
                         <ul className="mt-3 space-y-1.5">
