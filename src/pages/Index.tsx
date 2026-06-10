@@ -583,7 +583,7 @@ export default function Index() {
                         onClick={() => toggleTile(t.key)}
                         className={`rounded-2xl px-4 py-4 text-left transition ${
                           isActive
-                            ? `${t.bg.replace("/60", "")} ring-2 ${t.ring} shadow-md brightness-105 saturate-150`
+                            ? `${t.bg} ring-2 ${t.ring} shadow-md saturate-150`
                             : `${t.bg} ring-1 ring-inset ring-transparent hover:ring-2 ${dimmed ? "opacity-60" : ""}`
                         } ${disabled ? "!opacity-40 !cursor-not-allowed hover:ring-0" : ""}`}
                       >
