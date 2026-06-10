@@ -14,6 +14,7 @@ import {
 import { AssessmentGroupDrawer } from "./AssessmentGroupDrawer";
 import { defaultOgrn } from "./RegistrationInfoWidget";
 import { RegistrationInfoDrawer } from "./RegistrationInfoDrawer";
+import { KeyAnomaliesWidget } from "./KeyAnomaliesWidget";
 
 export type AssessmentStatus = "pending" | "confirmed" | "disagreed" | "updated" | "review";
 
@@ -335,59 +336,7 @@ export function AssessmentModal({
               <aside className="order-2 lg:col-start-2 lg:row-start-1">
 
                 <div className="space-y-3 lg:sticky lg:top-0">
-                  <div
-                    className={cn(
-                      "rounded-2xl border p-4 transition-colors duration-500",
-                      highlightedChanges
-                        ? "border-emerald-300 bg-emerald-50/40"
-                        : "border-border bg-white",
-                    )}
-                  >
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <div className="text-sm font-semibold text-foreground">Что изменилось</div>
-                        <div className="text-[11px] text-muted-foreground">
-                          {reassessmentCompleted
-                            ? "Появились новые изменения по 3 критериям"
-                            : "За последний период"}
-                        </div>
-                      </div>
-                      <span className="inline-flex h-6 min-w-6 items-center justify-center rounded-full bg-muted px-1.5 text-[11px] font-medium text-muted-foreground">
-                        {assessment.changes.length + extraChanges.length}
-                      </span>
-                    </div>
-                    <div className="mt-3">
-                      {assessment.changes.length + extraChanges.length === 0 ? (
-                        <div className="rounded-lg border border-dashed border-border px-3 py-4 text-center text-xs text-muted-foreground">
-                          За последний период новых факторов не обнаружено
-                        </div>
-                      ) : (
-                        <ul className="divide-y divide-border">
-                          {[
-                            ...extraChanges.map((c) => ({ ...c, fresh: true })),
-                            ...assessment.changes.map((c) => ({ ...c, fresh: false })),
-                          ].map((c, i) => {
-                            const Ico = changeIcon[c.tone];
-                            const cls = changeIconClass[c.tone];
-                            return (
-                              <li key={i} className="flex items-start gap-2.5 py-2.5 first:pt-0 last:pb-0">
-                                <span className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-full ${cls.bg}`}>
-                                  <Ico className={`h-3.5 w-3.5 ${cls.text}`} />
-                                </span>
-                                <div className="min-w-0 flex-1">
-                                  <div className="text-xs leading-snug text-foreground">{c.text}</div>
-                                  <div className="mt-0.5 text-[10px] text-muted-foreground">
-                                    {toneLabel[c.tone]}
-                                    {c.fresh && " · только что"}
-                                  </div>
-                                </div>
-                              </li>
-                            );
-                          })}
-                        </ul>
-                      )}
-                    </div>
-                  </div>
+                  <KeyAnomaliesWidget />
 
                   {(isReassessmentRunning || reassessmentCompleted) && (
                     <div className="rounded-2xl border border-border bg-white p-4">
@@ -404,7 +353,7 @@ export function AssessmentModal({
                       <p className="mt-1.5 text-[11px] leading-snug text-muted-foreground">
                         {isReassessmentRunning
                           ? `Проверяю данные по ИНН ${assessment.inn}: регистрационные сведения, налоговые маркеры и судебную нагрузку.`
-                          : "Появились новые изменения по 3 критериям. Проверьте блок «Что изменилось»."}
+                          : "Появились новые изменения по 3 критериям. Проверьте ключевые аномалии."}
                       </p>
                       {isReassessmentRunning && (
                         <ul className="mt-3 space-y-1.5">
