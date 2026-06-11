@@ -381,21 +381,10 @@ export function AssessmentModal({
                 Не согласен
               </Button>
               <Button
-                variant="outline"
-                onClick={handleRerunAssessment}
-                disabled={isReassessmentRunning}
+                onClick={handleDownload}
                 className="h-12 flex-1 rounded-full text-sm font-medium"
               >
-                {isReassessmentRunning ? (
-                  <>
-                    <Loader2 className="h-4 w-4 animate-spin" /> Обновляю оценку
-                  </>
-                ) : (
-                  <>
-                    <RefreshCw className="h-4 w-4" />
-                    {reassessmentCompleted ? "Запустить повторно" : "Запустить новую оценку"}
-                  </>
-                )}
+                <Download className="h-4 w-4" /> Скачать
               </Button>
             </div>
           </div>
