@@ -357,21 +357,10 @@ export function AssessmentModal({
                 <div className="grid grid-cols-1 gap-2.5">
                   {assessment.groups.map((g) => {
                     const counts = groupCounts(g);
-                    const checked = disagreeGroupIds.includes(g.id);
-                    const isUnderReview =
-                      disagreeSubmitted && !disagreeMode && disagreeGroupIds.includes(g.id);
-                    const submittedComment = disagreeComments[g.id]?.trim();
-                    const hasError = disagreeErrors[g.id];
                     return (
                       <div
                         key={g.id}
-                        className={cn(
-                          "rounded-lg border bg-white transition",
-                          disagreeMode && checked
-                            ? "border-primary/30 bg-primary/5"
-                            : "border-slate-100",
-                        )}
-
+                        className="rounded-lg border border-slate-100 bg-white transition"
                       >
                         <div
                           role="button"
@@ -385,27 +374,8 @@ export function AssessmentModal({
                           }}
                           className="group flex cursor-pointer items-center gap-3 px-3 py-3 text-left hover:bg-muted/30"
                         >
-                          {disagreeMode && (
-                            <div
-                              onClick={(e) => e.stopPropagation()}
-                              className="flex shrink-0 items-center"
-                            >
-                              <Checkbox
-                                checked={checked}
-                                onCheckedChange={() => toggleDisagreeGroup(g.id)}
-                                aria-label={`Выбрать группу ${g.title}`}
-                              />
-                            </div>
-                          )}
                           <div className="min-w-0 flex-1">
-                            <div className="flex flex-wrap items-center gap-2">
-                              <div className="text-sm font-medium text-foreground">{g.title}</div>
-                              {isUnderReview && (
-                                <span className="inline-flex items-center rounded-full border border-violet-200 bg-violet-50 px-2 py-0.5 text-[10px] font-medium text-violet-700">
-                                  На пересмотре
-                                </span>
-                              )}
-                            </div>
+                            <div className="text-sm font-medium text-foreground">{g.title}</div>
                             <div className="mt-2 flex flex-wrap items-center gap-1.5">
                               <CountPill kind="risk" count={counts.risk} />
                               <CountPill kind="clear" count={counts.clear} />
@@ -414,41 +384,6 @@ export function AssessmentModal({
                           </div>
                           <ChevronRight className="h-4 w-4 shrink-0 text-muted-foreground transition group-hover:text-foreground" />
                         </div>
-
-                        {disagreeMode && checked && (
-                          <div
-                            className="border-t border-primary/20 px-3 py-3"
-                            onClick={(e) => e.stopPropagation()}
-                          >
-                            <label className="text-[11px] font-medium text-foreground">
-                              Комментарий к группе
-                            </label>
-                            <Textarea
-                              value={disagreeComments[g.id] ?? ""}
-                              onChange={(e) => setGroupComment(g.id, e.target.value)}
-                              onClick={(e) => e.stopPropagation()}
-                              onFocus={(e) => e.stopPropagation()}
-                              placeholder="Опишите, с чем именно вы не согласны по этой группе."
-                              className={cn(
-                                "mt-1.5 min-h-[88px] resize-y",
-                                hasError && "border-rose-400 focus-visible:ring-rose-300",
-                              )}
-                              rows={3}
-                            />
-                            {hasError && (
-                              <div className="mt-1 text-[11px] text-rose-600">
-                                Добавьте комментарий по выбранной группе.
-                              </div>
-                            )}
-                          </div>
-                        )}
-
-                        {!disagreeMode && isUnderReview && submittedComment && (
-                          <div className="border-t border-border px-3 py-2.5 text-[12px] text-muted-foreground">
-                            <span className="font-medium text-foreground">Комментарий:</span>{" "}
-                            {submittedComment}
-                          </div>
-                        )}
                       </div>
                     );
                   })}
