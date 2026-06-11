@@ -20,7 +20,17 @@ export type AssessmentCriterion = {
   source?: string;
 };
 
-export type AssessmentGroupId = "legal" | "management" | "finance" | "court";
+export type AssessmentGroupId =
+  | "fns"
+  | "efrsb"
+  | "kad"
+  | "fssp"
+  | "rosfin"
+  | "minjust"
+  | "fas"
+  | "sud_mvd"
+  | "eis"
+  | "bank";
 
 export type AssessmentGroup = {
   id: AssessmentGroupId;
@@ -55,87 +65,178 @@ const FIN_REASON =
 const HEAD_REASON =
   "По найденной информации за последние 6 месяцев произошла смена директора компании.";
 
-const legal: AssessmentGroup = {
-  id: "legal",
-  title: "Юридический статус и правоспособность",
-  description:
-    "Проверка статуса ЮЛ, регистрации, ограничений и права заключать договор",
+// helpers
+const ok = (n: number, title: string): AssessmentCriterion => ({
+  number: n,
+  title,
+  passed: true,
+  reason: OK_REASON,
+});
+const nd = (n: number, title: string): AssessmentCriterion => ({
+  number: n,
+  title,
+  passed: null,
+  reason: NO_DATA_REASON,
+});
+const risk = (n: number, title: string, reason: string): AssessmentCriterion => ({
+  number: n,
+  title,
+  passed: false,
+  reason,
+});
+
+const fns: AssessmentGroup = {
+  id: "fns",
+  title: "ФНС",
+  description: "Федеральная налоговая служба",
   criteria: [
-    { number: 1, title: "Ликвидация или реорганизация", passed: true, reason: OK_REASON },
-    { number: 2, title: "Банкротство ЮЛ", passed: true, reason: OK_REASON },
-    { number: 3, title: "Деятельность приостановлена по КоАП РФ", passed: null, reason: NO_DATA_REASON },
-    { number: 4, title: "Решение о приостановлении деятельности", passed: null, reason: NO_DATA_REASON },
-    { number: 5, title: "Ограничения по счетам от ФНС", passed: null, reason: NO_DATA_REASON },
-    { number: 6, title: "Недостоверный адрес в ЕГРЮЛ", passed: true, reason: OK_REASON },
-    { number: 7, title: "Адрес массовой регистрации", passed: null, reason: NO_DATA_REASON },
-    { number: 8, title: "Смена юрадреса в течение года", passed: null, reason: NO_DATA_REASON },
-    { number: 9, title: "С даты регистрации менее 6 месяцев", passed: null, reason: NO_DATA_REASON },
-    { number: 10, title: "Отсутствие нужных ОКВЭД под договор", passed: null, reason: NO_DATA_REASON },
+    ok(1, "ЮЛ ликвидировано / в процессе ликвидации / реорганизации путём присоединения"),
+    ok(2, "ЮЛ в процедуре банкротства / банкрот / подавало заявление (признак в ЕГРЮЛ)"),
+    nd(3, "Деятельность приостановлена по КоАП РФ"),
+    nd(4, "Решение о приостановлении деятельности организации (запись в ЕГРЮЛ)"),
+    nd(5, "Наличие ограничений на операции по банковским счетам, установленных ФНС"),
+    ok(6, "Недостоверный адрес в ЕГРЮЛ (признак по решению ФНС)"),
+    nd(7, "Адрес массовой регистрации (данные ЕГРЮЛ, признак вычисляется)"),
+    nd(8, "Смена юридического адреса в течение года"),
+    nd(9, "С даты регистрации менее 6 месяцев"),
+    nd(10, "С даты регистрации прошло 12 месяцев"),
+    nd(11, "Отсутствие нужных ОКВЭД под договор / ТЗ"),
+    ok(12, "Недостоверные сведения о руководителе или учредителе по ФНС"),
+    ok(13, "ФИО руководителей в реестре дисквалифицированных лиц"),
+    nd(14, "Среди учредителей/руководителей найдены иностранные лица"),
+    nd(15, "Одно лицо = учредитель и руководитель"),
+    ok(16, "Более 10 ЮЛ с тем же руководителем (на основе ЕГРЮЛ)"),
+    ok(17, "Более 10 ЮЛ с тем же учредителем-физлицом (на основе ЕГРЮЛ)"),
+    risk(18, "Смена руководителя в течение года", HEAD_REASON),
+    nd(19, "Смена управляющей компании в течение года"),
+    nd(20, "Уставной капитал ≤50 тыс. руб."),
+    ok(21, "ЮЛ не представляет налоговую отчётность более года"),
+    nd(22, "Неоплаченная налоговая задолженность"),
+    nd(23, "Доля вычитаемого НДС более 89% (на основе деклараций)"),
+    nd(24, "Выручка (бухгалтерская отчётность)"),
+    nd(25, "Сумма предполагаемых обязательств более 30% выручки"),
+    nd(26, "Существенное снижение выручки (>50% к прошлому периоду)"),
+    nd(27, "Среднесписочная численность работников"),
+    ok(28, "Контрагент внесён в реестр ЮЛ, привлечённых к административной ответственности по ст. 19.28 КоАП"),
+    nd(29, "Бухгалтерская отчётность (все формы)"),
+    nd(30, "Налоговая отчётность (декларации, расчёты)"),
+    nd(31, "Госконтракты за 12 мес. при выручке >100 млн руб."),
+    risk(32, "Финансовый анализ на данных отчетности (блок fin_analysis)", FIN_REASON),
   ],
 };
 
-const management: AssessmentGroup = {
-  id: "management",
-  title: "Руководство и бенефициары",
-  description:
-    "Проверка руководителей, учредителей, связей и изменений в управлении",
+const efrsb: AssessmentGroup = {
+  id: "efrsb",
+  title: "ЕФРСБ",
+  description: "Единый федеральный реестр сведений о банкротстве",
   criteria: [
-    { number: 1, title: "Дисквалификация руководителей", passed: true, reason: OK_REASON },
-    { number: 2, title: "Недостоверные сведения о руководителе/учредителе", passed: true, reason: OK_REASON },
-    { number: 3, title: "Банкротство физлица (руководитель/учредитель)", passed: true, reason: OK_REASON },
-    { number: 4, title: "Судимость за экономические преступления", passed: null, reason: NO_DATA_REASON },
-    { number: 5, title: "Иностранные учредители/руководители", passed: null, reason: NO_DATA_REASON },
-    { number: 6, title: "Совпадение учредителя и руководителя", passed: null, reason: NO_DATA_REASON },
-    { number: 7, title: "Массовость руководителя", passed: true, reason: OK_REASON },
-    { number: 8, title: "Массовость учредителя", passed: true, reason: OK_REASON },
-    { number: 9, title: "Смена руководителя в течение года", passed: false, reason: HEAD_REASON },
-    { number: 10, title: "Смена управляющей компании в течение года", passed: null, reason: NO_DATA_REASON },
-    { number: 11, title: "Отсутствие маркеров из I–III групп", passed: false, reason: "Обнаружены риски в группах 1–3" },
+    ok(1, "ЮЛ в процедуре банкротства / банкрот / подавало заявление (подтверждение факта публикации)"),
+    ok(2, "Наличие за 12 мес. сообщений о банкротстве физлица — руководителя, учредителя"),
+    nd(3, "Наличие за 12 мес. сообщений о банкротстве физлица, являющегося ИП"),
+    nd(4, "Банкротство физлица-ИП за 12 мес."),
   ],
 };
 
-const finance: AssessmentGroup = {
-  id: "finance",
-  title: "Финансы и налоги",
-  description:
-    "Проверка налоговой дисциплины, долгов, выручки и финансовой устойчивости",
+const kad: AssessmentGroup = {
+  id: "kad",
+  title: "КАД",
+  description: "Картотека арбитражных дел",
   criteria: [
-    { number: 1, title: "Непредставление налоговой отчётности более 1 года", passed: true, reason: OK_REASON },
-    { number: 2, title: "Неоплаченная налоговая задолженность", passed: null, reason: NO_DATA_REASON },
-    { number: 3, title: "Высокая доля вычитаемого НДС", passed: null, reason: NO_DATA_REASON },
-    { number: 4, title: "Обязательства более 30% выручки", passed: null, reason: NO_DATA_REASON },
-    { number: 5, title: "Снижение выручки более 50%", passed: null, reason: NO_DATA_REASON },
-    { number: 6, title: "Недостаточная численность работников", passed: null, reason: NO_DATA_REASON },
-    { number: 7, title: "Уставной капитал не более 50 тыс. руб.", passed: null, reason: NO_DATA_REASON },
-    { number: 8, title: "С даты регистрации прошло 12 месяцев", passed: null, reason: NO_DATA_REASON },
-    { number: 9, title: "Положительный опыт с компаниями холдинга", passed: null, reason: NO_DATA_REASON },
-    { number: 10, title: "Наличие госконтрактов", passed: null, reason: NO_DATA_REASON },
-    { number: 11, title: "Финансовый анализ на данных отчётности", passed: false, reason: FIN_REASON },
+    nd(1, "Решение о приостановлении деятельности (оспаривание в суде)"),
+    nd(2, "Значительная сумма арбитражных дел в качестве ответчика за 12 месяцев"),
+    nd(3, "Требования к ответчику >10% выручки (расчёт на основе дел + отчётности из ФНС)"),
+    nd(4, "Наличие факта рассмотрения налогового спора в суде (налоговая — истец)"),
+    nd(5, "Претензии / санкции от госорганов (в части арбитражных дел)"),
+    ok(6, "наличие арбитражных исков (временно, пока не подключим Ирбис)"),
   ],
 };
 
-const court: AssessmentGroup = {
-  id: "court",
-  title: "Судебная нагрузка и репутация",
-  description: "Проверка судебных, исполнительных и репутационных факторов",
+const fssp: AssessmentGroup = {
+  id: "fssp",
+  title: "ФССП",
+  description: "Федеральная служба судебных приставов",
   criteria: [
-    { number: 1, title: "Терроризм / экстремизм", passed: true, reason: OK_REASON },
-    { number: 2, title: "Список иноагентов", passed: null, reason: NO_DATA_REASON },
-    { number: 3, title: "Административная ответственность ст. 19.28 КоАП", passed: true, reason: OK_REASON },
-    { number: 4, title: "Недобросовестный поставщик", passed: true, reason: OK_REASON },
-    { number: 5, title: "Исполнительные производства более 10% выручки", passed: null, reason: NO_DATA_REASON },
-    { number: 6, title: "Значительные арбитражные дела (ответчик)", passed: null, reason: NO_DATA_REASON },
-    { number: 7, title: "Требования к ответчику более 10% выручки", passed: null, reason: NO_DATA_REASON },
-    { number: 8, title: "Налоговый спор в суде", passed: null, reason: NO_DATA_REASON },
-    { number: 9, title: "Банкротство физлица-ИП за 12 мес.", passed: null, reason: NO_DATA_REASON },
-    { number: 10, title: "Претензии / санкции от госорганов", passed: null, reason: NO_DATA_REASON },
-    { number: 11, title: "Иная негативная репутационная информация", passed: true, reason: OK_REASON },
-    { number: 12, title: "3 и более фактора из III группы", passed: true, reason: OK_REASON },
-    { number: 13, title: "Информация об арбитражных исках", passed: true, reason: OK_REASON },
+    nd(1, "Значительная сумма исполнительных производств (>10% выручки)"),
   ],
 };
 
-export const defaultGroups: AssessmentGroup[] = [legal, management, finance, court];
+const rosfin: AssessmentGroup = {
+  id: "rosfin",
+  title: "Росфинмониторинг",
+  description: "Росфинмониторинг",
+  criteria: [
+    ok(1, "Контрагент в списках организаций, спонсирующих терроризм и/или экстремизм"),
+  ],
+};
+
+const minjust: AssessmentGroup = {
+  id: "minjust",
+  title: "Минюст РФ",
+  description: "Министерство юстиции РФ",
+  criteria: [
+    nd(1, "Контрагент в списке иноагентов"),
+  ],
+};
+
+const fas: AssessmentGroup = {
+  id: "fas",
+  title: "ФАС",
+  description: "Федеральная антимонопольная служба",
+  criteria: [
+    ok(1, "Контрагент в реестре недобросовестных поставщиков (44-ФЗ, 223-ФЗ)"),
+  ],
+};
+
+const sudMvd: AssessmentGroup = {
+  id: "sud_mvd",
+  title: "Суды общей юрисдикции / МВД",
+  description: "Суды общей юрисдикции / МВД",
+  criteria: [
+    nd(1, "Судимость руководителя / учредителя за экономические преступления (непогашенная)"),
+  ],
+};
+
+const eis: AssessmentGroup = {
+  id: "eis",
+  title: "ЕИС",
+  description: "Единая информационная система в сфере закупок",
+  criteria: [
+    nd(1, "Госконтракты за 12 мес. при выручке >100 млн руб. (факт наличия контрактов)"),
+  ],
+};
+
+const bank: AssessmentGroup = {
+  id: "bank",
+  title: "Внутренние данные банка",
+  description: "Внутренние данные банка",
+  criteria: [
+    nd(1, "Наличие ограничений по счетам от ФНС (фактическая блокировка, подтверждённая банком)"),
+    nd(2, "Положительный опыт взаимодействия с компаниями холдинга"),
+  ],
+};
+
+export const defaultGroups: AssessmentGroup[] = [
+  fns,
+  efrsb,
+  kad,
+  fssp,
+  rosfin,
+  minjust,
+  fas,
+  sudMvd,
+  eis,
+  bank,
+];
+
+export const MAIN_GROUP_IDS: AssessmentGroupId[] = ["fns", "efrsb", "kad", "fssp"];
+export const OTHER_GROUP_IDS: AssessmentGroupId[] = [
+  "rosfin",
+  "minjust",
+  "fas",
+  "sud_mvd",
+  "eis",
+  "bank",
+];
 
 function toPositiveGroups(groups: AssessmentGroup[]): AssessmentGroup[] {
   return groups.map((g) => ({
@@ -182,6 +283,19 @@ export function groupCounts(g: AssessmentGroup): GroupCounts {
     else no_data++;
   }
   return { risk, clear, no_data };
+}
+
+export function sumGroupCounts(groups: AssessmentGroup[]): GroupCounts {
+  return groups.reduce<GroupCounts>(
+    (acc, g) => {
+      const c = groupCounts(g);
+      acc.risk += c.risk;
+      acc.clear += c.clear;
+      acc.no_data += c.no_data;
+      return acc;
+    },
+    { risk: 0, clear: 0, no_data: 0 },
+  );
 }
 
 export const toneStyles: Record<
