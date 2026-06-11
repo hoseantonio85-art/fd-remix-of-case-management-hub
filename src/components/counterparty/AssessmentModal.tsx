@@ -118,11 +118,6 @@ export function AssessmentModal({
   
   const [groupDrawer, setGroupDrawer] = useState<AssessmentGroup | null>(null);
   const [registrationOpen, setRegistrationOpen] = useState(false);
-  const [historyOpen, setHistoryOpen] = useState(false);
-
-  // Correction drawer (replaces old inline disagreement flow).
-  const [groupDrawer, setGroupDrawer] = useState<AssessmentGroup | null>(null);
-  const [registrationOpen, setRegistrationOpen] = useState(false);
 
   // Correction drawer (replaces old inline disagreement flow).
   const [correctionOpen, setCorrectionOpen] = useState(false);
