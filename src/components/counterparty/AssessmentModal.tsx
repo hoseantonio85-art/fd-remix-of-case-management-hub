@@ -121,7 +121,7 @@ export function AssessmentModal({
 
   // Correction drawer (replaces old inline disagreement flow).
   const [correctionOpen, setCorrectionOpen] = useState(false);
-  const [correctedTag, setCorrectedTag] = useState<CorrectionTag | null>(null);
+
 
   // History blocks (persist per-counterparty within the session)
   const [correctionHistoryOpen, setCorrectionHistoryOpen] = useState(false);
