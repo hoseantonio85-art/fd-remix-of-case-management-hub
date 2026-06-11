@@ -406,10 +406,17 @@ export function AssessmentModal({
             ogrn={defaultOgrn}
           />
 
-          <AssessmentHistoryDrawer
-            open={historyOpen}
-            onOpenChange={setHistoryOpen}
-            positive={effectivePositive}
+          <CorrectionHistoryDrawer
+            open={correctionHistoryOpen}
+            onOpenChange={setCorrectionHistoryOpen}
+            records={correctionHistory}
+          />
+
+          <DownloadHistoryDrawer
+            open={downloadHistoryOpen}
+            onOpenChange={setDownloadHistoryOpen}
+            records={downloadHistory}
+            onRedownload={handleDownload}
           />
 
           <AssessmentCorrectionDrawer
