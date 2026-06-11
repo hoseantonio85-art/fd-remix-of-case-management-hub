@@ -284,10 +284,23 @@ export default function Index() {
   const [manualFlowIsNew, setManualFlowIsNew] = useState(false);
   const [manualFlowCpOpen, setManualFlowCpOpen] = useState(false);
 
+  const [statusOverrides, setStatusOverrides] = useState<Record<string, Counterparty["status"]>>({});
+
+  const applyOverride = (c: Counterparty): Counterparty => {
+    const override = statusOverrides[c.inn];
+    return override && override !== c.status ? { ...c, status: override } : c;
+  };
+
   const allCounterparties = useMemo(
-    () => [...addedCounterparties, ...counterparties],
-    [addedCounterparties],
+    () => [...addedCounterparties, ...counterparties].map(applyOverride),
+    [addedCounterparties, statusOverrides],
   );
+
+  const handleStatusChange = (inn: string, status: Counterparty["status"]) => {
+    setStatusOverrides((prev) => ({ ...prev, [inn]: status }));
+    setActive((prev) => (prev && prev.inn === inn ? { ...prev, status } : prev));
+    setManualFlowTarget((prev) => (prev && prev.inn === inn ? { ...prev, status } : prev));
+  };
 
   const handleStartAssessment = () => {
     const innRaw = runInn.trim();
