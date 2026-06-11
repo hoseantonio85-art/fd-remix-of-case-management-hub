@@ -180,16 +180,18 @@ export function DownloadHistoryDrawer({
   onOpenChange,
   records,
   onRedownload,
+  onDownloadAll,
 }: {
   open: boolean;
   onOpenChange: (o: boolean) => void;
   records: DownloadRecord[];
   onRedownload: (r: DownloadRecord) => void;
+  onDownloadAll?: () => void;
 }) {
   return (
     <InModalDrawer open={open} onOpenChange={onOpenChange}>
-      <div className="flex min-h-full flex-col">
-        <div className="flex-1 p-6">
+      <div className="flex h-full min-h-full flex-col">
+        <div className="flex-1 overflow-y-auto p-6">
           <h2 className="text-lg font-semibold">История скачивания</h2>
           <p className="mt-1 text-sm text-muted-foreground">
             Скачанные отчёты по оценке контрагента.
@@ -231,6 +233,13 @@ export function DownloadHistoryDrawer({
             </ol>
           )}
         </div>
+        {onDownloadAll ? (
+          <div className="sticky bottom-0 border-t border-slate-200 bg-white p-4">
+            <Button className="w-full gap-2" onClick={onDownloadAll}>
+              <Download className="h-4 w-4" /> Скачать весь отчёт
+            </Button>
+          </div>
+        ) : null}
       </div>
     </InModalDrawer>
   );
