@@ -443,7 +443,7 @@ export function AssessmentModal({
           <AssessmentHistoryDrawer
             open={historyOpen}
             onOpenChange={setHistoryOpen}
-            positive={positive}
+            positive={effectivePositive}
           />
         </div>
         </DialogPrimitive.Content>
