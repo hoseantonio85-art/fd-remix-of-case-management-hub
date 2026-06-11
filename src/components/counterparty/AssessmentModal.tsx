@@ -307,53 +307,17 @@ export function AssessmentModal({
                 <div className="space-y-3 lg:sticky lg:top-0">
                   {effectivePositive ? <TrustFactorsWidget /> : <KeyAnomaliesWidget />}
 
-                  <AssessmentHistoryEntry positive={effectivePositive} onOpen={() => setHistoryOpen(true)} />
+                  <CorrectionHistoryEntry
+                    count={correctionHistory.length}
+                    lastDate={correctionHistory[0]?.dateTime ?? ""}
+                    onOpen={() => setCorrectionHistoryOpen(true)}
+                  />
 
-                  {(isReassessmentRunning || reassessmentCompleted) && (
-                    <div className="rounded-2xl border border-border bg-white p-4">
-                      <div className="flex items-center gap-2">
-                        {isReassessmentRunning ? (
-                          <Loader2 className="h-4 w-4 animate-spin text-primary" />
-                        ) : (
-                          <CheckCircle2 className="h-4 w-4 text-emerald-600" />
-                        )}
-                        <div className="text-sm font-semibold text-foreground">
-                          {isReassessmentRunning ? "Оценка запущена" : "Оценка обновлена"}
-                        </div>
-                      </div>
-                      <p className="mt-1.5 text-[11px] leading-snug text-muted-foreground">
-                        {isReassessmentRunning
-                          ? `Проверяю данные по ИНН ${assessment.inn}: регистрационные сведения, налоговые маркеры и судебную нагрузку.`
-                          : "Появились новые изменения по 3 критериям. Проверьте ключевые аномалии."}
-                      </p>
-                      {isReassessmentRunning && (
-                        <ul className="mt-3 space-y-1.5">
-                          {[
-                            "Регистрационные данные",
-                            "Финансы и налоги",
-                            "Судебная нагрузка",
-                          ].map((label, idx) => {
-                            const done = progressStep > idx;
-                            const active = progressStep === idx;
-                            return (
-                              <li key={label} className="flex items-center gap-2 text-[11px]">
-                                {done ? (
-                                  <CheckCircle2 className="h-3.5 w-3.5 text-emerald-600" />
-                                ) : active ? (
-                                  <Loader2 className="h-3.5 w-3.5 animate-spin text-primary" />
-                                ) : (
-                                  <span className="h-3.5 w-3.5 rounded-full border border-border" />
-                                )}
-                                <span className={cn(done ? "text-foreground" : "text-muted-foreground")}>
-                                  {label}
-                                </span>
-                              </li>
-                            );
-                          })}
-                        </ul>
-                      )}
-                    </div>
-                  )}
+                  <DownloadHistoryEntry
+                    count={downloadHistory.length}
+                    lastDate={downloadHistory[0]?.dateTime ?? null}
+                    onOpen={() => setDownloadHistoryOpen(true)}
+                  />
 
                 </div>
               </aside>
