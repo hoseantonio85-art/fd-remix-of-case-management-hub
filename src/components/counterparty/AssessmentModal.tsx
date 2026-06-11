@@ -121,61 +121,61 @@ export function AssessmentModal({
   const [historyOpen, setHistoryOpen] = useState(false);
 
   // Correction drawer (replaces old inline disagreement flow).
+  const [groupDrawer, setGroupDrawer] = useState<AssessmentGroup | null>(null);
+  const [registrationOpen, setRegistrationOpen] = useState(false);
+
+  // Correction drawer (replaces old inline disagreement flow).
   const [correctionOpen, setCorrectionOpen] = useState(false);
   const [correctedTag, setCorrectedTag] = useState<CorrectionTag | null>(null);
 
-  // In-modal reassessment (separate from main-screen flow that asks INN).
-  const [isReassessmentRunning, setIsReassessmentRunning] = useState(false);
-  const [reassessmentCompleted, setReassessmentCompleted] = useState(false);
-  const [highlightedChanges, setHighlightedChanges] = useState(false);
-  const [extraChanges, setExtraChanges] = useState<{ text: string; tone: "rose" | "amber" | "slate" | "emerald" }[]>([]);
-  const [progressStep, setProgressStep] = useState(0);
-  const reassessTimers = useRef<number[]>([]);
+  // History blocks
+  const [correctionHistoryOpen, setCorrectionHistoryOpen] = useState(false);
+  const [downloadHistoryOpen, setDownloadHistoryOpen] = useState(false);
+  const [correctionHistory, setCorrectionHistory] = useState<CorrectionRecord[]>([]);
+  const [downloadHistory, setDownloadHistory] = useState<DownloadRecord[]>([]);
 
-  useEffect(() => {
-    return () => {
-      reassessTimers.current.forEach((t) => window.clearTimeout(t));
-    };
-  }, []);
-
-  // Reset local rerun state when switching counterparty or closing.
+  // Reset when switching counterparty or closing.
   useEffect(() => {
     if (!open) {
-      setIsReassessmentRunning(false);
-      setReassessmentCompleted(false);
-      setHighlightedChanges(false);
-      setExtraChanges([]);
-      setProgressStep(0);
       setCorrectionOpen(false);
       setCorrectedTag(null);
+      setCorrectionHistoryOpen(false);
+      setDownloadHistoryOpen(false);
+      setCorrectionHistory([]);
+      setDownloadHistory([]);
     }
   }, [open, assessment?.inn]);
 
-  const handleRerunAssessment = () => {
-    if (isReassessmentRunning) return;
-    setIsReassessmentRunning(true);
-    setReassessmentCompleted(false);
-    setProgressStep(0);
-    reassessTimers.current.forEach((t) => window.clearTimeout(t));
-    reassessTimers.current = [
-      window.setTimeout(() => setProgressStep(1), 500),
-      window.setTimeout(() => setProgressStep(2), 1100),
-      window.setTimeout(() => {
-        setIsReassessmentRunning(false);
-        setReassessmentCompleted(true);
-        setHighlightedChanges(true);
-        setExtraChanges([
-          { text: "Обновлены ограничения ФНС по счетам", tone: "rose" },
-          { text: "Изменилась налоговая задолженность", tone: "amber" },
-          { text: "Добавлен новый судебный фактор", tone: "slate" },
-        ]);
-        toast.success("Оценка обновлена");
-      }, 1800),
-      window.setTimeout(() => setHighlightedChanges(false), 5400),
-    ];
+  const nowLabel = () => {
+    const d = new Date();
+    const hh = String(d.getHours()).padStart(2, "0");
+    const mm = String(d.getMinutes()).padStart(2, "0");
+    return `Сегодня, ${hh}:${mm}`;
   };
 
+  const formatMonitoringDate = (iso: string) => {
+    if (!iso) return "—";
+    const d = new Date(iso);
+    if (Number.isNaN(d.getTime())) return iso;
+    return d.toLocaleDateString("ru-RU");
+  };
+
+  const currentTagLabel = correctedTag ?? (positive ? "Нет риска" : "Риск дефолта");
+
   const handleCorrectionSubmit = (payload: CorrectionPayload) => {
+    const fromTag = currentTagLabel;
+    setCorrectionHistory((prev) => [
+      {
+        id: `c-${Date.now()}`,
+        dateTime: nowLabel(),
+        author: "Вы · риск-менеджер",
+        fromTag,
+        toTag: payload.tag,
+        comment: payload.comment,
+        monitoringDate: formatMonitoringDate(payload.monitoringDate),
+      },
+      ...prev,
+    ]);
     setCorrectedTag(payload.tag);
     onStatusChange?.(correctionTagToStatus[payload.tag]);
     onDisagree({
@@ -184,6 +184,19 @@ export function AssessmentModal({
       submittedAt: new Date().toISOString(),
     });
     toast("Корректировка оценки отправлена");
+  };
+
+  const handleDownload = () => {
+    setDownloadHistory((prev) => [
+      {
+        id: `d-${Date.now()}`,
+        dateTime: nowLabel(),
+        tag: currentTagLabel,
+        fileName: "Отчёт оценки контрагента.pdf",
+      },
+      ...prev,
+    ]);
+    toast.success("Отчёт скачан");
   };
 
   if (!assessment) return null;
@@ -204,7 +217,7 @@ export function AssessmentModal({
 
   const baseSourceLabel =
     assessment.source === "auto" ? "Автоматический мониторинг" : "Запущено пользователем";
-  const sourceLabel = reassessmentCompleted ? "Запущено пользователем · только что" : baseSourceLabel;
+  const sourceLabel = baseSourceLabel;
 
 
 
