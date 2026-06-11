@@ -12,7 +12,11 @@ import {
   type Assessment,
   type AssessmentGroup,
   groupCounts,
+  sumGroupCounts,
+  MAIN_GROUP_IDS,
+  OTHER_GROUP_IDS,
 } from "@/lib/assessment-data";
+import { ChevronDown } from "lucide-react";
 import { AssessmentGroupDrawer } from "./AssessmentGroupDrawer";
 import { defaultOgrn } from "./RegistrationInfoWidget";
 import { RegistrationInfoDrawer } from "./RegistrationInfoDrawer";
