@@ -346,43 +346,25 @@ export function AssessmentModal({
                 <div>
                 <h3 className="mb-2 text-sm font-semibold">Группы оценки</h3>
                 <div className="grid grid-cols-1 gap-2.5">
-                  {assessment.groups.map((g) => {
-                    const counts = groupCounts(g);
+                  {MAIN_GROUP_IDS.map((id) => {
+                    const g = assessment.groups.find((x) => x.id === id);
+                    if (!g) return null;
                     return (
-                      <div
-                        key={g.id}
-                        className="rounded-lg border border-slate-100 bg-white transition"
-                      >
-                        <div
-                          role="button"
-                          tabIndex={0}
-                          onClick={() => setGroupDrawer(g)}
-                          onKeyDown={(e) => {
-                            if (e.key === "Enter" || e.key === " ") {
-                              e.preventDefault();
-                              setGroupDrawer(g);
-                            }
-                          }}
-                          className="group flex cursor-pointer items-center gap-3 px-3 py-3 text-left hover:bg-muted/30"
-                        >
-                          <div className="min-w-0 flex-1">
-                            <div className="text-sm font-medium text-foreground">{g.title}</div>
-                            <div className="mt-2 flex flex-wrap items-center gap-1.5">
-                              <CountPill kind="risk" count={counts.risk} />
-                              <CountPill kind="clear" count={counts.clear} />
-                              <CountPill kind="no_data" count={counts.no_data} />
-                            </div>
-                          </div>
-                          <ChevronRight className="h-4 w-4 shrink-0 text-muted-foreground transition group-hover:text-foreground" />
-                        </div>
-                      </div>
+                      <GroupCard key={g.id} group={g} onOpen={setGroupDrawer} />
                     );
                   })}
+                  <OtherGroupsAccordion
+                    groups={OTHER_GROUP_IDS
+                      .map((id) => assessment.groups.find((x) => x.id === id))
+                      .filter((g): g is AssessmentGroup => !!g)}
+                    onOpen={setGroupDrawer}
+                  />
                 </div>
                 </div>
               </section>
             </div>
           </div>
+
 
           {/* Footer actions */}
           <div className="shrink-0 border-t border-border bg-white px-5 py-4 lg:px-10">
