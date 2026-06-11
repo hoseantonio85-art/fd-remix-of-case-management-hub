@@ -91,6 +91,7 @@ export function AssessmentModal({
   onBack,
   onCloseFlow,
   positive = false,
+  onStatusChange,
 }: {
   assessment: Assessment | null;
   open: boolean;
@@ -105,6 +106,7 @@ export function AssessmentModal({
   onBack?: () => void;
   onCloseFlow?: () => void;
   positive?: boolean;
+  onStatusChange?: (status: CounterpartyStatus) => void;
 }) {
   
   const [groupDrawer, setGroupDrawer] = useState<AssessmentGroup | null>(null);
