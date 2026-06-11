@@ -123,23 +123,26 @@ export function AssessmentModal({
   const [correctionOpen, setCorrectionOpen] = useState(false);
   const [correctedTag, setCorrectedTag] = useState<CorrectionTag | null>(null);
 
-  // History blocks
+  // History blocks (persist per-counterparty within the session)
   const [correctionHistoryOpen, setCorrectionHistoryOpen] = useState(false);
   const [downloadHistoryOpen, setDownloadHistoryOpen] = useState(false);
-  const [correctionHistory, setCorrectionHistory] = useState<CorrectionRecord[]>([]);
-  const [downloadHistory, setDownloadHistory] = useState<DownloadRecord[]>([]);
+  const [correctionHistoryMap, setCorrectionHistoryMap] = useState<Record<string, CorrectionRecord[]>>({});
+  const [downloadHistoryMap, setDownloadHistoryMap] = useState<Record<string, DownloadRecord[]>>({});
+  const [correctedTagMap, setCorrectedTagMap] = useState<Record<string, CorrectionTag>>({});
 
-  // Reset when switching counterparty or closing.
+  const inn = assessment?.inn ?? "";
+  const correctionHistory = correctionHistoryMap[inn] ?? [];
+  const downloadHistory = downloadHistoryMap[inn] ?? [];
+  const correctedTag = correctedTagMap[inn] ?? null;
+
+  // Only reset transient UI state when modal closes.
   useEffect(() => {
     if (!open) {
       setCorrectionOpen(false);
-      setCorrectedTag(null);
       setCorrectionHistoryOpen(false);
       setDownloadHistoryOpen(false);
-      setCorrectionHistory([]);
-      setDownloadHistory([]);
     }
-  }, [open, assessment?.inn]);
+  }, [open]);
 
   const nowLabel = () => {
     const d = new Date();
@@ -158,20 +161,22 @@ export function AssessmentModal({
   const currentTagLabel = correctedTag ?? (positive ? "Нет риска" : "Риск дефолта");
 
   const handleCorrectionSubmit = (payload: CorrectionPayload) => {
+    if (!inn) return;
     const fromTag = currentTagLabel;
-    setCorrectionHistory((prev) => [
-      {
-        id: `c-${Date.now()}`,
-        dateTime: nowLabel(),
-        author: "Вы · риск-менеджер",
-        fromTag,
-        toTag: payload.tag,
-        comment: payload.comment,
-        monitoringDate: formatMonitoringDate(payload.monitoringDate),
-      },
+    const record: CorrectionRecord = {
+      id: `c-${Date.now()}`,
+      dateTime: nowLabel(),
+      author: "Вы · риск-менеджер",
+      fromTag,
+      toTag: payload.tag,
+      comment: payload.comment,
+      monitoringDate: formatMonitoringDate(payload.monitoringDate),
+    };
+    setCorrectionHistoryMap((prev) => ({
       ...prev,
-    ]);
-    setCorrectedTag(payload.tag);
+      [inn]: [record, ...(prev[inn] ?? [])],
+    }));
+    setCorrectedTagMap((prev) => ({ ...prev, [inn]: payload.tag }));
     onStatusChange?.(correctionTagToStatus[payload.tag]);
     onDisagree({
       text: payload.comment,
@@ -182,17 +187,20 @@ export function AssessmentModal({
   };
 
   const handleDownload = () => {
-    setDownloadHistory((prev) => [
-      {
-        id: `d-${Date.now()}`,
-        dateTime: nowLabel(),
-        tag: currentTagLabel,
-        fileName: "Отчёт оценки контрагента.pdf",
-      },
+    if (!inn) return;
+    const record: DownloadRecord = {
+      id: `d-${Date.now()}`,
+      dateTime: nowLabel(),
+      tag: currentTagLabel,
+      fileName: "Отчёт оценки контрагента.pdf",
+    };
+    setDownloadHistoryMap((prev) => ({
       ...prev,
-    ]);
+      [inn]: [record, ...(prev[inn] ?? [])],
+    }));
     toast.success("Отчёт скачан");
   };
+
 
   if (!assessment) return null;
 
