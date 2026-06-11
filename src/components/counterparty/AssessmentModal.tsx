@@ -170,6 +170,7 @@ export function AssessmentModal({
 
   const handleCorrectionSubmit = (payload: CorrectionPayload) => {
     setCorrectedTag(payload.tag);
+    onStatusChange?.(correctionTagToStatus[payload.tag]);
     onDisagree({
       text: payload.comment,
       status: "submitted",
