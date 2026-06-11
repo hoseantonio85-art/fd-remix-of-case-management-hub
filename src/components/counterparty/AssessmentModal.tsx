@@ -192,34 +192,6 @@ export function AssessmentModal({
       ? { label: "Сделки заключать можно", chip: "bg-emerald-100 text-emerald-900" }
       : { label: "Не заключать сделки", chip: "bg-rose-100 text-rose-900" };
 
-  const effectiveStatus: AssessmentStatus = disagreeSubmitted
-    ? "review"
-    : reassessmentCompleted
-      ? "updated"
-      : status;
-  const meta = positive
-    ? {
-        label: "Сделки заключать можно",
-        chip: "bg-emerald-100 text-emerald-900",
-        headerBg: "bg-gradient-to-b from-emerald-50 via-emerald-50/40 to-transparent",
-      }
-    : statusMeta[effectiveStatus];
-  const resolutionBadge = positive
-    ? { label: "Сделки заключать можно", chip: "bg-emerald-100 text-emerald-900" }
-    : { label: "Не заключать сделки", chip: "bg-rose-100 text-rose-900" };
-  const statusBadge: { label: string; chip: string } | null = isReassessmentRunning
-    ? { label: "Обновляется", chip: "bg-slate-100 text-slate-700" }
-    : disagreeSubmitted
-      ? { label: "На пересмотре", chip: "bg-amber-100 text-amber-900" }
-      : reassessmentCompleted || effectiveStatus === "updated"
-        ? { label: "Обновлена", chip: "bg-sky-100 text-sky-900" }
-        : effectiveStatus === "review"
-          ? { label: "На пересмотре", chip: "bg-amber-100 text-amber-900" }
-          : effectiveStatus === "confirmed"
-            ? { label: "Подтверждена", chip: "bg-emerald-100 text-emerald-800" }
-            : effectiveStatus === "disagreed"
-              ? { label: "Не согласовано", chip: "bg-orange-100 text-orange-900" }
-              : null;
   const baseSourceLabel =
     assessment.source === "auto" ? "Автоматический мониторинг" : "Запущено пользователем";
   const sourceLabel = reassessmentCompleted ? "Запущено пользователем · только что" : baseSourceLabel;
