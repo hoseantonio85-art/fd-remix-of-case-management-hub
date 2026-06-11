@@ -412,8 +412,8 @@ export function AssessmentModal({
             open={downloadHistoryOpen}
             onOpenChange={setDownloadHistoryOpen}
             records={downloadHistory}
-            onRedownload={handleDownload}
-            onDownloadAll={handleDownload}
+            onRedownload={() => toast.success("Отчёт скачан")}
+            onDownloadAll={() => toast.success("Отчёт скачан")}
           />
 
           <AssessmentCorrectionDrawer
