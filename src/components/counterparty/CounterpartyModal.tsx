@@ -725,6 +725,7 @@ export function CounterpartyModal({
           setAssessmentDisagreement(d);
           setAssessmentStatus("disagreed");
         }}
+        onStatusChange={(s) => onStatusChange?.(counterparty.inn, s)}
       />
 
     </Dialog>
