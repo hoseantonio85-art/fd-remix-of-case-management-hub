@@ -18,7 +18,7 @@ import {
 } from "@/lib/assessment-data";
 import { ChevronDown } from "lucide-react";
 import { AssessmentGroupDrawer } from "./AssessmentGroupDrawer";
-import { defaultOgrn } from "./RegistrationInfoWidget";
+import { defaultOgrn, defaultRegistrationInfo } from "./RegistrationInfoWidget";
 import { RegistrationInfoDrawer } from "./RegistrationInfoDrawer";
 import { KeyAnomaliesWidget } from "./KeyAnomaliesWidget";
 import { TrustFactorsWidget } from "./TrustFactorsWidget";
