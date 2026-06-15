@@ -340,7 +340,7 @@ export function ContractDrawer({
         </div>
       </div>
 
-      <div className="space-y-4 px-6 pb-6 pt-4">
+      <div className="space-y-4 px-6 pb-24 pt-4">
         {notice && (
           <div className="flex items-start gap-2 rounded-xl border border-emerald-200 bg-emerald-50 px-3 py-2 text-xs text-emerald-900">
             <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0" />
