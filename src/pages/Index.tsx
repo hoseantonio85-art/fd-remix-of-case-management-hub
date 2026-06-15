@@ -285,6 +285,9 @@ export default function Index() {
   const [manualFlowCpOpen, setManualFlowCpOpen] = useState(false);
 
   const [statusOverrides, setStatusOverrides] = useState<Record<string, Counterparty["status"]>>({});
+  const [statusChanges, setStatusChanges] = useState<
+    Record<string, { from: Counterparty["status"]; to: Counterparty["status"] }>
+  >({});
 
   const applyOverride = (c: Counterparty): Counterparty => {
     const override = statusOverrides[c.inn];
@@ -297,10 +300,30 @@ export default function Index() {
   );
 
   const handleStatusChange = (inn: string, status: Counterparty["status"]) => {
+    const base = [...addedCounterparties, ...counterparties].find((c) => c.inn === inn);
+    const current = statusOverrides[inn] ?? base?.status;
+    if (current && current !== status) {
+      setStatusChanges((prev) => ({ ...prev, [inn]: { from: current, to: status } }));
+    }
     setStatusOverrides((prev) => ({ ...prev, [inn]: status }));
     setActive((prev) => (prev && prev.inn === inn ? { ...prev, status } : prev));
     setManualFlowTarget((prev) => (prev && prev.inn === inn ? { ...prev, status } : prev));
   };
+
+  const categoryLabel: Record<CategoryKey, string> = {
+    risk: "Риск дефолта",
+    overdue_risk: "Просрочено с риском дефолта",
+    no_risk: "Нет риска",
+    overdue: "Просрочено",
+  };
+
+  const statusChangePlusByCategory = useMemo(() => {
+    const map: Record<CategoryKey, number> = { risk: 0, overdue_risk: 0, no_risk: 0, overdue: 0 };
+    for (const ch of Object.values(statusChanges)) {
+      if (ch.from !== ch.to) map[ch.to as CategoryKey]++;
+    }
+    return map;
+  }, [statusChanges]);
 
   const handleStartAssessment = () => {
     const innRaw = runInn.trim();
@@ -638,7 +661,14 @@ export default function Index() {
                         </div>
                         <div className="mt-3 flex items-end justify-between">
                           <div className="text-xl font-medium tracking-tight">{t.amount}</div>
-                          <div className="text-xs text-muted-foreground">{t.count}</div>
+                          <div className="flex items-center gap-1.5">
+                            {statusChangePlusByCategory[t.key] > 0 && (
+                              <span className="inline-flex h-5 items-center rounded-full bg-emerald-100 px-1.5 text-[11px] font-medium text-emerald-700">
+                                +{statusChangePlusByCategory[t.key]}
+                              </span>
+                            )}
+                            <div className="text-xs text-muted-foreground">{t.count}</div>
+                          </div>
                         </div>
                       </button>
                     );
@@ -742,14 +772,16 @@ export default function Index() {
                     <div className="flex min-w-0 flex-1 flex-col gap-1.5">
                       <div className="flex flex-wrap items-center gap-1.5">
                         {(() => {
-                          const catLabel: Record<CategoryKey, string> = {
-                            risk: "Риск дефолта",
-                            no_risk: "Нет риска",
-                            overdue_risk: "Просрочено с риском дефолта",
-                            overdue: "Просрочено",
-                          };
-                          return <CounterpartyStatusBadge tag={catLabel[c.status]} />;
+                          return <CounterpartyStatusBadge tag={categoryLabel[c.status]} />;
                         })()}
+                        {statusChanges[c.inn] && statusChanges[c.inn].from !== statusChanges[c.inn].to && (
+                          <span
+                            title={`${categoryLabel[statusChanges[c.inn].from as CategoryKey]} → ${categoryLabel[statusChanges[c.inn].to as CategoryKey]}`}
+                            className="inline-flex items-center rounded-full border border-violet-100 bg-violet-50 px-2 py-0.5 text-[11px] font-medium text-violet-700"
+                          >
+                            Статус изменён
+                          </span>
+                        )}
                         {indicators
                           .map((k) => ({ k, m: problemIndicatorMeta[k] }))
                           .filter((x) => Boolean(x.m))
