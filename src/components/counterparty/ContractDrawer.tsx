@@ -16,6 +16,7 @@ import {
   X,
   ChevronRight,
   Trash2,
+  Pencil,
 } from "lucide-react";
 import {
   Select,
@@ -606,7 +607,7 @@ export function ContractDrawer({
               setUpdateOpen(true);
             }}
           >
-            <RefreshCcw className="mr-1.5 h-4 w-4" />
+            <Pencil className="mr-1.5 h-4 w-4" />
             Внести изменения
           </Button>
         </div>
@@ -631,7 +632,6 @@ export function ContractDrawer({
             </button>
           </div>
           <div className="flex-1 space-y-3 overflow-y-auto px-6 py-4">
-            <LabeledInput label="Название договора" value={editName} onChange={setEditName} />
             <LabeledInput label="Задолженность" value={editDebt} onChange={setEditDebt} placeholder="0" />
             <LabeledInput label="Просрочка" value={editOverdueAmt} onChange={setEditOverdueAmt} placeholder="0" />
             <div>
