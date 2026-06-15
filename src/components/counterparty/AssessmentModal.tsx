@@ -170,7 +170,7 @@ export function AssessmentModal({
     const record: CorrectionRecord = {
       id: `c-${Date.now()}`,
       dateTime: nowLabel(),
-      author: "Вы · риск-менеджер",
+      author: "Измайлова Л.Д. • Инициатор",
       fromTag,
       toTag: payload.tag,
       comment: payload.comment,
