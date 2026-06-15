@@ -1040,6 +1040,19 @@ export default function Index() {
         onApply={applyProcessStage}
         counts={processCounts}
       />
+
+      <DrpaDataUpdateDrawer
+        open={drpaOpen}
+        onOpenChange={setDrpaOpen}
+        cards={drpaCards}
+        setCards={setDrpaCards}
+        confirmed={drpaConfirmed}
+        onConfirm={() => {
+          setDrpaConfirmed(true);
+          setDrpaOpen(false);
+          toast.success("Данные обновлены и подтверждены");
+        }}
+      />
     </div>
   );
 }
