@@ -636,6 +636,133 @@ export function CounterpartyModal({
                   );
                 })}
               </div>
+
+              {!addContractOpen ? (
+                <Button
+                  type="button"
+                  variant="secondary"
+                  onClick={() => {
+                    setAddContractOpen(true);
+                    setContractFormError(false);
+                  }}
+                  className="mt-3 h-11 w-full justify-center rounded-xl border border-border bg-slate-50 text-sm font-medium text-foreground hover:bg-slate-100"
+                >
+                  <Plus className="mr-1.5 h-4 w-4" />
+                  Добавить договор
+                </Button>
+              ) : (
+                <div className="mt-3 space-y-3 rounded-xl border border-border bg-white p-4">
+                  <div className="space-y-1">
+                    <label className="text-xs font-medium text-muted-foreground">Название договора</label>
+                    <Input
+                      value={newContractName}
+                      onChange={(e) => setNewContractName(e.target.value)}
+                      placeholder="Например, Договор поставки № 245"
+                    />
+                    {contractFormError && !newContractName.trim() && (
+                      <div className="text-[11px] text-rose-600">Обязательное поле</div>
+                    )}
+                  </div>
+                  <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+                    <div className="space-y-1">
+                      <label className="text-xs font-medium text-muted-foreground">Задолженность</label>
+                      <Input
+                        value={newContractDebt}
+                        onChange={(e) => setNewContractDebt(e.target.value)}
+                        placeholder="0 ₽"
+                      />
+                      {contractFormError && !newContractDebt.trim() && (
+                        <div className="text-[11px] text-rose-600">Обязательное поле</div>
+                      )}
+                    </div>
+                    <div className="space-y-1">
+                      <label className="text-xs font-medium text-muted-foreground">Просрочка</label>
+                      <Input
+                        value={newContractOverdue}
+                        onChange={(e) => setNewContractOverdue(e.target.value)}
+                        placeholder="0 ₽"
+                      />
+                      {contractFormError && !newContractOverdue.trim() && (
+                        <div className="text-[11px] text-rose-600">Обязательное поле</div>
+                      )}
+                    </div>
+                  </div>
+                  <div className="space-y-1">
+                    <label className="text-xs font-medium text-muted-foreground">Этап</label>
+                    <select
+                      value={newContractStage}
+                      onChange={(e) => setNewContractStage(e.target.value)}
+                      className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+                    >
+                      <option value="">Выберите этап</option>
+                      {CONTRACT_STAGES.map((s) => (
+                        <option key={s} value={s}>
+                          {s}
+                        </option>
+                      ))}
+                    </select>
+                    {contractFormError && !newContractStage && (
+                      <div className="text-[11px] text-rose-600">Обязательное поле</div>
+                    )}
+                  </div>
+                  <div className="flex justify-end gap-2 pt-1">
+                    <Button
+                      type="button"
+                      variant="outline"
+                      onClick={() => {
+                        setAddContractOpen(false);
+                        setNewContractName("");
+                        setNewContractDebt("");
+                        setNewContractOverdue("");
+                        setNewContractStage("");
+                        setContractFormError(false);
+                      }}
+                    >
+                      Отменить
+                    </Button>
+                    <Button
+                      type="button"
+                      onClick={() => {
+                        if (
+                          !newContractName.trim() ||
+                          !newContractDebt.trim() ||
+                          !newContractOverdue.trim() ||
+                          !newContractStage
+                        ) {
+                          setContractFormError(true);
+                          return;
+                        }
+                        const parseNum = (v: string) => {
+                          const n = Number(v.replace(/[^\d.,-]/g, "").replace(",", "."));
+                          return Number.isFinite(n) ? n : 0;
+                        };
+                        const newContract: Contract = {
+                          id: `c-${Date.now()}`,
+                          number: newContractName.trim(),
+                          date: new Date().toLocaleDateString("ru-RU"),
+                          amount: parseNum(newContractDebt),
+                          debt: parseNum(newContractDebt),
+                          overdue: parseNum(newContractOverdue),
+                          overdueDays: 0,
+                          measures: "",
+                          collectionStage: newContractStage,
+                          overdueHistory: [],
+                        };
+                        setContracts((prev) => [...prev, newContract]);
+                        setAddContractOpen(false);
+                        setNewContractName("");
+                        setNewContractDebt("");
+                        setNewContractOverdue("");
+                        setNewContractStage("");
+                        setContractFormError(false);
+                        toast.success("Договор добавлен");
+                      }}
+                    >
+                      Добавить
+                    </Button>
+                  </div>
+                </div>
+              )}
             </section>
             </div>
 
