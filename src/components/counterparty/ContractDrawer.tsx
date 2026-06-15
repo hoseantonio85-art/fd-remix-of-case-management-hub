@@ -14,7 +14,25 @@ import {
   Info as InfoIcon,
   RefreshCcw,
   X,
+  ChevronRight,
+  Trash2,
 } from "lucide-react";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+
+const SETTLEMENT_STAGES = [
+  "Мониторинг",
+  "Досудебное урегулирование",
+  "Передача в ДРПА",
+  "Судебное взыскание",
+  "Сопровождение банкротства",
+  "Сопровождение ликвидации",
+] as const;
 import type { Contract, OverdueRecord } from "@/lib/mock-data";
 import { toneStyles } from "./header-theme";
 import { InModalDrawer } from "./InModalDrawer";
@@ -118,6 +136,8 @@ export function ContractDrawer({
   const [overdueError, setOverdueError] = useState<string | null>(null);
   const [showAddOverdue, setShowAddOverdue] = useState(false);
   const [overdueAddedNotice, setOverdueAddedNotice] = useState(false);
+  const [expandedOverdues, setExpandedOverdues] = useState<Record<number, boolean>>({ 0: true });
+  const [overdueStages, setOverdueStages] = useState<Record<number, string>>({});
 
   // Update data form + change history
   type ChangeEntry = {
@@ -361,29 +381,21 @@ export function ContractDrawer({
 
 
         {/* OVERDUE HISTORY + INLINE ADD */}
-        <section className="rounded-xl border border-border bg-white p-4">
+        <section className="rounded-2xl border border-border bg-white p-4">
           <div className="mb-3 flex items-center justify-between gap-2">
-            <div className="text-sm font-semibold">История просрочек</div>
-            <Button
-              variant="outline"
-              size="sm"
-              className="h-8 px-3 text-xs"
+            <div className="text-base font-semibold">Просроченная ДЗ</div>
+            <button
+              type="button"
+              aria-label="Добавить просрочку"
               onClick={() => {
                 setShowAddOverdue((v) => !v);
                 setOverdueError(null);
                 setOverdueAddedNotice(false);
               }}
+              className="flex h-9 w-9 items-center justify-center rounded-full border border-border bg-muted/40 text-muted-foreground transition hover:bg-muted"
             >
-              {showAddOverdue ? (
-                <>
-                  <ChevronUp className="mr-1.5 h-3.5 w-3.5" /> Скрыть
-                </>
-              ) : (
-              <>
-                  <Plus className="mr-1.5 h-3.5 w-3.5" /> Добавить просрочку
-                </>
-              )}
-            </Button>
+              {showAddOverdue ? <X className="h-4 w-4" /> : <Plus className="h-4 w-4" />}
+            </button>
           </div>
 
           {overdueAddedNotice && !showAddOverdue && (
@@ -469,30 +481,105 @@ export function ContractDrawer({
           )}
 
           {allOverdues.length === 0 ? (
-            <div className="rounded-md border border-dashed border-border px-3 py-4 text-center text-xs text-muted-foreground">
+            <div className="rounded-2xl border border-dashed border-border px-3 py-6 text-center text-xs text-muted-foreground">
               Записей о просрочке пока нет
             </div>
           ) : (
-            <div className="overflow-hidden rounded-md border border-border">
-              {allOverdues.map((h, i) => (
-                <div
-                  key={i}
-                  className={`px-3 py-2 text-xs ${i > 0 ? "border-t border-border" : ""}`}
-                >
-                  <div className="font-medium">
-                    {h.date} · {h.amount.toFixed(2)} млн ₽ · {h.days} дн.
+            <div className="space-y-2">
+              {allOverdues.map((h, i) => {
+                const expanded = !!expandedOverdues[i];
+                const stage = overdueStages[i] ?? "Досудебное урегулирование";
+                return (
+                  <div
+                    key={i}
+                    className="rounded-2xl bg-muted/50 p-3"
+                  >
+                    <button
+                      type="button"
+                      onClick={() =>
+                        setExpandedOverdues((s) => ({ ...s, [i]: !s[i] }))
+                      }
+                      className="flex w-full items-center gap-3 text-left"
+                    >
+                      <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-white text-muted-foreground shadow-sm">
+                        {expanded ? (
+                          <ChevronDown className="h-4 w-4" />
+                        ) : (
+                          <ChevronRight className="h-4 w-4" />
+                        )}
+                      </span>
+                      <div className="text-sm font-medium">
+                        {h.amount.toLocaleString("ru-RU", { maximumFractionDigits: 1 })} млн. ₽{" "}
+                        <span className="text-muted-foreground">
+                          {h.days} {pluralDays(h.days)}
+                        </span>
+                      </div>
+                    </button>
+
+                    {expanded && (
+                      <div className="mt-3 space-y-2">
+                        <div className="grid grid-cols-2 gap-2">
+                          <div className="rounded-xl border border-border bg-white px-3 py-2">
+                            <div className="text-[11px] text-muted-foreground">Сумма</div>
+                            <div className="text-sm font-medium text-foreground">
+                              {Math.round(h.amount * 1_000_000).toLocaleString("ru-RU")}
+                            </div>
+                          </div>
+                          <div className="rounded-xl border border-border bg-white px-3 py-2">
+                            <div className="text-[11px] text-muted-foreground">
+                              Срок исполнения
+                            </div>
+                            <div className="text-sm font-medium text-foreground">
+                              {h.date}
+                            </div>
+                          </div>
+                        </div>
+                        <div className="rounded-xl border border-border bg-white px-3 py-1.5">
+                          <div className="text-[11px] text-muted-foreground">
+                            Этапы урегулирования
+                          </div>
+                          <Select
+                            value={stage}
+                            onValueChange={(v) =>
+                              setOverdueStages((s) => ({ ...s, [i]: v }))
+                            }
+                          >
+                            <SelectTrigger className="h-7 border-0 px-0 text-sm font-medium shadow-none focus:ring-0">
+                              <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent>
+                              {SETTLEMENT_STAGES.map((s) => (
+                                <SelectItem key={s} value={s}>
+                                  {s}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                        </div>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setLocalOverdues((arr) => {
+                              const localCount = arr.length;
+                              if (i < localCount) {
+                                return arr.filter((_, idx) => idx !== i);
+                              }
+                              return arr;
+                            });
+                          }}
+                          className="inline-flex items-center gap-1.5 px-1 pt-1 text-xs text-muted-foreground hover:text-foreground"
+                        >
+                          <Trash2 className="h-3.5 w-3.5" /> Удалить
+                        </button>
+                      </div>
+                    )}
                   </div>
-                  <div className="text-muted-foreground">
-                    Источник: {h.source ?? "NORM AI"}
-                  </div>
-                  {h.comment && (
-                    <div className="text-muted-foreground">{h.comment}</div>
-                  )}
-                </div>
-              ))}
+                );
+              })}
             </div>
           )}
         </section>
+
 
       </div>
 
