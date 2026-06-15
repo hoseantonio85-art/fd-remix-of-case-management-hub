@@ -37,7 +37,7 @@ import { getCounterpartyProblemIndicators, problemIndicatorMeta } from "@/lib/pr
 import { ResolutionCard } from "./ResolutionCard";
 import { AssessmentModal, type AssessmentStatus, type Disagreement } from "./AssessmentModal";
 import { buildAssessment, type Assessment } from "@/lib/assessment-data";
-import { defaultOgrn } from "./RegistrationInfoWidget";
+import { defaultOgrn, defaultRegistrationInfo } from "./RegistrationInfoWidget";
 import { RegistrationInfoDrawer } from "./RegistrationInfoDrawer";
 
 const toFiniteNumber = (value: unknown) => {
@@ -101,6 +101,7 @@ export function CounterpartyModal({
   const [newContractOverdue, setNewContractOverdue] = useState("");
   const [newContractStage, setNewContractStage] = useState<string>("");
   const [contractFormError, setContractFormError] = useState(false);
+  const [infoExpanded, setInfoExpanded] = useState(false);
   const ASSESSMENT_USER = "Михайлова Екатерина";
 
   useEffect(() => {
@@ -535,16 +536,6 @@ export function CounterpartyModal({
                   })}
                 </div>
                 <h2 className="mt-3 text-2xl font-semibold tracking-tight text-foreground">{counterparty.name}</h2>
-                <div className="mt-1 text-sm text-muted-foreground">
-                  ИНН {counterparty.inn} · ОГРН {defaultOgrn} ·{" "}
-                  <button
-                    type="button"
-                    onClick={() => setRegistrationOpen(true)}
-                    className="cursor-pointer text-primary transition hover:underline"
-                  >
-                    Подробнее
-                  </button>
-                </div>
               </div>
             );
           })()}
@@ -768,11 +759,34 @@ export function CounterpartyModal({
 
             {/* Right column: meta */}
             <aside className="space-y-4 lg:sticky lg:top-4 lg:self-start">
-              <DebtSummaryCard
-                steps={steps}
-                stepAnim={stepAnim}
-                onOpenDetails={() => setDebtDrawerOpen(true)}
-              />
+              <div className="rounded-2xl border border-border bg-white p-5">
+                <h3 className="text-sm font-semibold">Информация</h3>
+                <div className="mt-3 space-y-2.5">
+                  <InfoRow label="ИНН" value={counterparty.inn} />
+                  <InfoRow label="ОГРН" value={defaultOgrn} />
+                  <InfoRow
+                    label="Дата регистрации"
+                    value={`${defaultRegistrationInfo.registrationDate} (${defaultRegistrationInfo.businessAge})`}
+                  />
+                  <InfoRow label="Текущий статус ЕГРЮЛ" value={defaultRegistrationInfo.egrulStatus} />
+                  {infoExpanded && (
+                    <>
+                      <InfoRow
+                        label="Основной ОКВЭД"
+                        value={`${defaultRegistrationInfo.okvedCode} · ${defaultRegistrationInfo.okvedName}`}
+                      />
+                      <InfoRow label="Юридический адрес" value={defaultRegistrationInfo.legalAddress} />
+                    </>
+                  )}
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setInfoExpanded((p) => !p)}
+                  className="mt-4 w-full rounded-lg border border-border bg-white px-3 py-2 text-sm font-medium text-foreground transition hover:bg-muted/40"
+                >
+                  {infoExpanded ? "Свернуть" : "Подробнее"}
+                </button>
+              </div>
             </aside>
 
           </div>
