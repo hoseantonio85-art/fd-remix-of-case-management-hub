@@ -591,7 +591,10 @@ export default function Index() {
 
             {/* Дебиторская задолженность */}
             <div className="mb-3 flex flex-wrap items-center justify-between gap-3">
-              <h2 className="text-xl font-semibold">Дебиторская задолженность</h2>
+              <div className="flex items-baseline gap-2">
+                <h2 className="text-xl font-semibold">Дебиторская задолженность</h2>
+                <span className="text-xs text-muted-foreground">на 30.09.2025</span>
+              </div>
               <button
                 onClick={() => setProcessDrawerOpen(true)}
                 className={`inline-flex h-9 items-center gap-2 rounded-full border px-3.5 text-sm font-medium transition ${
