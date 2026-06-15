@@ -17,6 +17,7 @@ import {
   Loader2,
   SlidersHorizontal,
   X,
+  ShieldCheck,
 } from "lucide-react";
 import { counterparties, type Counterparty, type RiskType, type ProcessStage } from "@/lib/mock-data";
 import { CounterpartyModal } from "@/components/counterparty/CounterpartyModal";
@@ -31,6 +32,7 @@ import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { ProcessFilterDrawer } from "@/components/counterparty/ProcessFilterDrawer";
 import { processMeta, processOrder } from "@/lib/process-meta";
 import { toast } from "sonner";
+import { DrpaDataUpdateDrawer, type DrpaCardData } from "@/components/counterparty/DrpaDataUpdateDrawer";
 
 function buildNewCounterparty(inn: string, today: string): Counterparty {
   return {
@@ -288,6 +290,27 @@ export default function Index() {
   const [statusChanges, setStatusChanges] = useState<
     Record<string, { from: Counterparty["status"]; to: Counterparty["status"] }>
   >({});
+
+  // DRPA update flow
+  const [drpaOpen, setDrpaOpen] = useState(false);
+  const [drpaConfirmed, setDrpaConfirmed] = useState(false);
+  const [drpaCards, setDrpaCards] = useState<DrpaCardData[]>(() =>
+    counterparties
+      .filter(
+        (c) =>
+          c.status === "overdue" ||
+          c.status === "overdue_risk" ||
+          (c.overdueAmountNum ?? 0) > 0,
+      )
+      .map((c) => ({
+        counterparty: c,
+        contracts: c.contracts.map((k) => ({ ...k, overdueHistory: [...k.overdueHistory] })),
+        updated: false,
+      })),
+  );
+  const drpaTotal = drpaCards.length;
+  const drpaUpdated = drpaCards.filter((c) => c.updated).length;
+  const drpaInProgress = drpaUpdated > 0 && !drpaConfirmed;
 
   const applyOverride = (c: Counterparty): Counterparty => {
     const override = statusOverrides[c.inn];
@@ -595,22 +618,61 @@ export default function Index() {
               </div>
             </div>
 
-            {/* AI banner */}
-            <div className="mb-8 rounded-2xl border border-primary/30 bg-gradient-to-r from-primary/5 to-transparent p-4">
-              <div className="flex items-start gap-3">
-                <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-primary/15 text-primary">
-                  <Sparkles className="h-4 w-4" />
-                </div>
-                <div className="text-sm">
-                  <div className="font-medium">
-                    Я проанализировал дебиторскую задолженность на 30.09.2025: в зоне внимания 5 дебеторов и 3,9 млн руб
+            {/* AI banner — DRPA data update */}
+            {(() => {
+              const isInitial = !drpaConfirmed && drpaUpdated === 0;
+              const isInProgress = !drpaConfirmed && drpaUpdated > 0;
+              const isDone = drpaConfirmed;
+              const title = isDone
+                ? "Данные обновлены и подтверждены"
+                : isInProgress
+                  ? "Обновление данных не завершено"
+                  : "Обновите данные по задолженности";
+              const description = isDone
+                ? "Все договоры по контрагентам с просрочкой более 30 дней актуализированы на 01.07.2026 и зафиксированы для отправки в ДРПА."
+                : isInProgress
+                  ? `Обновлено ${drpaUpdated} из ${drpaTotal} контрагентов. Завершите проверку договоров и подтвердите данные для отправки в ДРПА.`
+                  : "Актуализируйте договоры контрагентов с просрочкой более 30 дней на 01.07.2026 и подтвердите данные для отправки в ДРПА. После подтверждения редактирование будет недоступно.";
+              const buttonLabel = isDone
+                ? "Посмотреть данные"
+                : isInProgress
+                  ? "Продолжить обновление"
+                  : "Перейти к обновлению";
+              const borderCls = isDone
+                ? "border-emerald-300 bg-gradient-to-r from-emerald-50 to-transparent"
+                : isInProgress
+                  ? "border-amber-300 bg-gradient-to-r from-amber-50 to-transparent"
+                  : "border-primary/30 bg-gradient-to-r from-primary/5 to-transparent";
+              const iconBg = isDone
+                ? "bg-emerald-100 text-emerald-700"
+                : isInProgress
+                  ? "bg-amber-100 text-amber-700"
+                  : "bg-primary/15 text-primary";
+              return (
+                <div className={`mb-8 rounded-2xl border p-4 ${borderCls}`}>
+                  <div className="flex items-start gap-3">
+                    <div className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-lg ${iconBg}`}>
+                      {isDone ? <ShieldCheck className="h-4 w-4" /> : <Sparkles className="h-4 w-4" />}
+                    </div>
+                    <div className="min-w-0 flex-1 text-sm">
+                      <div className="font-medium">{title}</div>
+                      <div className="mt-0.5 text-muted-foreground">{description}</div>
+                      <div className="mt-3">
+                        <Button
+                          size="sm"
+                          variant={isDone ? "outline" : "default"}
+                          className="h-8 px-3 text-xs"
+                          onClick={() => setDrpaOpen(true)}
+                        >
+                          {buttonLabel}
+                        </Button>
+                      </div>
+                    </div>
                   </div>
-                  <div className="mt-0.5 text-muted-foreground">
-                    Оценивается задолженность ЮЛ и ИП, зарегистрированных на территории РФ с задолженностью свыше 10 млн
-                  </div>
                 </div>
-              </div>
-            </div>
+              );
+            })()}
+
 
             {/* Дебиторская задолженность */}
             <div className="mb-3 flex flex-wrap items-center justify-between gap-3">
@@ -977,6 +1039,19 @@ export default function Index() {
         value={processStage}
         onApply={applyProcessStage}
         counts={processCounts}
+      />
+
+      <DrpaDataUpdateDrawer
+        open={drpaOpen}
+        onOpenChange={setDrpaOpen}
+        cards={drpaCards}
+        setCards={setDrpaCards}
+        confirmed={drpaConfirmed}
+        onConfirm={() => {
+          setDrpaConfirmed(true);
+          setDrpaOpen(false);
+          toast.success("Данные обновлены и подтверждены");
+        }}
       />
     </div>
   );
