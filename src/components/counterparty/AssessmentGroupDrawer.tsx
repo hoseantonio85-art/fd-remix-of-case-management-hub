@@ -47,6 +47,20 @@ export function AssessmentGroupDrawer({
           {group.criteria.length} {pluralCriteria(group.criteria.length)}
         </div>
 
+        {group.id === "fns" && (
+          <div className="mt-4 flex gap-3 rounded-2xl border border-rose-100 bg-rose-50/60 p-3.5">
+            <NormAssistantIcon size="sm" tone="rose" />
+            <div className="min-w-0 flex-1">
+              <div className="text-sm font-semibold text-rose-900">
+                Выявлена негативная динамика
+              </div>
+              <div className="mt-1 text-xs leading-relaxed text-rose-800/90">
+                За неделю добавились 2 риск-фактора. Основные изменения связаны с налоговой задолженностью и ограничениями по счетам.
+              </div>
+            </div>
+          </div>
+        )}
+
         {/* Summary filters */}
         <div className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-3">
           <SummaryStat
