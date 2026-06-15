@@ -336,6 +336,11 @@ export function ContractDrawer({
             label="Просроченная задолженность"
             value={`${contract.overdue.toFixed(1)} млн. ₽`}
             accent={overdue}
+            sub={
+              overdue && contract.overdueDays > 0
+                ? `${contract.overdueDays} ${pluralDays(contract.overdueDays)} просрочки`
+                : undefined
+            }
           />
         </div>
       </div>
@@ -918,14 +923,24 @@ function LabeledInput({
   );
 }
 
+function pluralDays(n: number) {
+  const m10 = n % 10;
+  const m100 = n % 100;
+  if (m10 === 1 && m100 !== 11) return "день";
+  if (m10 >= 2 && m10 <= 4 && (m100 < 12 || m100 > 14)) return "дня";
+  return "дней";
+}
+
 function DebtCard({
   label,
   value,
   accent,
+  sub,
 }: {
   label: string;
   value: string;
   accent?: boolean;
+  sub?: string;
 }) {
   return (
     <div className="rounded-xl border border-border bg-white px-4 py-3">
@@ -933,6 +948,7 @@ function DebtCard({
       <div className={`mt-1 text-lg font-semibold ${accent ? "text-rose-600" : "text-foreground"}`}>
         {value}
       </div>
+      {sub && <div className="mt-0.5 text-xs text-muted-foreground">{sub}</div>}
     </div>
   );
 }
