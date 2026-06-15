@@ -223,9 +223,6 @@ export function AssessmentModal({
       ? { label: "Сделки заключать можно", chip: "bg-emerald-100 text-emerald-900" }
       : { label: "Не заключать сделки", chip: "bg-rose-100 text-rose-900" };
 
-  const baseSourceLabel =
-    assessment.source === "auto" ? "Автоматический мониторинг" : "Запущено пользователем";
-  const sourceLabel = baseSourceLabel;
 
 
 
