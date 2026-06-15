@@ -336,6 +336,11 @@ export function ContractDrawer({
             label="Просроченная задолженность"
             value={`${contract.overdue.toFixed(1)} млн. ₽`}
             accent={overdue}
+            sub={
+              overdue && contract.overdueDays > 0
+                ? `${contract.overdueDays} ${pluralDays(contract.overdueDays)} просрочки`
+                : undefined
+            }
           />
         </div>
       </div>
