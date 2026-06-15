@@ -336,7 +336,7 @@ export function ContractDrawer({
             label="Просроченная задолженность"
             value={`${contract.overdue.toFixed(1)} млн. ₽`}
             accent={overdue}
-            sub={
+            right={
               overdue && contract.overdueDays > 0
                 ? `${contract.overdueDays} ${pluralDays(contract.overdueDays)} просрочки`
                 : undefined
@@ -935,20 +935,24 @@ function DebtCard({
   label,
   value,
   accent,
-  sub,
+  right,
 }: {
   label: string;
   value: string;
   accent?: boolean;
-  sub?: string;
+  right?: string;
 }) {
   return (
     <div className="rounded-xl border border-border bg-white px-4 py-3">
       <div className="text-xs text-muted-foreground">{label}</div>
-      <div className={`mt-1 text-lg font-semibold ${accent ? "text-rose-600" : "text-foreground"}`}>
-        {value}
+      <div className="mt-1 flex items-center justify-between">
+        <div className={`text-lg font-semibold ${accent ? "text-rose-600" : "text-foreground"}`}>
+          {value}
+        </div>
+        {right && (
+          <div className="text-xs text-muted-foreground whitespace-nowrap">{right}</div>
+        )}
       </div>
-      {sub && <div className="mt-0.5 text-xs text-muted-foreground">{sub}</div>}
     </div>
   );
 }
