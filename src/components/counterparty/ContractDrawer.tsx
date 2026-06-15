@@ -136,6 +136,8 @@ export function ContractDrawer({
   const [overdueError, setOverdueError] = useState<string | null>(null);
   const [showAddOverdue, setShowAddOverdue] = useState(false);
   const [overdueAddedNotice, setOverdueAddedNotice] = useState(false);
+  const [expandedOverdues, setExpandedOverdues] = useState<Record<number, boolean>>({ 0: true });
+  const [overdueStages, setOverdueStages] = useState<Record<number, string>>({});
 
   // Update data form + change history
   type ChangeEntry = {
