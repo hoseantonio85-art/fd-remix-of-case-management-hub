@@ -24,7 +24,7 @@ import type {
 } from "@/lib/mock-data";
 import { RiskDrawer, type DecisionKind, type RiskSavePayload } from "./RiskDrawer";
 import { ContractDrawer } from "./ContractDrawer";
-import { DebtSummaryCard } from "./DebtSummaryCard";
+
 import {
   DebtProcessDrawer,
   type DebtHistoryEntry,
