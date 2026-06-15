@@ -285,6 +285,9 @@ export default function Index() {
   const [manualFlowCpOpen, setManualFlowCpOpen] = useState(false);
 
   const [statusOverrides, setStatusOverrides] = useState<Record<string, Counterparty["status"]>>({});
+  const [statusChanges, setStatusChanges] = useState<
+    Record<string, { from: Counterparty["status"]; to: Counterparty["status"] }>
+  >({});
 
   const applyOverride = (c: Counterparty): Counterparty => {
     const override = statusOverrides[c.inn];
@@ -297,10 +300,30 @@ export default function Index() {
   );
 
   const handleStatusChange = (inn: string, status: Counterparty["status"]) => {
+    const base = [...addedCounterparties, ...counterparties].find((c) => c.inn === inn);
+    const current = statusOverrides[inn] ?? base?.status;
+    if (current && current !== status) {
+      setStatusChanges((prev) => ({ ...prev, [inn]: { from: current, to: status } }));
+    }
     setStatusOverrides((prev) => ({ ...prev, [inn]: status }));
     setActive((prev) => (prev && prev.inn === inn ? { ...prev, status } : prev));
     setManualFlowTarget((prev) => (prev && prev.inn === inn ? { ...prev, status } : prev));
   };
+
+  const categoryLabel: Record<CategoryKey, string> = {
+    risk: "Риск дефолта",
+    overdue_risk: "Просрочено с риском дефолта",
+    no_risk: "Нет риска",
+    overdue: "Просрочено",
+  };
+
+  const statusChangePlusByCategory = useMemo(() => {
+    const map: Record<CategoryKey, number> = { risk: 0, overdue_risk: 0, no_risk: 0, overdue: 0 };
+    for (const ch of Object.values(statusChanges)) {
+      if (ch.from !== ch.to) map[ch.to as CategoryKey]++;
+    }
+    return map;
+  }, [statusChanges]);
 
   const handleStartAssessment = () => {
     const innRaw = runInn.trim();
