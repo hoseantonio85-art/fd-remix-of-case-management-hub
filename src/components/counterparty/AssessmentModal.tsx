@@ -268,12 +268,8 @@ export function AssessmentModal({
               </span>
             </div>
             <h2 className="mt-3 text-2xl font-semibold tracking-tight text-foreground">
-              Оценка контрагента
+              Оценка контрагента {assessment.counterpartyName}
             </h2>
-            <div className="mt-1 text-sm text-muted-foreground">
-              {assessment.counterpartyName} · Оценка: {assessment.date} · {sourceLabel}
-              {assessment.nextCheck && <> · Следующая проверка: {assessment.nextCheck}</>}
-            </div>
             <div className={cn(
               "mt-5 rounded-3xl p-[1.5px]",
               effectivePositive
