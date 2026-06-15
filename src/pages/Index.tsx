@@ -290,6 +290,27 @@ export default function Index() {
     Record<string, { from: Counterparty["status"]; to: Counterparty["status"] }>
   >({});
 
+  // DRPA update flow
+  const [drpaOpen, setDrpaOpen] = useState(false);
+  const [drpaConfirmed, setDrpaConfirmed] = useState(false);
+  const [drpaCards, setDrpaCards] = useState<DrpaCardData[]>(() =>
+    counterparties
+      .filter(
+        (c) =>
+          c.status === "overdue" ||
+          c.status === "overdue_risk" ||
+          (c.overdueAmountNum ?? 0) > 0,
+      )
+      .map((c) => ({
+        counterparty: c,
+        contracts: c.contracts.map((k) => ({ ...k, overdueHistory: [...k.overdueHistory] })),
+        updated: false,
+      })),
+  );
+  const drpaTotal = drpaCards.length;
+  const drpaUpdated = drpaCards.filter((c) => c.updated).length;
+  const drpaInProgress = drpaUpdated > 0 && !drpaConfirmed;
+
   const applyOverride = (c: Counterparty): Counterparty => {
     const override = statusOverrides[c.inn];
     return override && override !== c.status ? { ...c, status: override } : c;
