@@ -781,7 +781,6 @@ export default function Index() {
                 </div>
               )}
               {filtered.map((c) => {
-                const stage = c.collection.find((s) => s.status === "current")?.stage ?? "—";
                 const indicators = getCounterpartyProblemIndicators(c);
                 return (
                   <button
@@ -821,7 +820,7 @@ export default function Index() {
 
                       <div className="truncate text-sm font-semibold text-foreground">{c.name}</div>
                       <div className="text-[12px] text-muted-foreground">
-                        {c.inn} · {c.contracts.length} дог. · {stage} · изм. {c.lastUpdate}
+                        {c.inn} · {c.contracts.length} дог. · изм. {c.lastUpdate}
                       </div>
                     </div>
                     <div className="hidden shrink-0 grid-cols-2 gap-3 sm:grid sm:w-[280px]">
