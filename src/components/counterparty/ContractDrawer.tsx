@@ -496,8 +496,8 @@ export function ContractDrawer({
 
       </div>
 
-      {/* Sticky footer */}
-      <div className="sticky bottom-0 z-20 border-t border-border bg-white px-6 py-4">
+      {/* Fixed footer */}
+      <div className="absolute bottom-0 left-0 right-0 z-20 border-t border-border bg-white px-6 py-4">
         <div className="flex flex-col gap-2 sm:flex-row">
           <Button
             type="button"
