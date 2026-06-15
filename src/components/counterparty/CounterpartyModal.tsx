@@ -95,6 +95,12 @@ export function CounterpartyModal({
   const [assessmentConfirmedAt, setAssessmentConfirmedAt] = useState<string | undefined>(undefined);
   const [assessmentDisagreement, setAssessmentDisagreement] = useState<Disagreement | null>(null);
   const [registrationOpen, setRegistrationOpen] = useState(false);
+  const [addContractOpen, setAddContractOpen] = useState(false);
+  const [newContractName, setNewContractName] = useState("");
+  const [newContractDebt, setNewContractDebt] = useState("");
+  const [newContractOverdue, setNewContractOverdue] = useState("");
+  const [newContractStage, setNewContractStage] = useState<string>("");
+  const [contractFormError, setContractFormError] = useState(false);
   const ASSESSMENT_USER = "Михайлова Екатерина";
 
   useEffect(() => {
