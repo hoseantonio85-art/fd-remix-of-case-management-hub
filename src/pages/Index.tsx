@@ -31,6 +31,7 @@ import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { ProcessFilterDrawer } from "@/components/counterparty/ProcessFilterDrawer";
 import { processMeta, processOrder } from "@/lib/process-meta";
 import { toast } from "sonner";
+import { DrpaDataUpdateDrawer, type DrpaCardData } from "@/components/counterparty/DrpaDataUpdateDrawer";
 
 function buildNewCounterparty(inn: string, today: string): Counterparty {
   return {
