@@ -661,7 +661,14 @@ export default function Index() {
                         </div>
                         <div className="mt-3 flex items-end justify-between">
                           <div className="text-xl font-medium tracking-tight">{t.amount}</div>
-                          <div className="text-xs text-muted-foreground">{t.count}</div>
+                          <div className="flex items-center gap-1.5">
+                            {statusChangePlusByCategory[t.key] > 0 && (
+                              <span className="inline-flex h-5 items-center rounded-full bg-emerald-100 px-1.5 text-[11px] font-medium text-emerald-700">
+                                +{statusChangePlusByCategory[t.key]}
+                              </span>
+                            )}
+                            <div className="text-xs text-muted-foreground">{t.count}</div>
+                          </div>
                         </div>
                       </button>
                     );
