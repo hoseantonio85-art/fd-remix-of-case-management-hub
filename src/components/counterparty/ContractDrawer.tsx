@@ -132,6 +132,11 @@ export function ContractDrawer({
   const [payAmount, setPayAmount] = useState("");
   const [payDate, setPayDate] = useState("");
   const [payError, setPayError] = useState<string | null>(null);
+  const [editOvIdx, setEditOvIdx] = useState<number | null>(null);
+  const [editOvAmount, setEditOvAmount] = useState("");
+  const [editOvDate, setEditOvDate] = useState("");
+  const [editOvStage, setEditOvStage] = useState<string>(SETTLEMENT_STAGES[0]);
+  const [editOvError, setEditOvError] = useState<string | null>(null);
 
   // Debt adjustments
   const [adjustments, setAdjustments] = useState<DebtAdjustment[]>([]);
