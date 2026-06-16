@@ -6,11 +6,12 @@ import { NormAssistantIcon } from "./NormAssistantIcon";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { largeModalContentClass } from "@/lib/modal-styles";
-import { AssessmentCorrectionDrawer, type CorrectionPayload, type CorrectionTag, type CounterpartyStatus, correctionTagToStatus } from "./AssessmentCorrectionDrawer";
+import { type CounterpartyStatus } from "./AssessmentCorrectionDrawer";
 import { getToneForTag, toneStyles } from "./header-theme";
 import {
   type Assessment,
   type AssessmentGroup,
+  type AssessmentGroupId,
   groupCounts,
   sumGroupCounts,
   MAIN_GROUP_IDS,
@@ -23,10 +24,11 @@ import { RegistrationInfoDrawer } from "./RegistrationInfoDrawer";
 import { KeyAnomaliesWidget } from "./KeyAnomaliesWidget";
 import { TrustFactorsWidget } from "./TrustFactorsWidget";
 import {
-  CorrectionHistoryEntry,
-  CorrectionHistoryDrawer,
-  type CorrectionRecord,
-} from "./AssessmentHistoryDrawer";
+  CommentHistoryEntry,
+  CommentHistoryDrawer,
+  type CommentRecord,
+} from "./AssessmentCommentHistory";
+import { AssessmentCommentDrawer, type AssessmentCommentPayload } from "./AssessmentCommentDrawer";
 
 export type AssessmentStatus = "pending" | "confirmed" | "disagreed" | "updated" | "review";
 
