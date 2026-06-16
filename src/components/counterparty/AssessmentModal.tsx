@@ -439,6 +439,10 @@ function GroupCard({
   compact?: boolean;
 }) {
   const counts = groupCounts(group);
+  const negatives = group.criteria.filter((c) => c.passed === false);
+  const [expanded, setExpanded] = useState(false);
+  const visibleNegatives = expanded ? negatives : negatives.slice(0, 2);
+  const hiddenCount = negatives.length - 2;
   return (
     <div className="rounded-lg border border-slate-100 bg-white transition">
       <div
@@ -468,6 +472,33 @@ function GroupCard({
           <ChevronRight className="h-4 w-4 shrink-0 text-muted-foreground transition group-hover:text-foreground" />
         </div>
       </div>
+      {negatives.length > 0 && (
+        <div className="border-t border-rose-100 px-3 py-2 space-y-1.5">
+          {visibleNegatives.map((c) => (
+            <div
+              key={c.number}
+              className="rounded-md bg-rose-50/70 px-2.5 py-1.5"
+            >
+              <div className="text-sm font-medium text-rose-900">{c.title}</div>
+              {c.reason && c.reason !== "Нарушений не выявлено" && c.reason !== "Нет данных для проверки" && (
+                <div className="mt-0.5 text-xs text-muted-foreground">{c.reason}</div>
+              )}
+            </div>
+          ))}
+          {hiddenCount > 0 && (
+            <button
+              type="button"
+              onClick={(e) => {
+                e.stopPropagation();
+                setExpanded((v) => !v);
+              }}
+              className="text-xs font-medium text-rose-700 hover:text-rose-800"
+            >
+              {expanded ? "Свернуть" : `Показать ещё ${hiddenCount}`}
+            </button>
+          )}
+        </div>
+      )}
     </div>
   );
 }
