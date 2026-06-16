@@ -342,12 +342,14 @@ export function AssessmentModal({
                       <GroupCard key={g.id} group={g} onOpen={setGroupDrawer} />
                     );
                   })}
-                  <OtherGroupsAccordion
-                    groups={OTHER_GROUP_IDS
+                  {(() => {
+                    const otherGroups = OTHER_GROUP_IDS
                       .map((id) => assessment.groups.find((x) => x.id === id))
-                      .filter((g): g is AssessmentGroup => !!g)}
-                    onOpen={setGroupDrawer}
-                  />
+                      .filter((g): g is AssessmentGroup => !!g);
+                    return otherGroups.length > 0 ? (
+                      <OtherGroupsAccordion groups={otherGroups} onOpen={setGroupDrawer} />
+                    ) : null;
+                  })()}
                 </div>
                 </div>
               </section>
