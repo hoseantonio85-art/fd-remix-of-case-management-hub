@@ -371,7 +371,7 @@ export function ContractDrawer({
         {/* DEBT ADJUSTMENTS */}
         <section className="rounded-2xl border border-border bg-white p-4">
           <div className="mb-3 flex items-center justify-between gap-2">
-            <div className="text-base font-semibold">Корректировка задолженности</div>
+            <div className="text-base font-semibold">Задолженность</div>
             <button
               type="button"
               aria-label="Добавить корректировку"
@@ -441,7 +441,7 @@ export function ContractDrawer({
           )}
 
           {adjustments.length === 0 ? (
-            <div className="rounded-2xl border border-dashed border-border px-3 py-6 text-center text-xs text-muted-foreground">
+            <div className="rounded-2xl border border-dashed border-border px-3 py-2 text-center text-xs text-muted-foreground">
               Корректировок пока нет
             </div>
           ) : (
