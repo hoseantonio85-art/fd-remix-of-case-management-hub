@@ -303,10 +303,10 @@ export function AssessmentModal({
                     </button>
                   </div>
 
-                  <CorrectionHistoryEntry
-                    count={correctionHistory.length}
-                    lastDate={correctionHistory[0]?.dateTime ?? ""}
-                    onOpen={() => setCorrectionHistoryOpen(true)}
+                  <CommentHistoryEntry
+                    count={commentHistory.length}
+                    lastDate={commentHistory[0]?.dateTime ?? ""}
+                    onOpen={() => setCommentHistoryOpen(true)}
                   />
 
 
@@ -324,7 +324,12 @@ export function AssessmentModal({
                     const g = assessment.groups.find((x) => x.id === id);
                     if (!g) return null;
                     return (
-                      <GroupCard key={g.id} group={g} onOpen={setGroupDrawer} />
+                      <GroupCard
+                        key={g.id}
+                        group={g}
+                        onOpen={setGroupDrawer}
+                        hasComment={commentedGroupIds.includes(g.id)}
+                      />
                     );
                   })}
                   {(() => {
@@ -346,7 +351,7 @@ export function AssessmentModal({
           <div className="shrink-0 border-t border-border bg-white px-5 py-4 lg:px-10">
             <Button
               variant="outline"
-              onClick={() => setCorrectionOpen(true)}
+              onClick={() => setCommentOpen(true)}
               className="h-12 w-full rounded-full text-sm font-medium"
             >
               Не согласен
@@ -370,16 +375,17 @@ export function AssessmentModal({
             ogrn={defaultOgrn}
           />
 
-          <CorrectionHistoryDrawer
-            open={correctionHistoryOpen}
-            onOpenChange={setCorrectionHistoryOpen}
-            records={correctionHistory}
+          <CommentHistoryDrawer
+            open={commentHistoryOpen}
+            onOpenChange={setCommentHistoryOpen}
+            records={commentHistory}
           />
 
-          <AssessmentCorrectionDrawer
-            open={correctionOpen}
-            onOpenChange={setCorrectionOpen}
-            onSubmit={handleCorrectionSubmit}
+          <AssessmentCommentDrawer
+            open={commentOpen}
+            onOpenChange={setCommentOpen}
+            groups={MAIN_GROUP_IDS.map((id) => assessment.groups.find((x) => x.id === id)).filter((g): g is AssessmentGroup => !!g)}
+            onSubmit={handleCommentSubmit}
           />
         </div>
         </DialogPrimitive.Content>
