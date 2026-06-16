@@ -439,7 +439,8 @@ export default function Index() {
 
   const byCategory = useMemo(() => {
     if (selectedTiles.size === 0) return byProcess;
-    return byProcess.filter((c) => selectedTiles.has(c.status));
+    // Pending («На оценке») cards should not be included into any risk/status category.
+    return byProcess.filter((c) => c.tag !== "На оценке" && selectedTiles.has(c.status));
   }, [byProcess, selectedTiles]);
 
   const riskCounts = useMemo(() => {
