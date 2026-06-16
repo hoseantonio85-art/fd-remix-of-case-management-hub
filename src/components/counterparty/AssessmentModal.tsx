@@ -122,25 +122,25 @@ export function AssessmentModal({
   const [groupDrawer, setGroupDrawer] = useState<AssessmentGroup | null>(null);
   const [registrationOpen, setRegistrationOpen] = useState(false);
 
-  // Correction drawer (replaces old inline disagreement flow).
-  const [correctionOpen, setCorrectionOpen] = useState(false);
+  // Comment drawer (replaces old correction flow).
+  const [commentOpen, setCommentOpen] = useState(false);
 
 
   // History blocks (persist per-counterparty within the session)
-  const [correctionHistoryOpen, setCorrectionHistoryOpen] = useState(false);
+  const [commentHistoryOpen, setCommentHistoryOpen] = useState(false);
   const [infoExpanded, setInfoExpanded] = useState(false);
-  const [correctionHistoryMap, setCorrectionHistoryMap] = useState<Record<string, CorrectionRecord[]>>({});
-  const [correctedTagMap, setCorrectedTagMap] = useState<Record<string, CorrectionTag>>({});
+  const [commentHistoryMap, setCommentHistoryMap] = useState<Record<string, CommentRecord[]>>({});
+  const [commentedGroupsMap, setCommentedGroupsMap] = useState<Record<string, AssessmentGroupId[]>>({});
 
   const inn = assessment?.inn ?? "";
-  const correctionHistory = correctionHistoryMap[inn] ?? [];
-  const correctedTag = correctedTagMap[inn] ?? null;
+  const commentHistory = commentHistoryMap[inn] ?? [];
+  const commentedGroupIds = commentedGroupsMap[inn] ?? [];
 
   // Only reset transient UI state when modal closes.
   useEffect(() => {
     if (!open) {
-      setCorrectionOpen(false);
-      setCorrectionHistoryOpen(false);
+      setCommentOpen(false);
+      setCommentHistoryOpen(false);
     }
   }, [open]);
 
@@ -151,39 +151,27 @@ export function AssessmentModal({
     return `Сегодня, ${hh}:${mm}`;
   };
 
-  const formatMonitoringDate = (iso: string) => {
-    if (!iso) return "—";
-    const d = new Date(iso);
-    if (Number.isNaN(d.getTime())) return iso;
-    return d.toLocaleDateString("ru-RU");
-  };
+  const currentTagLabel = positive ? "Нет риска" : "Риск дефолта";
 
-  const currentTagLabel = correctedTag ?? (positive ? "Нет риска" : "Риск дефолта");
-
-  const handleCorrectionSubmit = (payload: CorrectionPayload) => {
+  const handleCommentSubmit = (payload: AssessmentCommentPayload) => {
     if (!inn) return;
-    const fromTag = currentTagLabel;
-    const record: CorrectionRecord = {
+    const record: CommentRecord = {
       id: `c-${Date.now()}`,
       dateTime: nowLabel(),
       author: "Измайлова Л.Д. • Инициатор",
-      fromTag,
-      toTag: payload.tag,
+      groupTitles: payload.groupTitles,
       comment: payload.comment,
-      monitoringDate: formatMonitoringDate(payload.monitoringDate),
     };
-    setCorrectionHistoryMap((prev) => ({
+    setCommentHistoryMap((prev) => ({
       ...prev,
       [inn]: [record, ...(prev[inn] ?? [])],
     }));
-    setCorrectedTagMap((prev) => ({ ...prev, [inn]: payload.tag }));
-    onStatusChange?.(correctionTagToStatus[payload.tag]);
-    onDisagree({
-      text: payload.comment,
-      status: "submitted",
-      submittedAt: new Date().toISOString(),
+    setCommentedGroupsMap((prev) => {
+      const existing = prev[inn] ?? [];
+      const merged = Array.from(new Set([...existing, ...payload.groupIds]));
+      return { ...prev, [inn]: merged };
     });
-    toast("Корректировка оценки отправлена");
+    toast("Комментарий сохранён в истории оценки");
   };
 
 
