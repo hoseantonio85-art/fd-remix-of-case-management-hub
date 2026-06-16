@@ -140,6 +140,11 @@ export function ContractDrawer({
   const [adjDate, setAdjDate] = useState("");
   const [adjType, setAdjType] = useState<"increase" | "decrease">("increase");
   const [adjError, setAdjError] = useState<string | null>(null);
+  const [editAdjId, setEditAdjId] = useState<string | null>(null);
+  const [editAdjAmount, setEditAdjAmount] = useState("");
+  const [editAdjDate, setEditAdjDate] = useState("");
+  const [editAdjType, setEditAdjType] = useState<"increase" | "decrease">("increase");
+  const [editAdjError, setEditAdjError] = useState<string | null>(null);
 
   // Change history
   const [historyOpen, setHistoryOpen] = useState(false);
