@@ -138,7 +138,7 @@ export function AssessmentCommentDrawer({
 
           <div className="mt-6">
             <label className="mb-1.5 block text-sm font-medium">
-              Комментарий
+              Замечание
             </label>
             <Textarea
               rows={5}
@@ -154,7 +154,7 @@ export function AssessmentCommentDrawer({
             />
             {submitted && errors.comment && (
               <div className="mt-1 text-xs text-rose-600">
-                Добавьте комментарий
+                Добавьте замечание
               </div>
             )}
           </div>
@@ -169,7 +169,7 @@ export function AssessmentCommentDrawer({
             Отменить
           </Button>
           <Button className="flex-1" onClick={handleSave}>
-            Сохранить
+            Сохранить замечание
           </Button>
         </div>
       </div>
