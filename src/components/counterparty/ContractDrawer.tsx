@@ -388,8 +388,27 @@ export function ContractDrawer({
           {showAddAdjustment && (
             <div className="mb-3 rounded-2xl border border-border bg-muted/30 p-3">
               <div className="space-y-2">
+                <div>
+                  <div className="mb-1 text-xs text-muted-foreground">Тип операции</div>
+                  <div className="flex gap-2">
+                    <button
+                      type="button"
+                      onClick={() => { setAdjType("increase"); setAdjError(null); }}
+                      className={`flex h-9 flex-1 items-center justify-center rounded-full border text-sm font-medium transition ${adjType === "increase" ? "border-primary bg-primary text-primary-foreground" : "border-border bg-muted/40 text-muted-foreground hover:bg-muted"}`}
+                    >
+                      Увеличить
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => { setAdjType("decrease"); setAdjError(null); }}
+                      className={`flex h-9 flex-1 items-center justify-center rounded-full border text-sm font-medium transition ${adjType === "decrease" ? "border-primary bg-primary text-primary-foreground" : "border-border bg-muted/40 text-muted-foreground hover:bg-muted"}`}
+                    >
+                      Уменьшить
+                    </button>
+                  </div>
+                </div>
                 <LabeledInput
-                  label="Сумма корректировки, ₽"
+                  label="Сумма"
                   value={adjAmount}
                   onChange={(v) => {
                     setAdjAmount(v);
@@ -398,23 +417,11 @@ export function ContractDrawer({
                   placeholder="100000"
                 />
                 <LabeledInput
-                  label="Дата корректировки"
+                  label="Дата погашения"
                   value={adjDate}
                   onChange={setAdjDate}
                   placeholder="ДД.ММ.ГГГГ"
                 />
-                <div>
-                  <div className="mb-1 text-xs text-muted-foreground">Тип операции</div>
-                  <Select value={adjType} onValueChange={(v) => setAdjType(v as "increase" | "decrease")}>
-                    <SelectTrigger className="h-9 w-full border-input text-sm shadow-sm">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="increase">Увеличить</SelectItem>
-                      <SelectItem value="decrease">Уменьшить</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
               </div>
               {adjError && (
                 <div className="mt-2 flex items-start gap-2 rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 text-xs text-amber-900">
