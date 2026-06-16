@@ -127,14 +127,11 @@ export function AssessmentModal({
   // History blocks (persist per-counterparty within the session)
   const [correctionHistoryOpen, setCorrectionHistoryOpen] = useState(false);
   const [infoExpanded, setInfoExpanded] = useState(false);
-  const [downloadHistoryOpen, setDownloadHistoryOpen] = useState(false);
   const [correctionHistoryMap, setCorrectionHistoryMap] = useState<Record<string, CorrectionRecord[]>>({});
-  const [downloadHistoryMap, setDownloadHistoryMap] = useState<Record<string, DownloadRecord[]>>({});
   const [correctedTagMap, setCorrectedTagMap] = useState<Record<string, CorrectionTag>>({});
 
   const inn = assessment?.inn ?? "";
   const correctionHistory = correctionHistoryMap[inn] ?? [];
-  const downloadHistory = downloadHistoryMap[inn] ?? [];
   const correctedTag = correctedTagMap[inn] ?? null;
 
   // Only reset transient UI state when modal closes.
@@ -142,7 +139,6 @@ export function AssessmentModal({
     if (!open) {
       setCorrectionOpen(false);
       setCorrectionHistoryOpen(false);
-      setDownloadHistoryOpen(false);
     }
   }, [open]);
 
