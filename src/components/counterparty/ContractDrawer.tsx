@@ -11,6 +11,8 @@ import {
   Paperclip,
   History as HistoryIcon,
   X,
+  Pencil,
+  Trash2,
 } from "lucide-react";
 import {
   Select,
