@@ -833,7 +833,7 @@ export default function Index() {
 
                       <div className="truncate text-sm font-semibold text-foreground">{c.name}</div>
                       <div className="text-[12px] text-muted-foreground">
-                        {c.inn} · {c.contracts.length} договоры
+                        {c.inn} · {c.contracts.length} {getContractWord(c.contracts.length)}
                       </div>
                     </div>
                     <div className="hidden shrink-0 grid-cols-2 gap-3 sm:grid sm:w-[280px]">
