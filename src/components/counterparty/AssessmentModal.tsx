@@ -318,12 +318,6 @@ export function AssessmentModal({
                     </button>
                   </div>
 
-                  <DownloadHistoryEntry
-                    count={downloadHistory.length}
-                    lastDate={downloadHistory[0]?.dateTime ?? null}
-                    onOpen={() => setDownloadHistoryOpen(true)}
-                  />
-
                   <CorrectionHistoryEntry
                     count={correctionHistory.length}
                     lastDate={correctionHistory[0]?.dateTime ?? ""}
