@@ -462,6 +462,11 @@ function GroupCard({
           </div>
         </div>
         <div className="flex shrink-0 items-center gap-2">
+          {hasComment && (
+            <span className="inline-flex items-center rounded-full bg-violet-50 px-2 py-0.5 text-[11px] font-medium text-violet-700">
+              Комментарий
+            </span>
+          )}
           <ChevronRight className="h-4 w-4 shrink-0 text-muted-foreground transition group-hover:text-foreground" />
         </div>
       </div>
