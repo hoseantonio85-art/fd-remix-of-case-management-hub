@@ -184,21 +184,6 @@ export function AssessmentModal({
     toast("Корректировка оценки отправлена");
   };
 
-  const handleDownload = () => {
-    if (!inn) return;
-    const record: DownloadRecord = {
-      id: `d-${Date.now()}`,
-      dateTime: nowLabel(),
-      tag: currentTagLabel,
-      fileName: "Отчёт оценки контрагента.pdf",
-    };
-    setDownloadHistoryMap((prev) => ({
-      ...prev,
-      [inn]: [record, ...(prev[inn] ?? [])],
-    }));
-    toast.success("Отчёт скачан");
-  };
-
 
   if (!assessment) return null;
 
