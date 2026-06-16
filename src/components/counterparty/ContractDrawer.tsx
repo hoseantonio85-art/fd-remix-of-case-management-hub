@@ -411,6 +411,57 @@ export function ContractDrawer({
     if (payOpenIdx === i) setPayOpenIdx(null);
   };
 
+  const openEditOverdue = (i: number) => {
+    const o = overdues[i];
+    if (!o) return;
+    setEditOvIdx(i);
+    setEditOvAmount(String(Math.round(o.amount * 1_000_000)));
+    setEditOvDate(o.date);
+    setEditOvStage(o.stage);
+    setEditOvError(null);
+    setExpandedOverdues((s) => ({ ...s, [i]: true }));
+  };
+
+  const handleSaveOverdueEdit = () => {
+    if (editOvIdx === null) return;
+    const o = overdues[editOvIdx];
+    if (!o) return;
+    const n = Number(editOvAmount.replace(",", "."));
+    if (!editOvAmount || !Number.isFinite(n) || n <= 0) {
+      setEditOvError("Введите сумму просрочки");
+      return;
+    }
+    if (!editOvDate || !parseDDMMYYYY(editOvDate)) {
+      setEditOvError("Укажите срок исполнения");
+      return;
+    }
+    const amtMln = n / 1_000_000;
+    const paidSum = o.repayments.reduce((s, r) => s + r.amount, 0);
+    if (amtMln - paidSum < -1e-9) {
+      setEditOvError("Сумма меньше уже внесённых погашений");
+      return;
+    }
+    const base = parseDDMMYYYY(editOvDate);
+    const days = base ? Math.max(0, diffDays(base, TODAY)) : o.days;
+    const next = overdues.map((x, k) =>
+      k === editOvIdx ? { ...x, amount: amtMln, date: editOvDate, stage: editOvStage, days } : x,
+    );
+    setOverdues(next);
+    const newOverdueTotal = next.reduce(
+      (s, x) => s + Math.max(0, x.amount - x.repayments.reduce((a, r) => a + r.amount, 0)),
+      0,
+    );
+    onUpdateContract?.(contract.id, { overdue: newOverdueTotal });
+    logChange(
+      "Изменена просроченная ДЗ",
+      `${amtMln.toFixed(2)} млн ₽ · ${editOvDate} · ${editOvStage}`,
+    );
+    toast.success("Просроченная ДЗ обновлена");
+    setEditOvIdx(null);
+  };
+
+
+
 
 
   const handleAddRepayment = (i: number) => {
