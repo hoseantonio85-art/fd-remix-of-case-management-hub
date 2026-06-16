@@ -171,7 +171,7 @@ export function AssessmentModal({
       const merged = Array.from(new Set([...existing, ...payload.groupIds]));
       return { ...prev, [inn]: merged };
     });
-    toast("Комментарий сохранён в истории оценки");
+    toast("Замечание сохранено в блоке «Замечания к оценке»");
   };
 
 
