@@ -282,14 +282,13 @@ export default function Index() {
   const [processStage, setProcessStage] = useState<ProcessStage | null>(null);
   const [processDrawerOpen, setProcessDrawerOpen] = useState(false);
   const [runDialogOpen, setRunDialogOpen] = useState(false);
-  const [runInn, setRunInn] = useState("");
-  const [runError, setRunError] = useState<string | null>(null);
-  const [runLoading, setRunLoading] = useState(false);
+  const [pendingCp, setPendingCp] = useState<Counterparty | null>(null);
+  const [pendingCpOpen, setPendingCpOpen] = useState(false);
+  // Legacy manual assessment flow (kept for AssessmentModal scenarios from existing cards)
   const [manualAssessment, setManualAssessment] = useState<Assessment | null>(null);
   const [manualAssessmentOpen, setManualAssessmentOpen] = useState(false);
   const [manualStatus, setManualStatus] = useState<AssessmentStatus>("updated");
   const [manualDisagreement, setManualDisagreement] = useState<Disagreement | null>(null);
-  // Manual assessment flow (CTA «Оценить контрагента»)
   const [addedCounterparties, setAddedCounterparties] = useState<Counterparty[]>([]);
   const [manualFlowTarget, setManualFlowTarget] = useState<Counterparty | null>(null);
   const [manualFlowIsNew, setManualFlowIsNew] = useState(false);
