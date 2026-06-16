@@ -824,7 +824,7 @@ export default function Index() {
 
                       <div className="truncate text-sm font-semibold text-foreground">{c.name}</div>
                       <div className="text-[12px] text-muted-foreground">
-                        {c.inn} · {c.contracts.length} дог. · изм. {c.lastUpdate}
+                        {c.inn} · {c.contracts.length} договоры
                       </div>
                     </div>
                     <div className="hidden shrink-0 grid-cols-2 gap-3 sm:grid sm:w-[280px]">
@@ -871,7 +871,7 @@ export default function Index() {
           className="pointer-events-auto h-12 gap-2 rounded-full px-6 text-sm font-semibold shadow-lg shadow-primary/25"
         >
           <Sparkles className="h-4 w-4" />
-          Оценить контрагента
+          Запустить проверку
         </Button>
       </div>
 
