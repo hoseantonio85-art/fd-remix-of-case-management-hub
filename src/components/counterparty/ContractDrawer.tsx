@@ -166,10 +166,8 @@ export function ContractDrawer({
     setNotice(null);
     setCompletionDate(formatDDMMYYYY(TODAY));
     setAmount("");
-    setOccurDate("");
     setDueDate("");
-    setOverdueComment("");
-    setLocalOverdues([]);
+    setNewOverdueStage(SETTLEMENT_STAGES[0]);
     setShowAddOverdue(false);
     setOverdueAddedNotice(false);
     setOverdueError(null);
