@@ -181,6 +181,8 @@ export function ContractDrawer({
     setPayAmount("");
     setPayDate("");
     setPayError(null);
+    setEditOvIdx(null);
+    setEditOvError(null);
     setOverdues(
       contract.overdueHistory.map((h) => ({
         ...h,
