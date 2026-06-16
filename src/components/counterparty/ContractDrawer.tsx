@@ -849,51 +849,74 @@ export function ContractDrawer({
 
                     {expanded && (
                       <div className="mt-3 space-y-2">
-                        <div className="grid grid-cols-2 gap-2">
-                          <div className="rounded-xl border border-border bg-white px-3 py-2">
-                            <div className="text-[11px] text-muted-foreground">Сумма</div>
-                            <Input
-                              className="h-7 border-0 px-0 text-sm font-medium shadow-none focus-visible:ring-0"
-                              value={String(Math.round(o.amount * 1_000_000))}
-                              onChange={(e) => {
-                                const n = Number(e.target.value.replace(/[^\d]/g, ""));
-                                if (Number.isFinite(n)) handleEditOverdue(i, { amount: n / 1_000_000 });
-                              }}
-                              onBlur={() => commitOverdueEdit(i)}
-                            />
+                        {editOvIdx === i ? (
+                          <div className="rounded-2xl border border-border bg-white p-3">
+                            <div className="space-y-2">
+                              <LabeledInput
+                                label="Сумма просроченной ДЗ, ₽"
+                                value={editOvAmount}
+                                onChange={(v) => { setEditOvAmount(v); setEditOvError(null); }}
+                                placeholder="100000"
+                              />
+                              <LabeledInput
+                                label="Срок исполнения / дата оплаты"
+                                value={editOvDate}
+                                onChange={(v) => { setEditOvDate(v); setEditOvError(null); }}
+                                placeholder="ДД.ММ.ГГГГ"
+                              />
+                              <div>
+                                <div className="mb-1 text-xs text-muted-foreground">Этапы урегулирования</div>
+                                <Select value={editOvStage} onValueChange={setEditOvStage}>
+                                  <SelectTrigger className="h-9 w-full border-input text-sm shadow-sm">
+                                    <SelectValue />
+                                  </SelectTrigger>
+                                  <SelectContent>
+                                    {SETTLEMENT_STAGES.map((s) => (
+                                      <SelectItem key={s} value={s}>{s}</SelectItem>
+                                    ))}
+                                  </SelectContent>
+                                </Select>
+                              </div>
+                            </div>
+                            {editOvError && (
+                              <div className="mt-2 flex items-start gap-2 rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 text-xs text-amber-900">
+                                <AlertTriangle className="mt-0.5 h-3.5 w-3.5 shrink-0" />
+                                {editOvError}
+                              </div>
+                            )}
+                            <div className="mt-3 flex items-center gap-2">
+                              <Button size="sm" className="flex-1" onClick={handleSaveOverdueEdit} disabled={!editOvAmount || !editOvDate}>
+                                Сохранить
+                              </Button>
+                              <Button size="sm" variant="ghost" onClick={() => setEditOvIdx(null)}>
+                                Отменить
+                              </Button>
+                            </div>
                           </div>
-                          <div className="rounded-xl border border-border bg-white px-3 py-2">
-                            <div className="text-[11px] text-muted-foreground">Срок исполнения</div>
-                            <Input
-                              className="h-7 border-0 px-0 text-sm font-medium shadow-none focus-visible:ring-0"
-                              value={o.date}
-                              placeholder="ДД.ММ.ГГГГ"
-                              onChange={(e) => handleEditOverdue(i, { date: e.target.value })}
-                              onBlur={() => commitOverdueEdit(i)}
-                            />
-                          </div>
-                        </div>
-                        <div className="rounded-xl border border-border bg-white px-3 py-1.5">
-                          <div className="text-[11px] text-muted-foreground">Этапы урегулирования</div>
-                          <Select
-                            value={o.stage}
-                            onValueChange={(v) => {
-                              handleEditOverdue(i, { stage: v });
-                              commitOverdueEdit(i);
-                            }}
-                          >
-                            <SelectTrigger className="h-7 border-0 px-0 text-sm font-medium shadow-none focus:ring-0">
-                              <SelectValue />
-                            </SelectTrigger>
-                            <SelectContent>
-                              {SETTLEMENT_STAGES.map((s) => (
-                                <SelectItem key={s} value={s}>
-                                  {s}
-                                </SelectItem>
-                              ))}
-                            </SelectContent>
-                          </Select>
-                        </div>
+                        ) : (
+                          <>
+                            <div className="grid grid-cols-2 gap-2">
+                              <div className="rounded-xl border border-border bg-white px-3 py-2">
+                                <div className="text-[11px] text-muted-foreground">Сумма</div>
+                                <div className="text-sm font-medium text-foreground">
+                                  {o.amount.toLocaleString("ru-RU", { maximumFractionDigits: 2 })} млн ₽
+                                </div>
+                              </div>
+                              <div className="rounded-xl border border-border bg-white px-3 py-2">
+                                <div className="text-[11px] text-muted-foreground">Срок исполнения</div>
+                                <div className="text-sm font-medium text-foreground">{o.date}</div>
+                              </div>
+                            </div>
+                            <div className="rounded-xl border border-border bg-white px-3 py-2">
+                              <div className="text-[11px] text-muted-foreground">Этап</div>
+                              <div className="mt-0.5">
+                                <span className="inline-flex items-center rounded-full bg-muted px-2 py-0.5 text-xs font-medium text-foreground">
+                                  {o.stage}
+                                </span>
+                              </div>
+                            </div>
+                          </>
+                        )}
 
                         {o.repayments.length > 0 && (
                           <div className="rounded-xl border border-border bg-white px-3 py-2">
