@@ -130,9 +130,8 @@ export function ContractDrawer({
 
   // Overdue add form
   const [amount, setAmount] = useState("");
-  const [occurDate, setOccurDate] = useState("");
   const [dueDate, setDueDate] = useState("");
-  const [overdueComment, setOverdueComment] = useState("");
+  const [newOverdueStage, setNewOverdueStage] = useState<string>(SETTLEMENT_STAGES[0]);
   const [localOverdues, setLocalOverdues] = useState<LocalOverdue[]>([]);
   const [overdueError, setOverdueError] = useState<string | null>(null);
   const [showAddOverdue, setShowAddOverdue] = useState(false);
@@ -167,10 +166,8 @@ export function ContractDrawer({
     setNotice(null);
     setCompletionDate(formatDDMMYYYY(TODAY));
     setAmount("");
-    setOccurDate("");
     setDueDate("");
-    setOverdueComment("");
-    setLocalOverdues([]);
+    setNewOverdueStage(SETTLEMENT_STAGES[0]);
     setShowAddOverdue(false);
     setOverdueAddedNotice(false);
     setOverdueError(null);
@@ -207,7 +204,7 @@ export function ContractDrawer({
   const tagLabel = overdue ? "Есть просроченная задолженность" : "Без просрочки";
 
   const computedDays = (() => {
-    const base = parseDDMMYYYY(dueDate) ?? parseDDMMYYYY(occurDate);
+    const base = parseDDMMYYYY(dueDate);
     if (!base) return null;
     const d = diffDays(base, TODAY);
     return d > 0 ? d : 0;
@@ -301,17 +298,17 @@ export function ContractDrawer({
       setOverdueError("Введите сумму просрочки");
       return;
     }
-    if (!occurDate || !parseDDMMYYYY(occurDate)) {
-      setOverdueError("Укажите дату возникновения просрочки");
+    if (!dueDate || !parseDDMMYYYY(dueDate)) {
+      setOverdueError("Укажите срок исполнения");
       return;
     }
     setOverdueError(null);
     const days = computedDays ?? 0;
     const record: OverdueRecord = {
-      date: occurDate,
+      date: dueDate,
       amount: amountNum / 1_000_000,
       days,
-      comment: overdueComment || undefined,
+      comment: newOverdueStage,
     };
     onAddOverdue(contract.id, record);
     setLocalOverdues((prev) => [{ ...record, source: DEFAULT_RESPONSIBLE }, ...prev]);
@@ -326,9 +323,8 @@ export function ContractDrawer({
       ...h,
     ]);
     setAmount("");
-    setOccurDate("");
     setDueDate("");
-    setOverdueComment("");
+    setNewOverdueStage(SETTLEMENT_STAGES[0]);
     setShowAddOverdue(false);
     setOverdueAddedNotice(true);
   };
@@ -414,7 +410,7 @@ export function ContractDrawer({
 
           {showAddOverdue && (
             <div className="mb-3 rounded-2xl border border-border bg-muted/30 p-3">
-              <div className="grid grid-cols-2 gap-2">
+              <div className="space-y-2">
                 <LabeledInput
                   label="Сумма просроченной ДЗ, ₽"
                   value={amount}
@@ -425,26 +421,29 @@ export function ContractDrawer({
                   placeholder="100000"
                 />
                 <LabeledInput
-                  label="Дата возникновения"
-                  value={occurDate}
-                  onChange={(v) => {
-                    setOccurDate(v);
-                    setOverdueError(null);
-                  }}
-                  placeholder="ДД.ММ.ГГГГ"
-                />
-                <LabeledInput
                   label="Срок исполнения / дата оплаты"
                   value={dueDate}
                   onChange={setDueDate}
                   placeholder="ДД.ММ.ГГГГ"
                 />
-                <LabeledInput
-                  label="Комментарий"
-                  value={overdueComment}
-                  onChange={setOverdueComment}
-                  placeholder="—"
-                />
+                <div>
+                  <div className="mb-1 text-xs text-muted-foreground">Этапы урегулирования</div>
+                  <Select
+                    value={newOverdueStage}
+                    onValueChange={(v) => setNewOverdueStage(v)}
+                  >
+                    <SelectTrigger className="h-9 w-full border-input text-sm shadow-sm">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {SETTLEMENT_STAGES.map((s) => (
+                        <SelectItem key={s} value={s}>
+                          {s}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
               </div>
               {computedDays !== null && (
                 <div className="mt-2 text-xs text-muted-foreground">
@@ -463,7 +462,7 @@ export function ContractDrawer({
                   size="sm"
                   className="flex-1"
                   onClick={handleAddOverdue}
-                  disabled={!amount || !occurDate}
+                  disabled={!amount || !dueDate}
                 >
                   Добавить запись
                 </Button>
