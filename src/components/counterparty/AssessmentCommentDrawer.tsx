@@ -65,10 +65,10 @@ export function AssessmentCommentDrawer({
     <InModalDrawer open={open} onOpenChange={onOpenChange}>
       <div className="flex min-h-full flex-col">
         <div className="flex-1 overflow-y-auto p-6 pb-4">
-          <h2 className="text-lg font-semibold">Комментарий к оценке</h2>
+          <h2 className="text-lg font-semibold">Замечание к оценке</h2>
           <p className="mt-1 text-sm text-muted-foreground">
-            Выберите одну или несколько групп оценки и добавьте комментарий.
-            После сохранения запись появится в истории оценки.
+            Выберите группы оценки, к которым относится замечание, и опишите,
+            с чем вы не согласны.
           </p>
 
           <div className="mt-6">
