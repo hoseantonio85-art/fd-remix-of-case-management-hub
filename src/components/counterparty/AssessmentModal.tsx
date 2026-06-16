@@ -342,12 +342,14 @@ export function AssessmentModal({
                       <GroupCard key={g.id} group={g} onOpen={setGroupDrawer} />
                     );
                   })}
-                  <OtherGroupsAccordion
-                    groups={OTHER_GROUP_IDS
+                  {(() => {
+                    const otherGroups = OTHER_GROUP_IDS
                       .map((id) => assessment.groups.find((x) => x.id === id))
-                      .filter((g): g is AssessmentGroup => !!g)}
-                    onOpen={setGroupDrawer}
-                  />
+                      .filter((g): g is AssessmentGroup => !!g);
+                    return otherGroups.length > 0 ? (
+                      <OtherGroupsAccordion groups={otherGroups} onOpen={setGroupDrawer} />
+                    ) : null;
+                  })()}
                 </div>
                 </div>
               </section>
@@ -463,11 +465,6 @@ function GroupCard({
           </div>
         </div>
         <div className="flex shrink-0 items-center gap-2">
-          {group.id === "fns" && (
-            <span className="inline-flex h-5 items-center whitespace-nowrap rounded-full border border-rose-100 bg-rose-50 px-2 text-[11px] font-medium text-rose-700">
-              Требует внимания
-            </span>
-          )}
           <ChevronRight className="h-4 w-4 shrink-0 text-muted-foreground transition group-hover:text-foreground" />
         </div>
       </div>
