@@ -424,7 +424,13 @@ function GroupCard({
   group,
   onOpen,
   compact = false,
+  hasComment = false,
 }: {
+  group: AssessmentGroup;
+  onOpen: (g: AssessmentGroup) => void;
+  compact?: boolean;
+  hasComment?: boolean;
+}) {
   group: AssessmentGroup;
   onOpen: (g: AssessmentGroup) => void;
   compact?: boolean;
