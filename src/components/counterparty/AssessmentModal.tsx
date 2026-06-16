@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import * as DialogPrimitive from "@radix-ui/react-dialog";
-import { X, ArrowLeft, ChevronRight, Download } from "lucide-react";
+import { X, ArrowLeft, ChevronRight } from "lucide-react";
 import { toast } from "sonner";
 import { NormAssistantIcon } from "./NormAssistantIcon";
 import { Button } from "@/components/ui/button";
@@ -25,10 +25,7 @@ import { TrustFactorsWidget } from "./TrustFactorsWidget";
 import {
   CorrectionHistoryEntry,
   CorrectionHistoryDrawer,
-  DownloadHistoryEntry,
-  DownloadHistoryDrawer,
   type CorrectionRecord,
-  type DownloadRecord,
 } from "./AssessmentHistoryDrawer";
 
 export type AssessmentStatus = "pending" | "confirmed" | "disagreed" | "updated" | "review";
@@ -130,14 +127,11 @@ export function AssessmentModal({
   // History blocks (persist per-counterparty within the session)
   const [correctionHistoryOpen, setCorrectionHistoryOpen] = useState(false);
   const [infoExpanded, setInfoExpanded] = useState(false);
-  const [downloadHistoryOpen, setDownloadHistoryOpen] = useState(false);
   const [correctionHistoryMap, setCorrectionHistoryMap] = useState<Record<string, CorrectionRecord[]>>({});
-  const [downloadHistoryMap, setDownloadHistoryMap] = useState<Record<string, DownloadRecord[]>>({});
   const [correctedTagMap, setCorrectedTagMap] = useState<Record<string, CorrectionTag>>({});
 
   const inn = assessment?.inn ?? "";
   const correctionHistory = correctionHistoryMap[inn] ?? [];
-  const downloadHistory = downloadHistoryMap[inn] ?? [];
   const correctedTag = correctedTagMap[inn] ?? null;
 
   // Only reset transient UI state when modal closes.
@@ -145,7 +139,6 @@ export function AssessmentModal({
     if (!open) {
       setCorrectionOpen(false);
       setCorrectionHistoryOpen(false);
-      setDownloadHistoryOpen(false);
     }
   }, [open]);
 
@@ -189,21 +182,6 @@ export function AssessmentModal({
       submittedAt: new Date().toISOString(),
     });
     toast("Корректировка оценки отправлена");
-  };
-
-  const handleDownload = () => {
-    if (!inn) return;
-    const record: DownloadRecord = {
-      id: `d-${Date.now()}`,
-      dateTime: nowLabel(),
-      tag: currentTagLabel,
-      fileName: "Отчёт оценки контрагента.pdf",
-    };
-    setDownloadHistoryMap((prev) => ({
-      ...prev,
-      [inn]: [record, ...(prev[inn] ?? [])],
-    }));
-    toast.success("Отчёт скачан");
   };
 
 
@@ -340,12 +318,6 @@ export function AssessmentModal({
                     </button>
                   </div>
 
-                  <DownloadHistoryEntry
-                    count={downloadHistory.length}
-                    lastDate={downloadHistory[0]?.dateTime ?? null}
-                    onOpen={() => setDownloadHistoryOpen(true)}
-                  />
-
                   <CorrectionHistoryEntry
                     count={correctionHistory.length}
                     lastDate={correctionHistory[0]?.dateTime ?? ""}
@@ -360,10 +332,6 @@ export function AssessmentModal({
 
               {/* Groups — left, row 2 */}
               <section className="order-3 lg:col-start-1 lg:row-start-1 space-y-5">
-                <div className="grid grid-cols-2 gap-3">
-                  <LimitCard label="Расходные сделки" sublabel="Лимит аванса" value="12,4 млн ₽" />
-                  <LimitCard label="Доходные сделки" sublabel="Лимит дебиторской задолженности" value="18,7 млн ₽" />
-                </div>
                 <div>
                 <h3 className="mb-2 text-sm font-semibold">Группы оценки</h3>
                 <div className="grid grid-cols-1 gap-2.5">
@@ -389,21 +357,13 @@ export function AssessmentModal({
 
           {/* Footer actions */}
           <div className="shrink-0 border-t border-border bg-white px-5 py-4 lg:px-10">
-            <div className="flex flex-col gap-3 sm:flex-row">
-              <Button
-                variant="outline"
-                onClick={() => setCorrectionOpen(true)}
-                className="h-12 flex-1 rounded-full text-sm font-medium"
-              >
-                Не согласен
-              </Button>
-              <Button
-                onClick={handleDownload}
-                className="h-12 flex-1 rounded-full text-sm font-medium"
-              >
-                <Download className="h-4 w-4" /> Скачать
-              </Button>
-            </div>
+            <Button
+              variant="outline"
+              onClick={() => setCorrectionOpen(true)}
+              className="h-12 w-full rounded-full text-sm font-medium"
+            >
+              Не согласен
+            </Button>
           </div>
 
 
@@ -429,14 +389,6 @@ export function AssessmentModal({
             records={correctionHistory}
           />
 
-          <DownloadHistoryDrawer
-            open={downloadHistoryOpen}
-            onOpenChange={setDownloadHistoryOpen}
-            records={downloadHistory}
-            onRedownload={() => toast.success("Отчёт скачан")}
-            onDownloadAll={() => toast.success("Отчёт скачан")}
-          />
-
           <AssessmentCorrectionDrawer
             open={correctionOpen}
             onOpenChange={setCorrectionOpen}
@@ -446,18 +398,6 @@ export function AssessmentModal({
         </DialogPrimitive.Content>
       </DialogPrimitive.Portal>
     </DialogPrimitive.Root>
-  );
-}
-
-function LimitCard({ label, sublabel, value }: { label: string; sublabel: string; value: string }) {
-  return (
-    <div className="rounded-xl border border-border bg-white px-4 py-3">
-      <div className="text-xs text-muted-foreground">{label}</div>
-      <div className="mt-1 flex items-baseline gap-2">
-        <span className="text-lg font-semibold text-foreground">{value}</span>
-        <span className="text-xs text-muted-foreground leading-tight">{sublabel}</span>
-      </div>
-    </div>
   );
 }
 
