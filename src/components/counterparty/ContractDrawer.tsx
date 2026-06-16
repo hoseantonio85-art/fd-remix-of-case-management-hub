@@ -371,7 +371,7 @@ export function ContractDrawer({
         {/* DEBT ADJUSTMENTS */}
         <section className="rounded-2xl border border-border bg-white p-4">
           <div className="mb-3 flex items-center justify-between gap-2">
-            <div className="text-base font-semibold">Корректировка задолженности</div>
+            <div className="text-base font-semibold">Задолженность</div>
             <button
               type="button"
               aria-label="Добавить корректировку"
