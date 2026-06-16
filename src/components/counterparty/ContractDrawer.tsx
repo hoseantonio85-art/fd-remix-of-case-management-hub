@@ -827,7 +827,7 @@ export function ContractDrawer({
                           aria-label="Редактировать"
                           onClick={(e) => {
                             e.stopPropagation();
-                            setExpandedOverdues((s) => ({ ...s, [i]: true }));
+                            openEditOverdue(i);
                           }}
                           className="flex h-7 w-7 items-center justify-center rounded-full text-muted-foreground transition hover:bg-white hover:text-foreground"
                         >
