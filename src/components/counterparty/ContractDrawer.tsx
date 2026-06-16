@@ -441,7 +441,7 @@ export function ContractDrawer({
           )}
 
           {adjustments.length === 0 ? (
-            <div className="rounded-2xl border border-dashed border-border px-3 py-6 text-center text-xs text-muted-foreground">
+            <div className="rounded-2xl border border-dashed border-border px-3 py-2 text-center text-xs text-muted-foreground">
               Корректировок пока нет
             </div>
           ) : (
