@@ -332,10 +332,6 @@ export function AssessmentModal({
 
               {/* Groups — left, row 2 */}
               <section className="order-3 lg:col-start-1 lg:row-start-1 space-y-5">
-                <div className="grid grid-cols-2 gap-3">
-                  <LimitCard label="Расходные сделки" sublabel="Лимит аванса" value="12,4 млн ₽" />
-                  <LimitCard label="Доходные сделки" sublabel="Лимит дебиторской задолженности" value="18,7 млн ₽" />
-                </div>
                 <div>
                 <h3 className="mb-2 text-sm font-semibold">Группы оценки</h3>
                 <div className="grid grid-cols-1 gap-2.5">
@@ -361,21 +357,13 @@ export function AssessmentModal({
 
           {/* Footer actions */}
           <div className="shrink-0 border-t border-border bg-white px-5 py-4 lg:px-10">
-            <div className="flex flex-col gap-3 sm:flex-row">
-              <Button
-                variant="outline"
-                onClick={() => setCorrectionOpen(true)}
-                className="h-12 flex-1 rounded-full text-sm font-medium"
-              >
-                Не согласен
-              </Button>
-              <Button
-                onClick={handleDownload}
-                className="h-12 flex-1 rounded-full text-sm font-medium"
-              >
-                <Download className="h-4 w-4" /> Скачать
-              </Button>
-            </div>
+            <Button
+              variant="outline"
+              onClick={() => setCorrectionOpen(true)}
+              className="h-12 w-full rounded-full text-sm font-medium"
+            >
+              Не согласен
+            </Button>
           </div>
 
 
@@ -399,14 +387,6 @@ export function AssessmentModal({
             open={correctionHistoryOpen}
             onOpenChange={setCorrectionHistoryOpen}
             records={correctionHistory}
-          />
-
-          <DownloadHistoryDrawer
-            open={downloadHistoryOpen}
-            onOpenChange={setDownloadHistoryOpen}
-            records={downloadHistory}
-            onRedownload={() => toast.success("Отчёт скачан")}
-            onDownloadAll={() => toast.success("Отчёт скачан")}
           />
 
           <AssessmentCorrectionDrawer
