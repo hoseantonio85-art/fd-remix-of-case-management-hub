@@ -227,9 +227,10 @@ export function AssessmentModal({
                 {resolutionBadge.label}
               </span>
             </div>
-            <h2 className="mt-3 text-2xl font-semibold tracking-tight text-foreground">
+            <h2 className="mt-3 text-2xl font-semibold tracking-tight text-foreground min-w-0">
               Оценка контрагента {assessment.counterpartyName}
             </h2>
+            {inn && <p className="mt-1 text-xs text-muted-foreground">ИНН {inn}</p>}
             <div className={cn(
               "mt-5 rounded-3xl p-[1.5px]",
               effectivePositive
