@@ -177,19 +177,14 @@ export function AssessmentModal({
 
   if (!assessment) return null;
 
-  const effectivePositive = correctedTag ? correctedTag === "Нет риска" : positive;
-  const headerTone = correctedTag ? getToneForTag(correctedTag) : null;
-  const headerBg = headerTone
-    ? toneStyles[headerTone].gradient
-    : effectivePositive
-      ? "bg-gradient-to-b from-emerald-50 via-emerald-50/40 to-transparent"
-      : statusMeta[status].headerBg;
+  const effectivePositive = positive;
+  const headerBg = effectivePositive
+    ? "bg-gradient-to-b from-emerald-50 via-emerald-50/40 to-transparent"
+    : statusMeta[status].headerBg;
   const meta = { label: "", chip: "", headerBg };
-  const resolutionBadge = correctedTag
-    ? { label: correctedTag, chip: toneStyles[getToneForTag(correctedTag)].badge }
-    : effectivePositive
-      ? { label: "Сделки заключать можно", chip: "bg-emerald-100 text-emerald-900" }
-      : { label: "Не заключать сделки", chip: "bg-rose-100 text-rose-900" };
+  const resolutionBadge = effectivePositive
+    ? { label: "Сделки заключать можно", chip: "bg-emerald-100 text-emerald-900" }
+    : { label: "Не заключать сделки", chip: "bg-rose-100 text-rose-900" };
 
 
 
