@@ -765,19 +765,32 @@ export default function Index() {
                 </div>
               )}
               {filtered.map((c) => {
-                const indicators = getCounterpartyProblemIndicators(c);
+                const isPending = c.tag === "На оценке";
+                const indicators = isPending ? [] : getCounterpartyProblemIndicators(c);
+                const handleClick = () => {
+                  if (isPending) {
+                    setPendingCp(c);
+                    setPendingCpOpen(true);
+                  } else {
+                    setActive(c);
+                  }
+                };
                 return (
                   <button
                     key={c.id}
-                    onClick={() => setActive(c)}
+                    onClick={handleClick}
                     className="flex w-full items-center gap-4 rounded-2xl border border-[#E5E7EB] bg-white px-5 py-4 text-left transition hover:border-slate-300 hover:shadow-sm"
                   >
                     <div className="flex min-w-0 flex-1 flex-col gap-1.5">
                       <div className="flex flex-wrap items-center gap-1.5">
-                        {(() => {
-                          return <CounterpartyStatusBadge tag={categoryLabel[c.status]} />;
-                        })()}
-                        {statusChanges[c.inn] && statusChanges[c.inn].from !== statusChanges[c.inn].to && (
+                        {isPending ? (
+                          <span className="inline-flex w-fit items-center rounded-full bg-violet-100/80 px-2.5 py-1 text-[11px] font-medium text-violet-800">
+                            На оценке
+                          </span>
+                        ) : (
+                          <CounterpartyStatusBadge tag={categoryLabel[c.status]} />
+                        )}
+                        {!isPending && statusChanges[c.inn] && statusChanges[c.inn].from !== statusChanges[c.inn].to && (
                           <span
                             title={`${categoryLabel[statusChanges[c.inn].from as CategoryKey]} → ${categoryLabel[statusChanges[c.inn].to as CategoryKey]}`}
                             className="inline-flex items-center rounded-full border border-violet-100 bg-violet-50 px-2 py-0.5 text-[11px] font-medium text-violet-700"
@@ -807,28 +820,30 @@ export default function Index() {
                         {c.inn} · {c.contracts.length} {getContractWord(c.contracts.length)}
                       </div>
                     </div>
-                    <div className="hidden shrink-0 grid-cols-2 gap-3 sm:grid sm:w-[280px]">
-                      <div className="min-w-0 rounded-lg bg-slate-50/70 px-3 py-2.5">
-                        <div className="truncate text-sm font-medium text-foreground">
-                          {c.totalDebt}
+                    {!isPending && (
+                      <div className="hidden shrink-0 grid-cols-2 gap-3 sm:grid sm:w-[280px]">
+                        <div className="min-w-0 rounded-lg bg-slate-50/70 px-3 py-2.5">
+                          <div className="truncate text-sm font-medium text-foreground">
+                            {c.totalDebt}
+                          </div>
+                          <div className="mt-1 text-[11px] text-muted-foreground">
+                            Задолженность
+                          </div>
                         </div>
-                        <div className="mt-1 text-[11px] text-muted-foreground">
-                          Задолженность
+                        <div className="min-w-0 rounded-lg bg-slate-50/70 px-3 py-2.5">
+                          <div
+                            className={`truncate text-sm font-medium ${
+                              c.overdueAmountNum > 0 ? "text-rose-600" : "text-muted-foreground"
+                            }`}
+                          >
+                            {c.overdueAmountNum > 0 ? c.overdueDebt : "—"}
+                          </div>
+                          <div className="mt-1 text-[11px] text-muted-foreground">
+                            Просроченная
+                          </div>
                         </div>
                       </div>
-                      <div className="min-w-0 rounded-lg bg-slate-50/70 px-3 py-2.5">
-                        <div
-                          className={`truncate text-sm font-medium ${
-                            c.overdueAmountNum > 0 ? "text-rose-600" : "text-muted-foreground"
-                          }`}
-                        >
-                          {c.overdueAmountNum > 0 ? c.overdueDebt : "—"}
-                        </div>
-                        <div className="mt-1 text-[11px] text-muted-foreground">
-                          Просроченная
-                        </div>
-                      </div>
-                    </div>
+                    )}
                   </button>
                 );
               })}
