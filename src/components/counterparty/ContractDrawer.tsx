@@ -11,6 +11,8 @@ import {
   Paperclip,
   History as HistoryIcon,
   X,
+  Pencil,
+  Trash2,
 } from "lucide-react";
 import {
   Select,
@@ -138,6 +140,11 @@ export function ContractDrawer({
   const [adjDate, setAdjDate] = useState("");
   const [adjType, setAdjType] = useState<"increase" | "decrease">("increase");
   const [adjError, setAdjError] = useState<string | null>(null);
+  const [editAdjId, setEditAdjId] = useState<string | null>(null);
+  const [editAdjAmount, setEditAdjAmount] = useState("");
+  const [editAdjDate, setEditAdjDate] = useState("");
+  const [editAdjType, setEditAdjType] = useState<"increase" | "decrease">("increase");
+  const [editAdjError, setEditAdjError] = useState<string | null>(null);
 
   // Change history
   const [historyOpen, setHistoryOpen] = useState(false);
@@ -160,6 +167,11 @@ export function ContractDrawer({
     setAdjDate("");
     setAdjType("increase");
     setAdjError(null);
+    setEditAdjId(null);
+    setEditAdjAmount("");
+    setEditAdjDate("");
+    setEditAdjType("increase");
+    setEditAdjError(null);
     setPayOpenIdx(null);
     setPayAmount("");
     setPayDate("");
@@ -306,6 +318,93 @@ export function ContractDrawer({
     setAdjType("increase");
     setShowAddAdjustment(false);
   };
+
+  const openEditAdjustment = (a: DebtAdjustment) => {
+    setEditAdjId(a.id);
+    setEditAdjAmount(String(Math.round(a.amount * 1_000_000)));
+    setEditAdjDate(a.date);
+    setEditAdjType(a.type);
+    setEditAdjError(null);
+    setShowAddAdjustment(false);
+  };
+
+  const handleSaveAdjEdit = () => {
+    if (!editAdjId) return;
+    const a = adjustments.find((x) => x.id === editAdjId);
+    if (!a) return;
+    const n = Number(editAdjAmount.replace(",", "."));
+    if (!editAdjAmount || !Number.isFinite(n) || n <= 0) {
+      setEditAdjError("Введите сумму корректировки");
+      return;
+    }
+    if (!editAdjDate || !parseDDMMYYYY(editAdjDate)) {
+      setEditAdjError("Укажите дату корректировки");
+      return;
+    }
+    const amtMln = n / 1_000_000;
+    const next = adjustments.map((x) =>
+      x.id === a.id ? { ...x, amount: amtMln, date: editAdjDate, type: editAdjType } : x,
+    );
+    const delta = next.reduce((s, x) => s + (x.type === "increase" ? x.amount : -x.amount), 0);
+    if (contract.debt + delta < 0) {
+      setEditAdjError("Задолженность не может стать отрицательной");
+      return;
+    }
+    setAdjustments(next);
+    const newDebt = Math.max(0, contract.debt + delta);
+    onUpdateContract?.(contract.id, { debt: newDebt });
+    logChange(
+      "Корректировка задолженности изменена",
+      `${editAdjType === "increase" ? "+" : "−"}${amtMln.toFixed(2)} млн ₽ · ${editAdjDate}`,
+    );
+    toast.success("Задолженность обновлена");
+    setEditAdjId(null);
+  };
+
+  const handleDeleteAdjustment = (id: string) => {
+    const a = adjustments.find((x) => x.id === id);
+    if (!a) return;
+    const next = adjustments.filter((x) => x.id !== id);
+    setAdjustments(next);
+    const delta = next.reduce((s, x) => s + (x.type === "increase" ? x.amount : -x.amount), 0);
+    const newDebt = Math.max(0, contract.debt + delta);
+    onUpdateContract?.(contract.id, { debt: newDebt });
+    logChange(
+      "Удалена корректировка задолженности",
+      `${a.type === "increase" ? "+" : "−"}${a.amount.toFixed(2)} млн ₽ · ${a.date}`,
+    );
+    toast.success("Задолженность удалена");
+    if (editAdjId === id) setEditAdjId(null);
+  };
+
+  const handleDeleteOverdue = (i: number) => {
+    const o = overdues[i];
+    if (!o) return;
+    const next = overdues.filter((_, k) => k !== i);
+    setOverdues(next);
+    const newOverdueTotal = next.reduce(
+      (s, x) => s + Math.max(0, x.amount - x.repayments.reduce((a, r) => a + r.amount, 0)),
+      0,
+    );
+    onUpdateContract?.(contract.id, { overdue: newOverdueTotal });
+    logChange(
+      "Удалена просроченная ДЗ",
+      `${o.amount.toFixed(2)} млн ₽ · ${o.date}`,
+    );
+    toast.success("Просроченная ДЗ удалена");
+    setExpandedOverdues((s) => {
+      const ns: Record<number, boolean> = {};
+      Object.keys(s).forEach((k) => {
+        const idx = Number(k);
+        if (idx < i) ns[idx] = s[idx];
+        else if (idx > i) ns[idx - 1] = s[idx];
+      });
+      return ns;
+    });
+    if (payOpenIdx === i) setPayOpenIdx(null);
+  };
+
+
 
   const handleAddRepayment = (i: number) => {
     const n = Number(payAmount.replace(",", "."));
@@ -455,18 +554,86 @@ export function ContractDrawer({
             <div className="space-y-2">
               {adjustments.map((a) => (
                 <div key={a.id} className="rounded-2xl bg-muted/50 p-3">
-                  <div className="flex items-center justify-between">
-                    <div className="text-sm font-medium">
-                      <span className={a.type === "increase" ? "text-foreground" : "text-emerald-700"}>
-                        {a.type === "increase" ? "+" : "−"}
-                        {a.amount.toLocaleString("ru-RU", { maximumFractionDigits: 2 })} млн ₽
-                      </span>{" "}
-                      <span className="text-muted-foreground">
-                        · {a.type === "increase" ? "Увеличение" : "Уменьшение"}
-                      </span>
+                  {editAdjId === a.id ? (
+                    <div className="space-y-2">
+                      <div>
+                        <div className="mb-1 text-xs text-muted-foreground">Тип операции</div>
+                        <div className="flex gap-2">
+                          <button
+                            type="button"
+                            onClick={() => { setEditAdjType("increase"); setEditAdjError(null); }}
+                            className={`flex h-9 flex-1 items-center justify-center rounded-full border text-sm font-medium transition ${editAdjType === "increase" ? "border-primary bg-primary text-primary-foreground" : "border-border bg-white text-muted-foreground hover:bg-muted"}`}
+                          >
+                            Увеличить
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => { setEditAdjType("decrease"); setEditAdjError(null); }}
+                            className={`flex h-9 flex-1 items-center justify-center rounded-full border text-sm font-medium transition ${editAdjType === "decrease" ? "border-primary bg-primary text-primary-foreground" : "border-border bg-white text-muted-foreground hover:bg-muted"}`}
+                          >
+                            Уменьшить
+                          </button>
+                        </div>
+                      </div>
+                      <LabeledInput
+                        label="Сумма"
+                        value={editAdjAmount}
+                        onChange={(v) => { setEditAdjAmount(v); setEditAdjError(null); }}
+                        placeholder="100000"
+                      />
+                      <LabeledInput
+                        label="Дата погашения"
+                        value={editAdjDate}
+                        onChange={setEditAdjDate}
+                        placeholder="ДД.ММ.ГГГГ"
+                      />
+                      {editAdjError && (
+                        <div className="flex items-start gap-2 rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 text-xs text-amber-900">
+                          <AlertTriangle className="mt-0.5 h-3.5 w-3.5 shrink-0" />
+                          {editAdjError}
+                        </div>
+                      )}
+                      <div className="flex items-center gap-2">
+                        <Button size="sm" className="flex-1" onClick={handleSaveAdjEdit} disabled={!editAdjAmount || !editAdjDate}>
+                          Сохранить
+                        </Button>
+                        <Button size="sm" variant="ghost" onClick={() => setEditAdjId(null)}>
+                          Отмена
+                        </Button>
+                      </div>
                     </div>
-                    <div className="text-xs text-muted-foreground">{a.date}</div>
-                  </div>
+                  ) : (
+                    <div className="flex items-center justify-between gap-2">
+                      <div className="min-w-0 text-sm font-medium">
+                        <span className={a.type === "increase" ? "text-foreground" : "text-emerald-700"}>
+                          {a.type === "increase" ? "+" : "−"}
+                          {a.amount.toLocaleString("ru-RU", { maximumFractionDigits: 2 })} млн ₽
+                        </span>{" "}
+                        <span className="text-muted-foreground">
+                          · {a.type === "increase" ? "Увеличение" : "Уменьшение"}
+                        </span>
+                      </div>
+                      <div className="flex shrink-0 items-center gap-1">
+                        <div className="mr-1 text-xs text-muted-foreground">{a.date}</div>
+                        <button
+                          type="button"
+                          aria-label="Редактировать"
+                          onClick={() => openEditAdjustment(a)}
+                          className="flex h-7 w-7 items-center justify-center rounded-full text-muted-foreground transition hover:bg-white hover:text-foreground"
+                        >
+                          <Pencil className="h-3.5 w-3.5" />
+                        </button>
+                        <button
+                          type="button"
+                          aria-label="Удалить"
+                          onClick={() => handleDeleteAdjustment(a.id)}
+                          className="flex h-7 w-7 items-center justify-center rounded-full text-muted-foreground transition hover:bg-white hover:text-rose-600"
+                        >
+                          <Trash2 className="h-3.5 w-3.5" />
+                        </button>
+                      </div>
+                    </div>
+                  )}
                 </div>
               ))}
             </div>
@@ -570,31 +737,57 @@ export function ContractDrawer({
                     key={i}
                     className={`rounded-2xl p-3 ${fullyPaid ? "bg-emerald-50" : "bg-muted/50"}`}
                   >
-                    <button
-                      type="button"
-                      onClick={() => setExpandedOverdues((s) => ({ ...s, [i]: !s[i] }))}
-                      className="flex w-full items-center gap-3 text-left"
-                    >
-                      <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-white text-muted-foreground shadow-sm">
-                        {expanded ? <ChevronDown className="h-4 w-4" /> : <ChevronRight className="h-4 w-4" />}
-                      </span>
-                      <div className="flex-1 text-sm font-medium">
-                        {o.amount.toLocaleString("ru-RU", { maximumFractionDigits: 2 })} млн. ₽{" "}
-                        <span className="text-muted-foreground">
-                          {o.days} {pluralDays(o.days)}
+                    <div className="flex items-center gap-2">
+                      <button
+                        type="button"
+                        onClick={() => setExpandedOverdues((s) => ({ ...s, [i]: !s[i] }))}
+                        className="flex min-w-0 flex-1 items-center gap-3 text-left"
+                      >
+                        <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-white text-muted-foreground shadow-sm">
+                          {expanded ? <ChevronDown className="h-4 w-4" /> : <ChevronRight className="h-4 w-4" />}
                         </span>
-                        {paid > 0 && !fullyPaid && (
-                          <span className="ml-2 text-xs text-emerald-700">
-                            погашено {paid.toLocaleString("ru-RU", { maximumFractionDigits: 2 })} млн ₽
+                        <div className="min-w-0 flex-1 text-sm font-medium">
+                          {o.amount.toLocaleString("ru-RU", { maximumFractionDigits: 2 })} млн. ₽{" "}
+                          <span className="text-muted-foreground">
+                            {o.days} {pluralDays(o.days)}
                           </span>
-                        )}
-                      </div>
+                          {paid > 0 && !fullyPaid && (
+                            <span className="ml-2 text-xs text-emerald-700">
+                              погашено {paid.toLocaleString("ru-RU", { maximumFractionDigits: 2 })} млн ₽
+                            </span>
+                          )}
+                        </div>
+                      </button>
                       {fullyPaid && (
-                        <span className="inline-flex items-center rounded-full bg-emerald-100 px-2 py-0.5 text-[11px] font-medium text-emerald-800">
+                        <span className="inline-flex shrink-0 items-center rounded-full bg-emerald-100 px-2 py-0.5 text-[11px] font-medium text-emerald-800">
                           Погашено полностью
                         </span>
                       )}
-                    </button>
+                      <div className="flex shrink-0 items-center gap-1">
+                        <button
+                          type="button"
+                          aria-label="Редактировать"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setExpandedOverdues((s) => ({ ...s, [i]: true }));
+                          }}
+                          className="flex h-7 w-7 items-center justify-center rounded-full text-muted-foreground transition hover:bg-white hover:text-foreground"
+                        >
+                          <Pencil className="h-3.5 w-3.5" />
+                        </button>
+                        <button
+                          type="button"
+                          aria-label="Удалить"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleDeleteOverdue(i);
+                          }}
+                          className="flex h-7 w-7 items-center justify-center rounded-full text-muted-foreground transition hover:bg-white hover:text-rose-600"
+                        >
+                          <Trash2 className="h-3.5 w-3.5" />
+                        </button>
+                      </div>
+                    </div>
 
                     {expanded && (
                       <div className="mt-3 space-y-2">
