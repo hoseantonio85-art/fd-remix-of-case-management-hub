@@ -737,31 +737,57 @@ export function ContractDrawer({
                     key={i}
                     className={`rounded-2xl p-3 ${fullyPaid ? "bg-emerald-50" : "bg-muted/50"}`}
                   >
-                    <button
-                      type="button"
-                      onClick={() => setExpandedOverdues((s) => ({ ...s, [i]: !s[i] }))}
-                      className="flex w-full items-center gap-3 text-left"
-                    >
-                      <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-white text-muted-foreground shadow-sm">
-                        {expanded ? <ChevronDown className="h-4 w-4" /> : <ChevronRight className="h-4 w-4" />}
-                      </span>
-                      <div className="flex-1 text-sm font-medium">
-                        {o.amount.toLocaleString("ru-RU", { maximumFractionDigits: 2 })} млн. ₽{" "}
-                        <span className="text-muted-foreground">
-                          {o.days} {pluralDays(o.days)}
+                    <div className="flex items-center gap-2">
+                      <button
+                        type="button"
+                        onClick={() => setExpandedOverdues((s) => ({ ...s, [i]: !s[i] }))}
+                        className="flex min-w-0 flex-1 items-center gap-3 text-left"
+                      >
+                        <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-white text-muted-foreground shadow-sm">
+                          {expanded ? <ChevronDown className="h-4 w-4" /> : <ChevronRight className="h-4 w-4" />}
                         </span>
-                        {paid > 0 && !fullyPaid && (
-                          <span className="ml-2 text-xs text-emerald-700">
-                            погашено {paid.toLocaleString("ru-RU", { maximumFractionDigits: 2 })} млн ₽
+                        <div className="min-w-0 flex-1 text-sm font-medium">
+                          {o.amount.toLocaleString("ru-RU", { maximumFractionDigits: 2 })} млн. ₽{" "}
+                          <span className="text-muted-foreground">
+                            {o.days} {pluralDays(o.days)}
                           </span>
-                        )}
-                      </div>
+                          {paid > 0 && !fullyPaid && (
+                            <span className="ml-2 text-xs text-emerald-700">
+                              погашено {paid.toLocaleString("ru-RU", { maximumFractionDigits: 2 })} млн ₽
+                            </span>
+                          )}
+                        </div>
+                      </button>
                       {fullyPaid && (
-                        <span className="inline-flex items-center rounded-full bg-emerald-100 px-2 py-0.5 text-[11px] font-medium text-emerald-800">
+                        <span className="inline-flex shrink-0 items-center rounded-full bg-emerald-100 px-2 py-0.5 text-[11px] font-medium text-emerald-800">
                           Погашено полностью
                         </span>
                       )}
-                    </button>
+                      <div className="flex shrink-0 items-center gap-1">
+                        <button
+                          type="button"
+                          aria-label="Редактировать"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setExpandedOverdues((s) => ({ ...s, [i]: true }));
+                          }}
+                          className="flex h-7 w-7 items-center justify-center rounded-full text-muted-foreground transition hover:bg-white hover:text-foreground"
+                        >
+                          <Pencil className="h-3.5 w-3.5" />
+                        </button>
+                        <button
+                          type="button"
+                          aria-label="Удалить"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleDeleteOverdue(i);
+                          }}
+                          className="flex h-7 w-7 items-center justify-center rounded-full text-muted-foreground transition hover:bg-white hover:text-rose-600"
+                        >
+                          <Trash2 className="h-3.5 w-3.5" />
+                        </button>
+                      </div>
+                    </div>
 
                     {expanded && (
                       <div className="mt-3 space-y-2">
