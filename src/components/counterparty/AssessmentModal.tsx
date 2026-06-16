@@ -328,7 +328,6 @@ export function AssessmentModal({
                         key={g.id}
                         group={g}
                         onOpen={setGroupDrawer}
-                        hasComment={commentedGroupIds.includes(g.id)}
                       />
                     );
                   })}
