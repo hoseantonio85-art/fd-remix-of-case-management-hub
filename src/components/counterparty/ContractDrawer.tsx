@@ -340,10 +340,8 @@ export function ContractDrawer({
 
   return (
     <InModalDrawer open={open} onOpenChange={onOpenChange}>
-      <div className="relative flex h-full flex-col">
-        <div className="flex-1 overflow-y-auto">
-          {/* HEADER */}
-          <div className={`px-6 pt-6 pb-5 ${styles.gradient}`}>
+      {/* HEADER */}
+      <div className={`px-6 pt-6 pb-5 ${styles.gradient}`}>
         <span
           className={`inline-flex w-fit items-center rounded-full px-2.5 py-1 text-[11px] font-medium ${styles.badge}`}
         >
