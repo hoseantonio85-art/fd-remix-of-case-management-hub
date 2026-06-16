@@ -27,12 +27,12 @@ import { getCounterpartyProblemIndicators, problemIndicatorMeta } from "@/lib/pr
 import { AssessmentModal, type AssessmentStatus, type Disagreement } from "@/components/counterparty/AssessmentModal";
 import { buildAssessment, type Assessment } from "@/lib/assessment-data";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { ProcessFilterDrawer } from "@/components/counterparty/ProcessFilterDrawer";
 import { processMeta, processOrder } from "@/lib/process-meta";
 import { toast } from "sonner";
 import { DrpaDataUpdateDrawer, type DrpaCardData } from "@/components/counterparty/DrpaDataUpdateDrawer";
+import { RunCheckDialog } from "@/components/counterparty/RunCheckDialog";
+import { PendingAssessmentModal } from "@/components/counterparty/PendingAssessmentModal";
 
 function buildNewCounterparty(inn: string, today: string): Counterparty {
   return {
@@ -282,14 +282,13 @@ export default function Index() {
   const [processStage, setProcessStage] = useState<ProcessStage | null>(null);
   const [processDrawerOpen, setProcessDrawerOpen] = useState(false);
   const [runDialogOpen, setRunDialogOpen] = useState(false);
-  const [runInn, setRunInn] = useState("");
-  const [runError, setRunError] = useState<string | null>(null);
-  const [runLoading, setRunLoading] = useState(false);
+  const [pendingCp, setPendingCp] = useState<Counterparty | null>(null);
+  const [pendingCpOpen, setPendingCpOpen] = useState(false);
+  // Legacy manual assessment flow (kept for AssessmentModal scenarios from existing cards)
   const [manualAssessment, setManualAssessment] = useState<Assessment | null>(null);
   const [manualAssessmentOpen, setManualAssessmentOpen] = useState(false);
   const [manualStatus, setManualStatus] = useState<AssessmentStatus>("updated");
   const [manualDisagreement, setManualDisagreement] = useState<Disagreement | null>(null);
-  // Manual assessment flow (CTA «Оценить контрагента»)
   const [addedCounterparties, setAddedCounterparties] = useState<Counterparty[]>([]);
   const [manualFlowTarget, setManualFlowTarget] = useState<Counterparty | null>(null);
   const [manualFlowIsNew, setManualFlowIsNew] = useState(false);
@@ -361,36 +360,8 @@ export default function Index() {
     return map;
   }, [statusChanges]);
 
-  const handleStartAssessment = () => {
-    const innRaw = runInn.trim();
-    if (!innRaw) {
-      setRunError("Введите ИНН контрагента");
-      return;
-    }
-    if (!/^\d{10}(\d{2})?$/.test(innRaw)) {
-      setRunError("ИНН должен содержать 10 или 12 цифр");
-      return;
-    }
-    setRunError(null);
-    setRunLoading(true);
-    setTimeout(() => {
-      const today = new Date().toLocaleDateString("ru-RU");
-      const existing = allCounterparties.find((c) => c.inn === innRaw) ?? null;
-      const target: Counterparty = existing ?? buildNewCounterparty(innRaw, today);
-      setManualFlowTarget(target);
-      setManualFlowIsNew(!existing);
-      setManualAssessment(buildAssessment(target.name, innRaw, "manual", today, target.status === "no_risk" ? "positive" : "negative"));
-      setManualStatus("updated");
-      setManualDisagreement(null);
-      setRunLoading(false);
-      setRunDialogOpen(false);
-      setManualAssessmentOpen(true);
-      setRunInn("");
-      toast.success("Оценка создана", {
-        description: `ИНН ${innRaw}`,
-      });
-    }, 1500);
-  };
+
+
 
   // ESC/overlay close on AssessmentModal in manual flow → behave like Back:
   // close assessment, open CounterpartyModal of the just-evaluated counterparty.
@@ -468,7 +439,8 @@ export default function Index() {
 
   const byCategory = useMemo(() => {
     if (selectedTiles.size === 0) return byProcess;
-    return byProcess.filter((c) => selectedTiles.has(c.status));
+    // Pending («На оценке») cards should not be included into any risk/status category.
+    return byProcess.filter((c) => c.tag !== "На оценке" && selectedTiles.has(c.status));
   }, [byProcess, selectedTiles]);
 
   const riskCounts = useMemo(() => {
@@ -794,19 +766,32 @@ export default function Index() {
                 </div>
               )}
               {filtered.map((c) => {
-                const indicators = getCounterpartyProblemIndicators(c);
+                const isPending = c.tag === "На оценке";
+                const indicators = isPending ? [] : getCounterpartyProblemIndicators(c);
+                const handleClick = () => {
+                  if (isPending) {
+                    setPendingCp(c);
+                    setPendingCpOpen(true);
+                  } else {
+                    setActive(c);
+                  }
+                };
                 return (
                   <button
                     key={c.id}
-                    onClick={() => setActive(c)}
+                    onClick={handleClick}
                     className="flex w-full items-center gap-4 rounded-2xl border border-[#E5E7EB] bg-white px-5 py-4 text-left transition hover:border-slate-300 hover:shadow-sm"
                   >
                     <div className="flex min-w-0 flex-1 flex-col gap-1.5">
                       <div className="flex flex-wrap items-center gap-1.5">
-                        {(() => {
-                          return <CounterpartyStatusBadge tag={categoryLabel[c.status]} />;
-                        })()}
-                        {statusChanges[c.inn] && statusChanges[c.inn].from !== statusChanges[c.inn].to && (
+                        {isPending ? (
+                          <span className="inline-flex w-fit items-center rounded-full bg-violet-100/80 px-2.5 py-1 text-[11px] font-medium text-violet-800">
+                            На оценке
+                          </span>
+                        ) : (
+                          <CounterpartyStatusBadge tag={categoryLabel[c.status]} />
+                        )}
+                        {!isPending && statusChanges[c.inn] && statusChanges[c.inn].from !== statusChanges[c.inn].to && (
                           <span
                             title={`${categoryLabel[statusChanges[c.inn].from as CategoryKey]} → ${categoryLabel[statusChanges[c.inn].to as CategoryKey]}`}
                             className="inline-flex items-center rounded-full border border-violet-100 bg-violet-50 px-2 py-0.5 text-[11px] font-medium text-violet-700"
@@ -836,28 +821,30 @@ export default function Index() {
                         {c.inn} · {c.contracts.length} {getContractWord(c.contracts.length)}
                       </div>
                     </div>
-                    <div className="hidden shrink-0 grid-cols-2 gap-3 sm:grid sm:w-[280px]">
-                      <div className="min-w-0 rounded-lg bg-slate-50/70 px-3 py-2.5">
-                        <div className="truncate text-sm font-medium text-foreground">
-                          {c.totalDebt}
+                    {!isPending && (
+                      <div className="hidden shrink-0 grid-cols-2 gap-3 sm:grid sm:w-[280px]">
+                        <div className="min-w-0 rounded-lg bg-slate-50/70 px-3 py-2.5">
+                          <div className="truncate text-sm font-medium text-foreground">
+                            {c.totalDebt}
+                          </div>
+                          <div className="mt-1 text-[11px] text-muted-foreground">
+                            Задолженность
+                          </div>
                         </div>
-                        <div className="mt-1 text-[11px] text-muted-foreground">
-                          Задолженность
+                        <div className="min-w-0 rounded-lg bg-slate-50/70 px-3 py-2.5">
+                          <div
+                            className={`truncate text-sm font-medium ${
+                              c.overdueAmountNum > 0 ? "text-rose-600" : "text-muted-foreground"
+                            }`}
+                          >
+                            {c.overdueAmountNum > 0 ? c.overdueDebt : "—"}
+                          </div>
+                          <div className="mt-1 text-[11px] text-muted-foreground">
+                            Просроченная
+                          </div>
                         </div>
                       </div>
-                      <div className="min-w-0 rounded-lg bg-slate-50/70 px-3 py-2.5">
-                        <div
-                          className={`truncate text-sm font-medium ${
-                            c.overdueAmountNum > 0 ? "text-rose-600" : "text-muted-foreground"
-                          }`}
-                        >
-                          {c.overdueAmountNum > 0 ? c.overdueDebt : "—"}
-                        </div>
-                        <div className="mt-1 text-[11px] text-muted-foreground">
-                          Просроченная
-                        </div>
-                      </div>
-                    </div>
+                    )}
                   </button>
                 );
               })}
@@ -872,11 +859,7 @@ export default function Index() {
       {/* Floating CTA — pinned to bottom of main work area, independent of list height */}
       <div className="pointer-events-none fixed inset-x-0 bottom-6 z-30 flex justify-center lg:left-64">
         <Button
-          onClick={() => {
-            setRunInn("");
-            setRunError(null);
-            setRunDialogOpen(true);
-          }}
+          onClick={() => setRunDialogOpen(true)}
           className="pointer-events-auto h-12 gap-2 rounded-full px-6 text-sm font-semibold shadow-lg shadow-primary/25"
         >
           <Sparkles className="h-4 w-4" />
@@ -892,91 +875,36 @@ export default function Index() {
         onStatusChange={handleStatusChange}
       />
 
-      {/* Run assessment by INN dialog */}
-      <Dialog
+      <RunCheckDialog
         open={runDialogOpen}
-        onOpenChange={(o) => {
-          if (runLoading) return;
-          setRunDialogOpen(o);
-          if (!o) setRunError(null);
+        onOpenChange={setRunDialogOpen}
+        onSubmit={(inn) => {
+          const today = new Date().toLocaleDateString("ru-RU");
+          const pendingCp: Counterparty = {
+            ...buildNewCounterparty(inn, today),
+            name: `Контрагент по ИНН ${inn}`,
+            tag: "На оценке",
+          };
+          setAddedCounterparties((prev) =>
+            prev.some((c) => c.inn === inn && c.tag === "На оценке")
+              ? prev
+              : [pendingCp, ...prev],
+          );
+          setRunDialogOpen(false);
+          setPendingCp(pendingCp);
+          setPendingCpOpen(true);
+          toast.success("Оценка успешно создана");
         }}
-      >
-        <DialogContent className="max-w-md gap-0 rounded-2xl p-0 [&>button]:hidden">
-          <div className="flex items-start gap-3 border-b border-border px-5 pt-5 pb-4">
-            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary">
-              <Sparkles className="h-4 w-4" />
-            </div>
-            <div className="min-w-0 flex-1">
-              <div className="text-sm font-semibold text-foreground">Оценить контрагента</div>
-              <p className="mt-0.5 text-[12px] text-muted-foreground">
-                Введите ИНН, чтобы запустить проверку благонадёжности
-              </p>
-            </div>
-            <button
-              onClick={() => !runLoading && setRunDialogOpen(false)}
-              className="rounded p-1 text-muted-foreground hover:bg-muted"
-              aria-label="Закрыть"
-            >
-              <X className="h-4 w-4" />
-            </button>
-          </div>
-          {runLoading ? (
-            <div className="flex items-start gap-3 px-5 py-6">
-              <Loader2 className="mt-0.5 h-5 w-5 shrink-0 animate-spin text-primary" />
-              <div className="min-w-0">
-                <div className="text-sm font-medium text-foreground">
-                  Запускаю оценку контрагента
-                </div>
-                <p className="mt-1 text-[12px] text-muted-foreground">
-                  Проверяю регистрационные данные, финансовые маркеры и судебную нагрузку
-                </p>
-              </div>
-            </div>
-          ) : (
-            <div className="px-5 py-4">
-              <label className="text-[11px] font-medium text-muted-foreground">ИНН</label>
-              <Input
-                value={runInn}
-                onChange={(e) => {
-                  setRunInn(e.target.value);
-                  if (runError) setRunError(null);
-                }}
-                placeholder="Введите ИНН контрагента"
-                className="mt-1 bg-white"
-                onKeyDown={(e) => {
-                  if (e.key === "Enter") handleStartAssessment();
-                }}
-              />
-              {runError && (
-                <div className="mt-2 text-[12px] text-rose-600">{runError}</div>
-              )}
-            </div>
-          )}
-          <div className="flex justify-end gap-2 border-t border-border px-5 py-3">
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => setRunDialogOpen(false)}
-              disabled={runLoading}
-            >
-              Отмена
-            </Button>
-            <Button
-              size="sm"
-              onClick={handleStartAssessment}
-              disabled={runLoading || !runInn.trim()}
-            >
-              {runLoading ? (
-                <>
-                  <Loader2 className="h-3.5 w-3.5 animate-spin" /> Запуск…
-                </>
-              ) : (
-                "Запустить оценку"
-              )}
-            </Button>
-          </div>
-        </DialogContent>
-      </Dialog>
+      />
+
+      <PendingAssessmentModal
+        counterparty={pendingCp}
+        open={pendingCpOpen}
+        onOpenChange={(o) => {
+          setPendingCpOpen(o);
+          if (!o) setPendingCp(null);
+        }}
+      />
 
       <AssessmentModal
         assessment={manualAssessment}
