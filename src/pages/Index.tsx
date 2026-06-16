@@ -360,36 +360,8 @@ export default function Index() {
     return map;
   }, [statusChanges]);
 
-  const handleStartAssessment = () => {
-    const innRaw = runInn.trim();
-    if (!innRaw) {
-      setRunError("Введите ИНН контрагента");
-      return;
-    }
-    if (!/^\d{10}(\d{2})?$/.test(innRaw)) {
-      setRunError("ИНН должен содержать 10 или 12 цифр");
-      return;
-    }
-    setRunError(null);
-    setRunLoading(true);
-    setTimeout(() => {
-      const today = new Date().toLocaleDateString("ru-RU");
-      const existing = allCounterparties.find((c) => c.inn === innRaw) ?? null;
-      const target: Counterparty = existing ?? buildNewCounterparty(innRaw, today);
-      setManualFlowTarget(target);
-      setManualFlowIsNew(!existing);
-      setManualAssessment(buildAssessment(target.name, innRaw, "manual", today, target.status === "no_risk" ? "positive" : "negative"));
-      setManualStatus("updated");
-      setManualDisagreement(null);
-      setRunLoading(false);
-      setRunDialogOpen(false);
-      setManualAssessmentOpen(true);
-      setRunInn("");
-      toast.success("Оценка создана", {
-        description: `ИНН ${innRaw}`,
-      });
-    }, 1500);
-  };
+
+
 
   // ESC/overlay close on AssessmentModal in manual flow → behave like Back:
   // close assessment, open CounterpartyModal of the just-evaluated counterparty.
