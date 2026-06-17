@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import * as DialogPrimitive from "@radix-ui/react-dialog";
-import { X, ArrowLeft, ChevronRight, AlertTriangle } from "lucide-react";
+import { X, ArrowLeft, ChevronRight, AlertTriangle, MessageSquare } from "lucide-react";
 import { toast } from "sonner";
 import { NormAssistantIcon } from "./NormAssistantIcon";
 import { Button } from "@/components/ui/button";
