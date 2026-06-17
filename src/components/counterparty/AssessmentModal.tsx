@@ -264,6 +264,7 @@ export function AssessmentModal({
                         key={g.id}
                         group={g}
                         onOpen={setGroupDrawer}
+                        hasComment={!!groupComments[g.id]}
                       />
                     );
                   })}
@@ -272,7 +273,7 @@ export function AssessmentModal({
                       .map((id) => assessment.groups.find((x) => x.id === id))
                       .filter((g): g is AssessmentGroup => !!g);
                     return otherGroups.length > 0 ? (
-                      <OtherGroupsAccordion groups={otherGroups} onOpen={setGroupDrawer} />
+                      <OtherGroupsAccordion groups={otherGroups} onOpen={setGroupDrawer} groupComments={groupComments} />
                     ) : null;
                   })()}
                 </div>
