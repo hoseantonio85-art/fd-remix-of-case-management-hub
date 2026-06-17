@@ -32,6 +32,7 @@ import { processMeta, processOrder } from "@/lib/process-meta";
 import { toast } from "sonner";
 import { DrpaDataUpdateDrawer, type DrpaCardData } from "@/components/counterparty/DrpaDataUpdateDrawer";
 import { RunCheckDialog } from "@/components/counterparty/RunCheckDialog";
+import { PendingAssessmentModal } from "@/components/counterparty/PendingAssessmentModal";
 import { CheckProcessPill } from "@/components/counterparty/CheckProcessPill";
 import { CheckProcessDrawer, type CheckProcess } from "@/components/counterparty/CheckProcessDrawer";
 
