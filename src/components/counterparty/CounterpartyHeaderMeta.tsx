@@ -48,16 +48,16 @@ export function CounterpartyHeaderMeta({
 
   return (
     <div className={cn("mt-1", className)}>
-      <p className="text-xs text-muted-foreground">
-        ИНН {inn} · {status}
-      </p>
-      <button
-        type="button"
-        onClick={() => setOpen(true)}
-        className="mt-1 inline-flex items-center text-xs font-medium text-muted-foreground underline-offset-2 transition hover:text-foreground hover:underline"
-      >
-        Подробнее
-      </button>
+      <div className="flex items-center gap-2 text-xs text-muted-foreground">
+        <span>ИНН {inn} · {status}</span>
+        <button
+          type="button"
+          onClick={() => setOpen(true)}
+          className="font-medium text-green-600 transition hover:text-green-700"
+        >
+          Подробнее
+        </button>
+      </div>
 
       <InModalDrawer open={open} onOpenChange={setOpen}>
         <div className="p-6">
