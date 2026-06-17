@@ -33,8 +33,8 @@ import { toast } from "sonner";
 import { DrpaDataUpdateDrawer, type DrpaCardData } from "@/components/counterparty/DrpaDataUpdateDrawer";
 import { RunCheckDialog } from "@/components/counterparty/RunCheckDialog";
 import { PendingAssessmentModal } from "@/components/counterparty/PendingAssessmentModal";
-import { CheckProcessPill } from "@/components/counterparty/CheckProcessPill";
-import { CheckProcessDrawer, type CheckProcess } from "@/components/counterparty/CheckProcessDrawer";
+import { ChecksWidget } from "@/components/counterparty/CheckProcessPill";
+import { ChecksDrawer, type CheckRecord } from "@/components/counterparty/CheckProcessDrawer";
 
 function buildNewCounterparty(inn: string, today: string): Counterparty {
   return {
