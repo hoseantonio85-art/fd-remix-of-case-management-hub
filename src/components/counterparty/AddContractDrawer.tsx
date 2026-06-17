@@ -165,15 +165,16 @@ export function AddContractDrawer({
           </div>
         </div>
 
-        <div className="sticky bottom-0 flex justify-end gap-2 border-t border-border bg-white px-6 py-4">
+        <div className="flex gap-3 border-t border-border bg-white px-6 py-4">
           <Button
             type="button"
             variant="ghost"
+            className="flex-1"
             onClick={() => onOpenChange(false)}
           >
             Отменить
           </Button>
-          <Button type="button" onClick={handleSubmit}>
+          <Button type="button" className="flex-1" onClick={handleSubmit}>
             Добавить
           </Button>
         </div>
