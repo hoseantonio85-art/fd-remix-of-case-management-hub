@@ -104,6 +104,9 @@ export function AssessmentModal({
   onCloseFlow,
   positive = false,
   onStatusChange,
+  completionMode = false,
+  onDeleteResult,
+  onAddToList,
 }: {
   assessment: Assessment | null;
   open: boolean;
@@ -119,6 +122,9 @@ export function AssessmentModal({
   onCloseFlow?: () => void;
   positive?: boolean;
   onStatusChange?: (status: CounterpartyStatus) => void;
+  completionMode?: boolean;
+  onDeleteResult?: () => void;
+  onAddToList?: () => void;
 }) {
   
   const [groupDrawer, setGroupDrawer] = useState<AssessmentGroup | null>(null);
