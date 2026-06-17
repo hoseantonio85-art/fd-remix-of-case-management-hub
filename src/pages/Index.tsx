@@ -33,8 +33,8 @@ import { toast } from "sonner";
 import { DrpaDataUpdateDrawer, type DrpaCardData } from "@/components/counterparty/DrpaDataUpdateDrawer";
 import { RunCheckDialog } from "@/components/counterparty/RunCheckDialog";
 import { PendingAssessmentModal } from "@/components/counterparty/PendingAssessmentModal";
-import { CheckProcessPill } from "@/components/counterparty/CheckProcessPill";
-import { CheckProcessDrawer, type CheckProcess } from "@/components/counterparty/CheckProcessDrawer";
+import { ChecksWidget } from "@/components/counterparty/CheckProcessPill";
+import { ChecksDrawer, type CheckRecord } from "@/components/counterparty/CheckProcessDrawer";
 
 function buildNewCounterparty(inn: string, today: string): Counterparty {
   return {
@@ -286,8 +286,9 @@ export default function Index() {
   const [runDialogOpen, setRunDialogOpen] = useState(false);
   const [pendingCp, setPendingCp] = useState<Counterparty | null>(null);
   const [pendingCpOpen, setPendingCpOpen] = useState(false);
-  const [checkProcess, setCheckProcess] = useState<CheckProcess | null>(null);
+  const [checks, setChecks] = useState<CheckRecord[]>([]);
   const [checkDrawerOpen, setCheckDrawerOpen] = useState(false);
+  const [activeCheckId, setActiveCheckId] = useState<string | null>(null);
   const [checkAssessment, setCheckAssessment] = useState<Assessment | null>(null);
   const [checkAssessmentOpen, setCheckAssessmentOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
@@ -603,12 +604,11 @@ export default function Index() {
                 <span className="text-sm text-muted-foreground">1002</span>
               </div>
               <div className="flex min-h-[40px] items-center">
-                {checkProcess && (
-                  <CheckProcessPill
-                    status={checkProcess.status}
-                    onClick={() => setCheckDrawerOpen(true)}
-                  />
-                )}
+                <ChecksWidget
+                  runningCount={checks.filter((c) => c.status === "running").length}
+                  doneCount={checks.filter((c) => c.status === "done").length}
+                  onClick={() => setCheckDrawerOpen(true)}
+                />
               </div>
             </div>
 
@@ -921,14 +921,19 @@ export default function Index() {
         onOpenChange={setRunDialogOpen}
         onSubmit={(inn, files) => {
           setRunDialogOpen(false);
-          const proc: CheckProcess = {
+          const id = `check-${inn}-${Date.now()}`;
+          const rec: CheckRecord = {
+            id,
             inn,
             fileNames: files.map((f) => f.name),
             status: "running",
+            createdAt: Date.now(),
           };
-          setCheckProcess(proc);
+          setChecks((prev) => [rec, ...prev]);
           window.setTimeout(() => {
-            setCheckProcess((prev) => (prev && prev.inn === inn ? { ...prev, status: "done" } : prev));
+            setChecks((prev) =>
+              prev.map((c) => (c.id === id ? { ...c, status: "done" } : c)),
+            );
           }, 2800);
         }}
       />
@@ -942,17 +947,17 @@ export default function Index() {
         }}
       />
 
-      <CheckProcessDrawer
+      <ChecksDrawer
         open={checkDrawerOpen}
         onOpenChange={setCheckDrawerOpen}
-        process={checkProcess}
-        onOpenAssessment={() => {
-          if (!checkProcess) return;
+        checks={checks}
+        onOpenCheck={(c) => {
           const a = buildAssessment(
-            `Контрагент по ИНН ${checkProcess.inn}`,
-            checkProcess.inn,
+            `Контрагент по ИНН ${c.inn}`,
+            c.inn,
             "auto",
           );
+          setActiveCheckId(c.id);
           setCheckAssessment(a);
           setCheckDrawerOpen(false);
           setCheckAssessmentOpen(true);
@@ -964,7 +969,10 @@ export default function Index() {
         open={checkAssessmentOpen}
         onOpenChange={(o) => {
           setCheckAssessmentOpen(o);
-          if (!o) setCheckAssessment(null);
+          if (!o) {
+            setCheckAssessment(null);
+            setActiveCheckId(null);
+          }
         }}
         status="updated"
         disagreement={null}
@@ -973,29 +981,35 @@ export default function Index() {
         onDisagree={() => {}}
         completionMode
         onDeleteResult={() => {
+          if (activeCheckId) {
+            setChecks((prev) => prev.filter((c) => c.id !== activeCheckId));
+          }
           setCheckAssessmentOpen(false);
           setCheckAssessment(null);
-          setCheckProcess(null);
+          setActiveCheckId(null);
           toast("Результат проверки удалён");
         }}
         onAddToList={() => {
-          if (!checkProcess) return;
+          const check = checks.find((c) => c.id === activeCheckId);
+          if (!check) return;
           const today = new Date().toLocaleDateString("ru-RU");
           const cp: Counterparty = {
-            ...buildNewCounterparty(checkProcess.inn, today),
-            name: `Контрагент по ИНН ${checkProcess.inn}`,
+            ...buildNewCounterparty(check.inn, today),
+            name: `Контрагент по ИНН ${check.inn}`,
             tag: "Нет риска",
             status: "no_risk",
           };
           setAddedCounterparties((prev) =>
             prev.some((c) => c.inn === cp.inn) ? prev : [cp, ...prev],
           );
+          setChecks((prev) => prev.filter((c) => c.id !== check.id));
           setCheckAssessmentOpen(false);
           setCheckAssessment(null);
-          setCheckProcess(null);
+          setActiveCheckId(null);
           toast.success("Контрагент добавлен в список дебиторов");
         }}
       />
+
 
 
       <AssessmentModal

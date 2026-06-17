@@ -1,138 +1,110 @@
 import { Sheet, SheetContent } from "@/components/ui/sheet";
-import { Button } from "@/components/ui/button";
-import { CheckCircle2, FileText, Loader2 } from "lucide-react";
-import type { CheckProcessStatus } from "./CheckProcessPill";
+import { CheckCircle2, Loader2, ClipboardList } from "lucide-react";
 
-export type CheckProcess = {
+export type CheckProcessStatus = "running" | "done";
+
+export type CheckRecord = {
+  id: string;
   inn: string;
   fileNames: string[];
   status: CheckProcessStatus;
+  createdAt: number;
 };
 
-const STAGES = [
-  "Данные получены",
-  "Документы анализируются",
-  "Оценка формируется",
-];
+function formatDate(ts: number) {
+  const d = new Date(ts);
+  return d.toLocaleString("ru-RU", {
+    day: "2-digit",
+    month: "2-digit",
+    year: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+  });
+}
 
-export function CheckProcessDrawer({
+export function ChecksDrawer({
   open,
   onOpenChange,
-  process,
-  onOpenAssessment,
+  checks,
+  onOpenCheck,
 }: {
   open: boolean;
   onOpenChange: (o: boolean) => void;
-  process: CheckProcess | null;
-  onOpenAssessment: () => void;
+  checks: CheckRecord[];
+  onOpenCheck: (c: CheckRecord) => void;
 }) {
-  if (!process) return null;
-  const isDone = process.status === "done";
-  const activeStage = isDone ? STAGES.length - 1 : 1;
-
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent side="right" className="flex w-full flex-col gap-0 p-0 sm:max-w-md">
         <div className="border-b border-border px-6 pt-6 pb-4">
-          <div className="text-base font-semibold tracking-tight">Проверка контрагента</div>
-          <div className="mt-1 text-[12px] text-muted-foreground">ИНН {process.inn}</div>
+          <div className="text-base font-semibold tracking-tight">Проверки</div>
+          <div className="mt-1 text-[12px] text-muted-foreground">
+            {checks.length === 0
+              ? "Нет активных проверок"
+              : `Всего: ${checks.length}`}
+          </div>
         </div>
 
-        <div className="flex-1 space-y-5 overflow-y-auto px-6 py-5">
-          <div>
-            <div className="text-[11px] font-medium uppercase tracking-wide text-muted-foreground">
-              Статус
+        <div className="flex-1 overflow-y-auto px-6 py-5">
+          {checks.length === 0 ? (
+            <div className="flex flex-col items-center justify-center py-12 text-center">
+              <div className="mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-slate-100 text-slate-500">
+                <ClipboardList className="h-6 w-6" />
+              </div>
+              <div className="text-sm font-semibold text-foreground">Проверок пока нет</div>
+              <p className="mt-1.5 max-w-xs text-[12px] text-muted-foreground">
+                Запустите проверку по ИНН и документам, чтобы получить результат оценки.
+              </p>
             </div>
-            <div className="mt-1.5 inline-flex items-center gap-2 rounded-full bg-slate-100 px-3 py-1 text-[12px] font-medium text-slate-700">
-              {isDone ? (
-                <>
-                  <CheckCircle2 className="h-3.5 w-3.5 text-emerald-600" />
-                  Проверка завершена
-                </>
-              ) : (
-                <>
-                  <Loader2 className="h-3.5 w-3.5 animate-spin text-primary" />
-                  На проверке
-                </>
-              )}
-            </div>
-          </div>
-
-          <div>
-            <div className="text-[11px] font-medium uppercase tracking-wide text-muted-foreground">
-              Этапы
-            </div>
-            <ol className="mt-2 space-y-2">
-              {STAGES.map((s, i) => {
-                const done = isDone || i < activeStage;
-                const active = !isDone && i === activeStage;
+          ) : (
+            <ul className="space-y-2.5">
+              {checks.map((c) => {
+                const isDone = c.status === "done";
+                const clickable = isDone;
                 return (
-                  <li
-                    key={s}
-                    className={`flex items-center gap-2.5 rounded-lg border px-3 py-2 text-[13px] transition ${
-                      active
-                        ? "border-primary/30 bg-primary/5 text-foreground animate-pulse"
-                        : done
-                        ? "border-emerald-200 bg-emerald-50/60 text-foreground"
-                        : "border-border bg-white text-muted-foreground"
-                    }`}
-                  >
-                    <span
-                      className={`flex h-5 w-5 shrink-0 items-center justify-center rounded-full text-[10px] font-semibold ${
-                        done
-                          ? "bg-emerald-500 text-white"
-                          : active
-                          ? "bg-primary text-primary-foreground"
-                          : "bg-slate-200 text-slate-500"
+                  <li key={c.id}>
+                    <button
+                      disabled={!clickable}
+                      onClick={() => clickable && onOpenCheck(c)}
+                      className={`flex w-full flex-col gap-2 rounded-2xl border bg-white px-4 py-3 text-left transition animate-in fade-in slide-in-from-right-1 ${
+                        clickable
+                          ? "border-border hover:border-slate-300 hover:shadow-sm cursor-pointer"
+                          : "border-border cursor-default"
                       }`}
                     >
-                      {done ? <CheckCircle2 className="h-3 w-3" /> : i + 1}
-                    </span>
-                    {s}
+                      <div className="flex items-center justify-between gap-2">
+                        <div className="min-w-0">
+                          <div className="truncate text-sm font-semibold text-foreground">
+                            Контрагент по ИНН {c.inn}
+                          </div>
+                          <div className="mt-0.5 text-[11px] text-muted-foreground">
+                            ИНН {c.inn} · {formatDate(c.createdAt)}
+                          </div>
+                        </div>
+                        {isDone ? (
+                          <span className="inline-flex shrink-0 items-center gap-1 rounded-full bg-emerald-50 px-2 py-0.5 text-[11px] font-medium text-emerald-700">
+                            <CheckCircle2 className="h-3 w-3" />
+                            Проверка завершена
+                          </span>
+                        ) : (
+                          <span className="inline-flex shrink-0 items-center gap-1 rounded-full bg-slate-100 px-2 py-0.5 text-[11px] font-medium text-slate-700">
+                            <Loader2 className="h-3 w-3 animate-spin text-primary" />
+                            На проверке
+                          </span>
+                        )}
+                      </div>
+                      {!isDone && (
+                        <div className="text-[11px] text-muted-foreground">
+                          Результат формируется
+                        </div>
+                      )}
+                    </button>
                   </li>
                 );
               })}
-            </ol>
-          </div>
-
-          {process.fileNames.length > 0 && (
-            <div>
-              <div className="text-[11px] font-medium uppercase tracking-wide text-muted-foreground">
-                Документы
-              </div>
-              <ul className="mt-2 space-y-1.5">
-                {process.fileNames.map((n, i) => (
-                  <li
-                    key={i}
-                    className="flex items-center gap-2 rounded-lg border border-border bg-white px-2.5 py-1.5 text-[12px]"
-                  >
-                    <FileText className="h-3.5 w-3.5 shrink-0 text-muted-foreground" />
-                    <span className="truncate">{n}</span>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          )}
-
-          {!isDone && (
-            <p className="text-[12px] text-muted-foreground">
-              Обычно проверка занимает до 10 минут. Уведомление придёт на почту.
-            </p>
-          )}
-          {isDone && (
-            <p className="text-[12px] text-muted-foreground">
-              Результат готов. Откройте оценку, чтобы посмотреть детали.
-            </p>
+            </ul>
           )}
         </div>
-
-        {isDone && (
-          <div className="shrink-0 border-t border-border bg-white px-6 py-3">
-            <Button onClick={onOpenAssessment} className="w-full rounded-full">
-              Открыть оценку
-            </Button>
-          </div>
-        )}
       </SheetContent>
     </Sheet>
   );
