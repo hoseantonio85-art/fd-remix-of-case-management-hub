@@ -28,9 +28,39 @@ export function ChecksWidget({
     }
   }, [total]);
 
+  // Countdown bucket while running: 0 -> "≈ 10 мин", 1 -> "≈ 5 мин", 2 -> "Почти готово"
+  const [bucket, setBucket] = useState(0);
+  const runStartRef = useRef<number | null>(null);
+  useEffect(() => {
+    if (!isRunning) {
+      runStartRef.current = null;
+      setBucket(0);
+      return;
+    }
+    if (runStartRef.current == null) {
+      runStartRef.current = Date.now();
+      setBucket(0);
+    }
+    const tick = () => {
+      const elapsed = Date.now() - (runStartRef.current ?? Date.now());
+      if (elapsed >= 4000) setBucket(2);
+      else if (elapsed >= 2000) setBucket(1);
+      else setBucket(0);
+    };
+    tick();
+    const id = window.setInterval(tick, 500);
+    return () => window.clearInterval(id);
+  }, [isRunning]);
+
   let subtitle = "Нет проверок";
-  if (isRunning) subtitle = `${runningCount} в обработке`;
-  else if (isDoneOnly)
+  if (isRunning) {
+    subtitle =
+      bucket === 0
+        ? "≈ 10 мин осталось"
+        : bucket === 1
+          ? "≈ 5 мин осталось"
+          : "Почти готово";
+  } else if (isDoneOnly)
     subtitle = `${doneCount} ${
       doneCount === 1
         ? "результат готов"
@@ -38,6 +68,8 @@ export function ChecksWidget({
           ? "результата готовы"
           : "результатов готовы"
     }`;
+
+  const dashOffset = bucket === 0 ? 75 : bucket === 1 ? 45 : 12;
 
   return (
     <button
@@ -95,7 +127,8 @@ export function ChecksWidget({
                 strokeWidth="3"
                 strokeLinecap="round"
                 strokeDasharray="94.2"
-                strokeDashoffset="55"
+                strokeDashoffset={dashOffset}
+                style={{ transition: "stroke-dashoffset 0.6s ease" }}
               />
             </svg>
             <Sparkles className="relative h-4 w-4 text-primary" />
