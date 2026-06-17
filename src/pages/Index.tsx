@@ -602,12 +602,13 @@ export default function Index() {
                 <h1 className="text-3xl font-semibold tracking-tight">Контрагенты</h1>
                 <span className="text-sm text-muted-foreground">1002</span>
               </div>
-              <div className="relative w-full max-w-xs">
-                <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-                <input
-                  placeholder="Найти…"
-                  className="h-10 w-full rounded-full border border-border bg-white pl-9 pr-4 text-sm outline-none focus:border-primary"
-                />
+              <div className="flex min-h-[40px] items-center">
+                {checkProcess && (
+                  <CheckProcessPill
+                    status={checkProcess.status}
+                    onClick={() => setCheckDrawerOpen(true)}
+                  />
+                )}
               </div>
             </div>
 
