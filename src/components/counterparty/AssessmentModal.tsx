@@ -503,7 +503,7 @@ function OtherGroupsAccordion({
       {open && (
         <div className="border-t border-slate-100 bg-slate-50/40 p-2 space-y-2">
           {groups.map((g) => (
-            <GroupCard key={g.id} group={g} onOpen={onOpen} compact />
+            <GroupCard key={g.id} group={g} onOpen={onOpen} compact hasComment={!!groupComments[g.id]} />
           ))}
         </div>
       )}
