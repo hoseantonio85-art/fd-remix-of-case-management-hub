@@ -235,7 +235,7 @@ export function AssessmentModal({
             <h2 className="mt-3 text-2xl font-semibold tracking-tight text-foreground min-w-0">
               Оценка контрагента {assessment.counterpartyName}
             </h2>
-            {inn && <p className="mt-1 text-xs text-muted-foreground">ИНН {inn}</p>}
+            {inn && <CounterpartyHeaderMeta inn={inn} />}
           </div>
 
 
