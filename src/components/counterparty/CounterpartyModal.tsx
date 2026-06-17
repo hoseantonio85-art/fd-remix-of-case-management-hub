@@ -480,9 +480,9 @@ export function CounterpartyModal({
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent
-        className={cn(largeModalContentClass, "gap-0 overflow-y-auto [&>button]:hidden sm:max-w-[calc(100vw-32px)] sm:rounded-3xl")}
+        className={cn(largeModalContentClass, "gap-0 [&>button]:hidden sm:max-w-[calc(100vw-32px)] sm:rounded-3xl")}
       >
-        <div className="relative flex flex-col">
+        <div className="relative flex min-h-0 flex-1 flex-col">
           {/* Header */}
           {(() => {
             const categoryLabel: Record<Counterparty["status"], string> = {
@@ -495,7 +495,7 @@ export function CounterpartyModal({
             const tone = getToneForTag(tagLabel);
             const styles = toneStyles[tone];
             return (
-              <div className={`relative px-5 pt-6 pb-6 lg:px-10 ${styles.gradient}`}>
+              <div className={`relative shrink-0 px-5 pt-6 pb-6 lg:px-10 ${styles.gradient}`}>
                 <button
                   onClick={() => onOpenChange(false)}
                   className="absolute right-5 top-5 rounded-full bg-white/70 p-1.5 text-muted-foreground backdrop-blur hover:bg-white"
@@ -527,7 +527,7 @@ export function CounterpartyModal({
 
 
 
-          <div className="grid grid-cols-1 gap-y-6 gap-x-6 bg-white px-5 py-6 lg:grid-cols-[minmax(0,1fr)_340px] lg:gap-x-12 lg:px-10">
+          <div className="grid grid-cols-1 gap-y-6 gap-x-6 bg-white px-5 py-6 lg:grid-cols-[minmax(0,1fr)_340px] lg:gap-x-12 lg:px-10 min-h-0 flex-1 overflow-y-auto">
             <div className="space-y-6 min-w-0">
             {counterparty.status === "no_risk" ? (
               <ResolutionCard
