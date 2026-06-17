@@ -1,18 +1,17 @@
 import { useState } from "react";
-import { ChevronDown } from "lucide-react";
 import { cn } from "@/lib/utils";
 import {
   defaultOgrn,
   defaultRegistrationInfo,
   type RegistrationInfo,
 } from "./RegistrationInfoWidget";
+import { InModalDrawer } from "./InModalDrawer";
 
 export type ExtraRow = { label: string; value: React.ReactNode };
 
 /**
- * Shared "ИНН ... · Действующая" subtitle + "Подробнее" toggle that reveals the
- * counterparty meta information (registration data). Used across counterparty
- * modals/drawers to keep the header pattern identical.
+ * Shared "ИНН ... · Действующая" subtitle + "Подробнее" text button that opens
+ * a drawer with the full counterparty meta information.
  */
 export function CounterpartyHeaderMeta({
   inn,
@@ -45,7 +44,7 @@ export function CounterpartyHeaderMeta({
     { label: "Юридический адрес", value: registrationInfo.legalAddress },
     { label: "Текущий статус ЕГРЮЛ", value: registrationInfo.egrulStatus },
     ...extraRows,
-  ];
+  ].filter((r) => r.value !== undefined && r.value !== null && r.value !== "");
 
   return (
     <div className={cn("mt-1", className)}>
@@ -54,29 +53,35 @@ export function CounterpartyHeaderMeta({
       </p>
       <button
         type="button"
-        onClick={() => setOpen((v) => !v)}
-        aria-expanded={open}
-        className="mt-1 inline-flex items-center gap-1 text-xs font-medium text-muted-foreground transition hover:text-foreground"
+        onClick={() => setOpen(true)}
+        className="mt-1 inline-flex items-center text-xs font-medium text-muted-foreground underline-offset-2 transition hover:text-foreground hover:underline"
       >
-        {open ? "Свернуть" : "Подробнее"}
-        <ChevronDown className={cn("h-3 w-3 transition", open && "rotate-180")} />
+        Подробнее
       </button>
-      {open && (
-        <div className="mt-3 rounded-xl border border-border bg-white/70 p-3 backdrop-blur-sm">
-          <ul className="divide-y divide-border">
+
+      <InModalDrawer open={open} onOpenChange={setOpen}>
+        <div className="p-6">
+          <h2 className="text-lg font-semibold tracking-tight text-foreground">
+            Информация о контрагенте
+          </h2>
+          <div className="mt-1 text-xs text-muted-foreground">
+            ИНН {inn} · {status}
+          </div>
+
+          <ul className="mt-5 divide-y divide-border">
             {rows.map((r) => (
-              <li key={r.label} className="py-2 first:pt-0 last:pb-0">
-                <div className="text-[10px] uppercase tracking-wide text-muted-foreground">
+              <li key={r.label} className="py-2.5 first:pt-0 last:pb-0">
+                <div className="text-[11px] uppercase tracking-wide text-muted-foreground">
                   {r.label}
                 </div>
-                <div className="mt-0.5 text-xs leading-snug text-foreground break-words">
+                <div className="mt-0.5 text-sm leading-snug text-foreground break-words">
                   {r.value}
                 </div>
               </li>
             ))}
           </ul>
         </div>
-      )}
+      </InModalDrawer>
     </div>
   );
 }
