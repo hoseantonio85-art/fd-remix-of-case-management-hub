@@ -178,6 +178,7 @@ export function ContractDrawer({
     setEditAdjDate("");
     setEditAdjType("increase");
     setEditAdjError(null);
+    setExpandedAdjustments({});
     setPayOpenIdx(null);
     setPayAmount("");
     setPayDate("");
