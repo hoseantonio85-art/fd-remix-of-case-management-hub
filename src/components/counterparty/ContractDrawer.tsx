@@ -335,6 +335,7 @@ export function ContractDrawer({
     setEditAdjType(a.type);
     setEditAdjError(null);
     setShowAddAdjustment(false);
+    setExpandedAdjustments((s) => ({ ...s, [a.id]: true }));
   };
 
   const handleSaveAdjEdit = () => {
