@@ -74,7 +74,7 @@ export function RunCheckDialog({
               Укажите ИНН контрагента. Документы можно приложить дополнительно — они помогут точнее сформировать оценку.
             </p>
           </div>
-          {!loading && (
+          {!isSending && (
             <button
               onClick={() => handleClose(false)}
               className="rounded p-1 text-muted-foreground hover:bg-muted"
@@ -85,125 +85,139 @@ export function RunCheckDialog({
           )}
         </div>
 
-        {loading ? (
-          <div className="flex items-start gap-3 px-5 py-6">
-            <Loader2 className="mt-0.5 h-5 w-5 shrink-0 animate-spin text-primary" />
-            <div className="min-w-0">
-              <div className="text-sm font-medium text-foreground">Запускаем проверку</div>
-              <p className="mt-1 text-[12px] text-muted-foreground">
-                Собираем данные по ИНН и загруженным документам. Обычно это занимает до 10 минут.
-                Уведомление о результате придёт на почту.
+        <div className="space-y-4 px-5 py-4">
+          <div>
+            <label className="text-[11px] font-medium text-muted-foreground">ИНН</label>
+            <Input
+              value={inn}
+              onChange={(e) => {
+                setInn(e.target.value);
+                if (error) setError(null);
+              }}
+              placeholder="Введите ИНН"
+              className="mt-1 bg-white"
+              disabled={isSending}
+              onKeyDown={(e) => {
+                if (e.key === "Enter" && isValid && !isSending) handleStart();
+              }}
+            />
+            {error && <div className="mt-1.5 text-[12px] text-rose-600">{error}</div>}
+          </div>
+
+          <div>
+            <label className="text-[11px] font-medium text-muted-foreground">Документы</label>
+            <button
+              type="button"
+              onClick={() => fileRef.current?.click()}
+              onDragOver={(e) => {
+                e.preventDefault();
+                setDragOver(true);
+              }}
+              onDragLeave={() => setDragOver(false)}
+              onDrop={(e) => {
+                e.preventDefault();
+                setDragOver(false);
+                addFiles(e.dataTransfer.files);
+              }}
+              disabled={isSending}
+              className={`mt-1 flex w-full flex-col items-center justify-center gap-1 rounded-xl border-2 border-dashed px-4 py-5 text-center transition ${
+                dragOver
+                  ? "border-primary bg-primary/5"
+                  : "border-slate-200 bg-slate-50/60 hover:bg-slate-50"
+              }`}
+            >
+              <Upload className="h-5 w-5 text-muted-foreground" />
+              <div className="text-[13px] font-medium text-foreground">
+                Перетащите файлы сюда или выберите на компьютере
+              </div>
+              <div className="text-[11px] text-muted-foreground">
+                Необязательно · PDF, DOCX, XLSX до 25 МБ
+              </div>
+            </button>
+            <input
+              ref={fileRef}
+              type="file"
+              multiple
+              className="hidden"
+              accept=".pdf,.docx,.xlsx"
+              onChange={(e) => addFiles(e.target.files)}
+            />
+            {files.length > 0 && (
+              <ul className="mt-2 space-y-1">
+                {files.map((f, i) => (
+                  <li
+                    key={i}
+                    className="flex items-center gap-2 rounded-lg border border-border bg-white px-2.5 py-1.5 text-[12px]"
+                  >
+                    <FileText className="h-3.5 w-3.5 shrink-0 text-muted-foreground" />
+                    <span className="min-w-0 flex-1 truncate">{f.name}</span>
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setFiles((prev) => prev.filter((_, j) => j !== i));
+                      }}
+                      className="rounded p-0.5 text-muted-foreground hover:bg-muted"
+                      aria-label="Удалить"
+                    >
+                      <X className="h-3 w-3" />
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
+
+          <div className="flex items-start gap-2.5 rounded-xl border border-primary/20 bg-primary/5 px-3 py-2.5">
+            <Info className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
+            <div className="min-w-0 text-[12px]">
+              <div className="font-medium text-foreground">Проверка займёт до 10 минут</div>
+              <p className="mt-0.5 text-muted-foreground">
+                Когда оценка будет готова, мы отправим уведомление на почту.
               </p>
             </div>
           </div>
-        ) : (
-          <div className="space-y-4 px-5 py-4">
-            <div>
-              <label className="text-[11px] font-medium text-muted-foreground">ИНН</label>
-              <Input
-                value={inn}
-                onChange={(e) => {
-                  setInn(e.target.value);
-                  if (error) setError(null);
-                }}
-                placeholder="Введите ИНН"
-                className="mt-1 bg-white"
-                onKeyDown={(e) => {
-                  if (e.key === "Enter" && isValid) handleStart();
-                }}
-              />
-              {error && <div className="mt-1.5 text-[12px] text-rose-600">{error}</div>}
-            </div>
-
-            <div>
-              <label className="text-[11px] font-medium text-muted-foreground">Документы</label>
-              <button
-                type="button"
-                onClick={() => fileRef.current?.click()}
-                onDragOver={(e) => {
-                  e.preventDefault();
-                  setDragOver(true);
-                }}
-                onDragLeave={() => setDragOver(false)}
-                onDrop={(e) => {
-                  e.preventDefault();
-                  setDragOver(false);
-                  addFiles(e.dataTransfer.files);
-                }}
-                className={`mt-1 flex w-full flex-col items-center justify-center gap-1 rounded-xl border-2 border-dashed px-4 py-5 text-center transition ${
-                  dragOver
-                    ? "border-primary bg-primary/5"
-                    : "border-slate-200 bg-slate-50/60 hover:bg-slate-50"
-                }`}
-              >
-                <Upload className="h-5 w-5 text-muted-foreground" />
-                <div className="text-[13px] font-medium text-foreground">
-                  Перетащите файлы сюда или выберите на компьютере
-                </div>
-                <div className="text-[11px] text-muted-foreground">
-                  Необязательно · PDF, DOCX, XLSX до 25 МБ
-                </div>
-              </button>
-              <input
-                ref={fileRef}
-                type="file"
-                multiple
-                className="hidden"
-                accept=".pdf,.docx,.xlsx"
-                onChange={(e) => addFiles(e.target.files)}
-              />
-              {files.length > 0 && (
-                <ul className="mt-2 space-y-1">
-                  {files.map((f, i) => (
-                    <li
-                      key={i}
-                      className="flex items-center gap-2 rounded-lg border border-border bg-white px-2.5 py-1.5 text-[12px]"
-                    >
-                      <FileText className="h-3.5 w-3.5 shrink-0 text-muted-foreground" />
-                      <span className="min-w-0 flex-1 truncate">{f.name}</span>
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          setFiles((prev) => prev.filter((_, j) => j !== i));
-                        }}
-                        className="rounded p-0.5 text-muted-foreground hover:bg-muted"
-                        aria-label="Удалить"
-                      >
-                        <X className="h-3 w-3" />
-                      </button>
-                    </li>
-                  ))}
-                </ul>
-              )}
-            </div>
-
-            <div className="flex items-start gap-2.5 rounded-xl border border-primary/20 bg-primary/5 px-3 py-2.5">
-              <Info className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
-              <div className="min-w-0 text-[12px]">
-                <div className="font-medium text-foreground">Проверка займёт до 10 минут</div>
-                <p className="mt-0.5 text-muted-foreground">
-                  Когда оценка будет готова, мы отправим уведомление на почту.
-                </p>
-              </div>
-            </div>
-          </div>
-        )}
+        </div>
 
         <div className="flex justify-end gap-2 border-t border-border px-5 py-3">
-          <Button variant="ghost" size="sm" onClick={() => handleClose(false)} disabled={loading}>
+          <Button variant="ghost" size="sm" onClick={() => handleClose(false)} disabled={isSending}>
             Отменить
           </Button>
-          <Button size="sm" onClick={handleStart} disabled={loading || !isValid}>
-            {loading ? (
-              <>
-                <Loader2 className="h-3.5 w-3.5 animate-spin" /> Запуск…
-              </>
-            ) : (
-              "Запустить проверку"
-            )}
+          <Button size="sm" onClick={handleStart} disabled={isSending || !isValid}>
+            {isSending ? "Запуск…" : "Запустить проверку"}
           </Button>
         </div>
       </DialogContent>
+      {flying && typeof document !== "undefined" &&
+        createPortal(
+          <div className="pointer-events-none fixed inset-0 z-[100]">
+            <div
+              className="absolute left-1/2 top-1/2 flex h-9 items-center gap-1.5 rounded-full bg-gradient-to-r from-primary to-violet-500 px-3 text-white shadow-lg shadow-primary/30"
+              style={{
+                animation: "flyToChecks 700ms cubic-bezier(0.4, 0, 0.2, 1) forwards",
+              }}
+            >
+              <Sparkles className="h-3.5 w-3.5" />
+              <span className="text-[12px] font-medium">Проверка</span>
+            </div>
+            <style>{`
+              @keyframes flyToChecks {
+                0% {
+                  transform: translate(-50%, -50%) scale(1);
+                  opacity: 0;
+                }
+                15% {
+                  transform: translate(-50%, -50%) scale(1);
+                  opacity: 1;
+                }
+                100% {
+                  transform: translate(calc(50vw - 80px), calc(-50vh + 40px)) scale(0.3);
+                  opacity: 0;
+                }
+              }
+            `}</style>
+          </div>,
+          document.body,
+        )}
     </Dialog>
   );
 }
