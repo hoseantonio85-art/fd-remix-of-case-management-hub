@@ -371,10 +371,16 @@ function CountPill({ kind, count }: { kind: AssessmentCountKind; count: number }
       : kind === "clear"
         ? "без нарушений"
         : "нет данных";
+  const isActiveRisk = kind === "risk" && count > 0;
+  const bg = isActiveRisk
+    ? "bg-rose-50 border-rose-100"
+    : "bg-slate-100/80 border-slate-200/70";
+  const iconColor = isActiveRisk ? "text-rose-500" : "text-slate-400";
+  const textColor = isActiveRisk ? "text-rose-700" : "text-slate-600";
   return (
-    <span className={`inline-flex h-6 items-center gap-1 rounded-full px-2.5 text-xs font-medium ${m.bg}`}>
-      <Ico className={`h-3.5 w-3.5 ${m.icon_color}`} />
-      <span className={`leading-none ${m.num}`}>
+    <span className={`inline-flex h-6 items-center gap-1 rounded-full border px-2.5 text-xs font-medium ${bg}`}>
+      <Ico className={`h-3.5 w-3.5 ${iconColor}`} />
+      <span className={`leading-none ${textColor}`}>
         <span className="font-semibold">{count}</span> {label}
       </span>
     </span>
