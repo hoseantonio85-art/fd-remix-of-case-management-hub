@@ -528,7 +528,7 @@ export function CounterpartyModal({
 
 
 
-          <div className="grid grid-cols-1 gap-y-6 gap-x-6 bg-white px-5 py-6 lg:grid-cols-[minmax(0,1fr)_340px] lg:gap-x-12 lg:px-10 min-h-0 flex-1 overflow-y-auto">
+          <div className="grid grid-cols-1 gap-y-6 gap-x-6 bg-white px-5 py-6 lg:gap-x-12 lg:px-10 min-h-0 flex-1 overflow-y-auto">
             <div className="space-y-6 min-w-0">
             {counterparty.status === "no_risk" ? (
               <ResolutionCard
