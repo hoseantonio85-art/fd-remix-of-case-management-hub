@@ -246,9 +246,8 @@ export function AssessmentModal({
             <div className="grid gap-y-5 gap-x-5 lg:grid-cols-[minmax(0,1fr)_320px] lg:gap-x-12">
               {/* What changed — right column */}
               <aside className="order-2 lg:col-start-2 lg:row-start-1">
-
                 <div className="space-y-3 lg:sticky lg:top-0">
-
+                  <AssessmentInfoWidget />
                 </div>
               </aside>
 
@@ -517,6 +516,20 @@ function InfoRow({ label, value }: { label: string; value: React.ReactNode }) {
     <div>
       <div className="text-[11px] uppercase tracking-wide text-muted-foreground">{label}</div>
       <div className="mt-0.5 text-sm leading-snug text-foreground break-words">{value}</div>
+    </div>
+  );
+}
+
+function AssessmentInfoWidget() {
+  return (
+    <div className="rounded-2xl border border-border bg-white p-4">
+      <h4 className="text-base font-semibold">Информация</h4>
+      <div className="mt-3 space-y-3">
+        <InfoRow label="Дата проверки" value="16.06.2026" />
+        <InfoRow label="Мониторинг" value="Ежедневно" />
+        <InfoRow label="Динамика за неделю" value="+3 риска" />
+        <InfoRow label="Автор" value="Норм" />
+      </div>
     </div>
   );
 }
