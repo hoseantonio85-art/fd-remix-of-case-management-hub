@@ -150,6 +150,7 @@ export function ContractDrawer({
   const [editAdjDate, setEditAdjDate] = useState("");
   const [editAdjType, setEditAdjType] = useState<"increase" | "decrease">("increase");
   const [editAdjError, setEditAdjError] = useState<string | null>(null);
+  const [expandedAdjustments, setExpandedAdjustments] = useState<Record<string, boolean>>({});
 
   // Change history
   const [historyOpen, setHistoryOpen] = useState(false);
@@ -177,6 +178,7 @@ export function ContractDrawer({
     setEditAdjDate("");
     setEditAdjType("increase");
     setEditAdjError(null);
+    setExpandedAdjustments({});
     setPayOpenIdx(null);
     setPayAmount("");
     setPayDate("");
@@ -333,6 +335,7 @@ export function ContractDrawer({
     setEditAdjType(a.type);
     setEditAdjError(null);
     setShowAddAdjustment(false);
+    setExpandedAdjustments((s) => ({ ...s, [a.id]: true }));
   };
 
   const handleSaveAdjEdit = () => {
@@ -610,73 +613,48 @@ export function ContractDrawer({
             </div>
           ) : (
             <div className="space-y-2">
-              {adjustments.map((a) => (
-                <div key={a.id} className="rounded-2xl bg-muted/50 p-3">
-                  {editAdjId === a.id ? (
-                    <div className="space-y-2">
-                      <div>
-                        <div className="mb-1 text-xs text-muted-foreground">Тип операции</div>
-                        <div className="flex gap-2">
-                          <button
-                            type="button"
-                            onClick={() => { setEditAdjType("increase"); setEditAdjError(null); }}
-                            className={`flex h-9 flex-1 items-center justify-center rounded-full border text-sm font-medium transition ${editAdjType === "increase" ? "border-primary bg-primary text-primary-foreground" : "border-border bg-white text-muted-foreground hover:bg-muted"}`}
-                          >
-                            Увеличить
-                          </button>
-                          <button
-                            type="button"
-                            onClick={() => { setEditAdjType("decrease"); setEditAdjError(null); }}
-                            className={`flex h-9 flex-1 items-center justify-center rounded-full border text-sm font-medium transition ${editAdjType === "decrease" ? "border-primary bg-primary text-primary-foreground" : "border-border bg-white text-muted-foreground hover:bg-muted"}`}
-                          >
-                            Уменьшить
-                          </button>
-                        </div>
-                      </div>
-                      <LabeledInput
-                        label="Сумма"
-                        value={editAdjAmount}
-                        onChange={(v) => { setEditAdjAmount(v); setEditAdjError(null); }}
-                        placeholder="100000"
-                      />
-                      <LabeledInput
-                        label="Дата погашения"
-                        value={editAdjDate}
-                        onChange={setEditAdjDate}
-                        placeholder="ДД.ММ.ГГГГ"
-                      />
-                      {editAdjError && (
-                        <div className="flex items-start gap-2 rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 text-xs text-amber-900">
-                          <AlertTriangle className="mt-0.5 h-3.5 w-3.5 shrink-0" />
-                          {editAdjError}
-                        </div>
-                      )}
-                      <div className="flex items-center gap-2">
-                        <Button size="sm" className="flex-1" onClick={handleSaveAdjEdit} disabled={!editAdjAmount || !editAdjDate}>
-                          Сохранить
-                        </Button>
-                        <Button size="sm" variant="ghost" onClick={() => setEditAdjId(null)}>
-                          Отмена
-                        </Button>
-                      </div>
-                    </div>
-                  ) : (
-                    <div className="flex items-center justify-between gap-2">
-                      <div className="min-w-0 text-sm font-medium">
-                        <span className={a.type === "increase" ? "text-foreground" : "text-emerald-700"}>
-                          {a.type === "increase" ? "+" : "−"}
-                          {a.amount.toLocaleString("ru-RU", { maximumFractionDigits: 2 })} млн ₽
-                        </span>{" "}
-                        <span className="text-muted-foreground">
-                          · {a.type === "increase" ? "Увеличение" : "Уменьшение"}
+              {adjustments.map((a) => {
+                const expanded = !!expandedAdjustments[a.id];
+                const isEditing = editAdjId === a.id;
+                const sign = a.type === "increase" ? "+" : "−";
+                const typeLabel = a.type === "increase" ? "Увеличение" : "Уменьшение";
+                return (
+                  <div key={a.id} className="rounded-2xl bg-muted/50 p-3">
+                    <div className="flex items-center gap-2">
+                      <button
+                        type="button"
+                        onClick={() =>
+                          setExpandedAdjustments((s) => ({ ...s, [a.id]: !s[a.id] }))
+                        }
+                        className="flex min-w-0 flex-1 items-center gap-3 text-left"
+                      >
+                        <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-white text-muted-foreground shadow-sm">
+                          {expanded ? (
+                            <ChevronDown className="h-4 w-4" />
+                          ) : (
+                            <ChevronRight className="h-4 w-4" />
+                          )}
                         </span>
-                      </div>
+                        <div className="min-w-0 flex-1 text-sm font-medium">
+                          <span
+                            className={
+                              a.type === "increase" ? "text-foreground" : "text-emerald-700"
+                            }
+                          >
+                            {sign}
+                            {a.amount.toLocaleString("ru-RU", { maximumFractionDigits: 2 })} млн ₽
+                          </span>{" "}
+                          <span className="text-muted-foreground">· {a.date}</span>
+                        </div>
+                      </button>
                       <div className="flex shrink-0 items-center gap-1">
-                        <div className="mr-1 text-xs text-muted-foreground">{a.date}</div>
                         <button
                           type="button"
                           aria-label="Редактировать"
-                          onClick={() => openEditAdjustment(a)}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            openEditAdjustment(a);
+                          }}
                           className="flex h-7 w-7 items-center justify-center rounded-full text-muted-foreground transition hover:bg-white hover:text-foreground"
                         >
                           <Pencil className="h-3.5 w-3.5" />
@@ -684,16 +662,93 @@ export function ContractDrawer({
                         <button
                           type="button"
                           aria-label="Удалить"
-                          onClick={() => handleDeleteAdjustment(a.id)}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleDeleteAdjustment(a.id);
+                          }}
                           className="flex h-7 w-7 items-center justify-center rounded-full text-muted-foreground transition hover:bg-white hover:text-rose-600"
                         >
                           <Trash2 className="h-3.5 w-3.5" />
                         </button>
                       </div>
                     </div>
-                  )}
-                </div>
-              ))}
+
+                    {expanded && (
+                      <div className="mt-3">
+                        {isEditing ? (
+                          <div className="rounded-2xl border border-border bg-white p-3">
+                            <div className="space-y-2">
+                              <div>
+                                <div className="mb-1 text-xs text-muted-foreground">Тип операции</div>
+                                <div className="flex gap-2">
+                                  <button
+                                    type="button"
+                                    onClick={() => { setEditAdjType("increase"); setEditAdjError(null); }}
+                                    className={`flex h-9 flex-1 items-center justify-center rounded-full border text-sm font-medium transition ${editAdjType === "increase" ? "border-primary bg-primary text-primary-foreground" : "border-border bg-white text-muted-foreground hover:bg-muted"}`}
+                                  >
+                                    Увеличить
+                                  </button>
+                                  <button
+                                    type="button"
+                                    onClick={() => { setEditAdjType("decrease"); setEditAdjError(null); }}
+                                    className={`flex h-9 flex-1 items-center justify-center rounded-full border text-sm font-medium transition ${editAdjType === "decrease" ? "border-primary bg-primary text-primary-foreground" : "border-border bg-white text-muted-foreground hover:bg-muted"}`}
+                                  >
+                                    Уменьшить
+                                  </button>
+                                </div>
+                              </div>
+                              <LabeledInput
+                                label="Сумма"
+                                value={editAdjAmount}
+                                onChange={(v) => { setEditAdjAmount(v); setEditAdjError(null); }}
+                                placeholder="100000"
+                              />
+                              <LabeledInput
+                                label="Дата погашения"
+                                value={editAdjDate}
+                                onChange={setEditAdjDate}
+                                placeholder="ДД.ММ.ГГГГ"
+                              />
+                              {editAdjError && (
+                                <div className="flex items-start gap-2 rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 text-xs text-amber-900">
+                                  <AlertTriangle className="mt-0.5 h-3.5 w-3.5 shrink-0" />
+                                  {editAdjError}
+                                </div>
+                              )}
+                              <div className="flex items-center gap-2">
+                                <Button size="sm" className="flex-1" onClick={handleSaveAdjEdit} disabled={!editAdjAmount || !editAdjDate}>
+                                  Сохранить
+                                </Button>
+                                <Button size="sm" variant="ghost" onClick={() => setEditAdjId(null)}>
+                                  Отмена
+                                </Button>
+                              </div>
+                            </div>
+                          </div>
+                        ) : (
+                          <div className="space-y-2">
+                            <div>
+                              <div className="text-xs text-muted-foreground">Тип операции</div>
+                              <div className="text-sm font-medium text-foreground">{typeLabel}</div>
+                            </div>
+                            <div>
+                              <div className="text-xs text-muted-foreground">Сумма</div>
+                              <div className="text-sm font-medium text-foreground">
+                                {sign}
+                                {a.amount.toLocaleString("ru-RU", { maximumFractionDigits: 2 })} млн ₽
+                              </div>
+                            </div>
+                            <div>
+                              <div className="text-xs text-muted-foreground">Дата погашения</div>
+                              <div className="text-sm font-medium text-foreground">{a.date}</div>
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
             </div>
           )}
         </section>
