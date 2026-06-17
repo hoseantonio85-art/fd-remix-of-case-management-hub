@@ -29,9 +29,7 @@ export function PendingAssessmentModal({
           </button>
           <CounterpartyStatusBadge tag="На оценке" />
           <h2 className="mt-3 text-xl font-semibold tracking-tight">{counterparty.name}</h2>
-          <div className="mt-1 text-[12px] text-muted-foreground">
-            ИНН {counterparty.inn} · 0 договоров
-          </div>
+          <CounterpartyHeaderMeta inn={counterparty.inn} />
         </div>
 
         <div className="flex-1 overflow-y-auto px-6 py-10">
