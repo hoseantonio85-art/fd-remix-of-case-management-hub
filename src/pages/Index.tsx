@@ -921,14 +921,19 @@ export default function Index() {
         onOpenChange={setRunDialogOpen}
         onSubmit={(inn, files) => {
           setRunDialogOpen(false);
-          const proc: CheckProcess = {
+          const id = `check-${inn}-${Date.now()}`;
+          const rec: CheckRecord = {
+            id,
             inn,
             fileNames: files.map((f) => f.name),
             status: "running",
+            createdAt: Date.now(),
           };
-          setCheckProcess(proc);
+          setChecks((prev) => [rec, ...prev]);
           window.setTimeout(() => {
-            setCheckProcess((prev) => (prev && prev.inn === inn ? { ...prev, status: "done" } : prev));
+            setChecks((prev) =>
+              prev.map((c) => (c.id === id ? { ...c, status: "done" } : c)),
+            );
           }, 2800);
         }}
       />
@@ -942,17 +947,17 @@ export default function Index() {
         }}
       />
 
-      <CheckProcessDrawer
+      <ChecksDrawer
         open={checkDrawerOpen}
         onOpenChange={setCheckDrawerOpen}
-        process={checkProcess}
-        onOpenAssessment={() => {
-          if (!checkProcess) return;
+        checks={checks}
+        onOpenCheck={(c) => {
           const a = buildAssessment(
-            `Контрагент по ИНН ${checkProcess.inn}`,
-            checkProcess.inn,
+            `Контрагент по ИНН ${c.inn}`,
+            c.inn,
             "auto",
           );
+          setActiveCheckId(c.id);
           setCheckAssessment(a);
           setCheckDrawerOpen(false);
           setCheckAssessmentOpen(true);
@@ -964,7 +969,10 @@ export default function Index() {
         open={checkAssessmentOpen}
         onOpenChange={(o) => {
           setCheckAssessmentOpen(o);
-          if (!o) setCheckAssessment(null);
+          if (!o) {
+            setCheckAssessment(null);
+            setActiveCheckId(null);
+          }
         }}
         status="updated"
         disagreement={null}
@@ -973,29 +981,35 @@ export default function Index() {
         onDisagree={() => {}}
         completionMode
         onDeleteResult={() => {
+          if (activeCheckId) {
+            setChecks((prev) => prev.filter((c) => c.id !== activeCheckId));
+          }
           setCheckAssessmentOpen(false);
           setCheckAssessment(null);
-          setCheckProcess(null);
+          setActiveCheckId(null);
           toast("Результат проверки удалён");
         }}
         onAddToList={() => {
-          if (!checkProcess) return;
+          const check = checks.find((c) => c.id === activeCheckId);
+          if (!check) return;
           const today = new Date().toLocaleDateString("ru-RU");
           const cp: Counterparty = {
-            ...buildNewCounterparty(checkProcess.inn, today),
-            name: `Контрагент по ИНН ${checkProcess.inn}`,
+            ...buildNewCounterparty(check.inn, today),
+            name: `Контрагент по ИНН ${check.inn}`,
             tag: "Нет риска",
             status: "no_risk",
           };
           setAddedCounterparties((prev) =>
             prev.some((c) => c.inn === cp.inn) ? prev : [cp, ...prev],
           );
+          setChecks((prev) => prev.filter((c) => c.id !== check.id));
           setCheckAssessmentOpen(false);
           setCheckAssessment(null);
-          setCheckProcess(null);
+          setActiveCheckId(null);
           toast.success("Контрагент добавлен в список дебиторов");
         }}
       />
+
 
 
       <AssessmentModal
