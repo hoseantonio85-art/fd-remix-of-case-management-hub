@@ -496,7 +496,7 @@ export function CounterpartyModal({
             const tone = getToneForTag(tagLabel);
             const styles = toneStyles[tone];
             return (
-              <div className={`relative shrink-0 px-5 pt-6 pb-6 lg:px-10 ${styles.gradient}`}>
+              <div className={`shrink-0 px-5 pt-6 pb-6 lg:px-10 ${styles.gradient}`}>
                 <button
                   onClick={() => onOpenChange(false)}
                   className="absolute right-5 top-5 rounded-full bg-white/70 p-1.5 text-muted-foreground backdrop-blur hover:bg-white"

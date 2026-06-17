@@ -19,7 +19,7 @@ export function PendingAssessmentModal({
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className={`${largeModalContentClass} [&>button]:hidden`}>
-        <div className="relative border-b border-border bg-gradient-to-b from-slate-50 via-slate-50/40 to-transparent px-6 pt-6 pb-5">
+        <div className="border-b border-border bg-gradient-to-b from-slate-50 via-slate-50/40 to-transparent px-6 pt-6 pb-5">
           <button
             onClick={() => onOpenChange(false)}
             className="absolute right-4 top-4 rounded p-1 text-muted-foreground hover:bg-muted"

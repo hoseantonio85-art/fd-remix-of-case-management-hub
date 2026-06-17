@@ -208,7 +208,7 @@ export function AssessmentModal({
         >
         <div className="relative flex min-h-0 flex-1 flex-col">
           {/* Header */}
-          <div className={cn("relative shrink-0 px-5 pt-6 pb-6 lg:px-10", meta.headerBg)}>
+          <div className={cn("shrink-0 px-5 pt-6 pb-6 lg:px-10", meta.headerBg)}>
             <div className="absolute right-5 top-5 flex items-center gap-2">
               {onBack && (
                 <button
