@@ -253,7 +253,6 @@ export function AssessmentModal({
               {/* Groups — left, row 2 */}
               <section className="order-3 lg:col-start-1 lg:row-start-1 space-y-5">
                 <div>
-                
                 <div className="grid grid-cols-1 gap-2.5">
                   {MAIN_GROUP_IDS.map((id) => {
                     const g = assessment.groups.find((x) => x.id === id);
