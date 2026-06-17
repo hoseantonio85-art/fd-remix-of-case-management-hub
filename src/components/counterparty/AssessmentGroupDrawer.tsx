@@ -164,12 +164,6 @@ function pluralCriteria(n: number) {
   return "критериев";
 }
 
-const activeCardStyles: Record<AssessmentCountKind, string> = {
-  risk: "ring-1 ring-rose-200 bg-rose-50/40 border-rose-200",
-  clear: "ring-1 ring-emerald-200 bg-emerald-50/40 border-emerald-200",
-  no_data: "ring-1 ring-slate-200 bg-slate-50/40 border-slate-300",
-};
-
 function SummaryStat({
   kind,
   value,
@@ -183,7 +177,21 @@ function SummaryStat({
 }) {
   const m = assessmentCountMeta[kind];
   const Ico = m.icon;
-  const activeStyle = activeCardStyles[kind];
+  const isActiveRisk = kind === "risk" && value > 0;
+
+  const activeStyle = isActiveRisk
+    ? "ring-1 ring-rose-200 bg-rose-50/40 border-rose-200"
+    : "ring-1 ring-slate-200 bg-slate-100/60 border-slate-300";
+
+  const iconBg = isActiveRisk ? "bg-rose-50" : "bg-slate-100";
+  const iconColor = isActiveRisk ? "text-rose-500" : "text-slate-400";
+  const numColor = isActiveRisk ? "text-rose-700" : "text-slate-900";
+  const labelColor = isActive
+    ? isActiveRisk
+      ? "text-slate-700"
+      : "text-slate-600"
+    : "text-slate-500";
+
   return (
     <button
       onClick={onClick}
@@ -194,14 +202,14 @@ function SummaryStat({
       }`}
     >
       <div className="flex items-center justify-between">
-        <div className={`flex h-8 w-8 items-center justify-center rounded-full ${m.bg}`}>
-          <Ico className={`h-4 w-4 ${m.icon_color}`} />
+        <div className={`flex h-8 w-8 items-center justify-center rounded-full ${iconBg}`}>
+          <Ico className={`h-4 w-4 ${iconColor}`} />
         </div>
-        <div className={`text-2xl font-semibold leading-none ${isActive ? m.num : "text-slate-900"}`}>
+        <div className={`text-2xl font-semibold leading-none ${isActive ? numColor : "text-slate-900"}`}>
           {value}
         </div>
       </div>
-      <div className={`mt-3 text-xs leading-snug ${isActive ? "text-slate-700" : "text-slate-500"}`}>
+      <div className={`mt-3 text-xs leading-snug ${labelColor}`}>
         {m.label}
       </div>
     </button>
