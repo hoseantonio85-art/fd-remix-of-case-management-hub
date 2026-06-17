@@ -934,7 +934,7 @@ export default function Index() {
             setChecks((prev) =>
               prev.map((c) => (c.id === id ? { ...c, status: "done" } : c)),
             );
-          }, 2800);
+          }, 5000);
         }}
       />
 
