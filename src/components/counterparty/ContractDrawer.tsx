@@ -505,9 +505,10 @@ export function ContractDrawer({
   };
 
   return (
-    <InModalDrawer open={open} onOpenChange={onOpenChange}>
-      {/* HEADER */}
-      <div className={`px-6 pt-6 pb-5 ${styles.gradient}`}>
+    <InModalDrawer open={open} onOpenChange={onOpenChange} className="overflow-hidden">
+      <div className="relative flex h-full min-h-0 flex-col">
+        {/* HEADER */}
+        <div className={`shrink-0 px-6 pt-6 pb-5 ${styles.gradient}`}>
         <span
           className={`inline-flex w-fit items-center rounded-full px-2.5 py-1 text-[11px] font-medium ${styles.badge}`}
         >
@@ -527,7 +528,7 @@ export function ContractDrawer({
         </div>
       </div>
 
-      <div className="space-y-4 px-6 pb-24 pt-4">
+      <div className="min-h-0 flex-1 overflow-y-auto space-y-4 px-6 pb-6 pt-4">
         {/* DEBT ADJUSTMENTS */}
         <section className="rounded-2xl border border-border bg-white p-4">
           <div className="mb-3 flex items-center justify-between gap-2">
@@ -1062,18 +1063,18 @@ export function ContractDrawer({
         </section>
       </div>
 
-      {/* Fixed footer */}
-      <div className="absolute bottom-0 left-0 right-0 z-20 border-t border-border bg-white px-6 py-4">
-        <Button
-          type="button"
-          variant="outline"
-          className="h-11 w-full rounded-xl"
-          onClick={() => setHistoryOpen(true)}
-        >
-          <HistoryIcon className="mr-1.5 h-4 w-4" />
-          История изменений
-        </Button>
-      </div>
+        {/* Footer */}
+        <div className="shrink-0 border-t border-border bg-white px-6 py-4">
+          <Button
+            type="button"
+            variant="outline"
+            className="h-11 w-full rounded-xl"
+            onClick={() => setHistoryOpen(true)}
+          >
+            <HistoryIcon className="mr-1.5 h-4 w-4" />
+            История изменений
+          </Button>
+        </div>
 
       {/* Change history overlay */}
       {historyOpen && (
@@ -1116,7 +1117,7 @@ export function ContractDrawer({
             )}
           </div>
         </div>
-      )}
+      </div>
     </InModalDrawer>
   );
 }
