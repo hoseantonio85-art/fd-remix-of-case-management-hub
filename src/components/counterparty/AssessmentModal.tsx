@@ -290,7 +290,7 @@ export function AssessmentModal({
               onClick={() => setCommentOpen(true)}
               className="h-12 w-full rounded-full text-sm font-medium"
             >
-              Не согласен
+              Оставить комментарий
             </Button>
           </div>
 
