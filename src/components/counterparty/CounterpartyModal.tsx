@@ -831,3 +831,16 @@ function Cell({
     </div>
   );
 }
+
+function CounterpartyInfoWidget() {
+  return (
+    <div className="rounded-2xl border border-border bg-white p-4">
+      <h4 className="text-base font-semibold">Информация</h4>
+      <div className="mt-3 space-y-3">
+        <InfoRow label="Обновлено из 1С" value="31.03.26" />
+        <InfoRow label="Отредактировано" value="01.04.2027" />
+        <InfoRow label="Автор" value="Иванов Иван Иванович" />
+      </div>
+    </div>
+  );
+}
