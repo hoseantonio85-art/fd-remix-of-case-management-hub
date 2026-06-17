@@ -286,8 +286,9 @@ export default function Index() {
   const [runDialogOpen, setRunDialogOpen] = useState(false);
   const [pendingCp, setPendingCp] = useState<Counterparty | null>(null);
   const [pendingCpOpen, setPendingCpOpen] = useState(false);
-  const [checkProcess, setCheckProcess] = useState<CheckProcess | null>(null);
+  const [checks, setChecks] = useState<CheckRecord[]>([]);
   const [checkDrawerOpen, setCheckDrawerOpen] = useState(false);
+  const [activeCheckId, setActiveCheckId] = useState<string | null>(null);
   const [checkAssessment, setCheckAssessment] = useState<Assessment | null>(null);
   const [checkAssessmentOpen, setCheckAssessmentOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
