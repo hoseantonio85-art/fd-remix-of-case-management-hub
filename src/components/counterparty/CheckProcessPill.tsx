@@ -46,7 +46,7 @@ export function ChecksWidget({
         )}
 
         {isRunning && (
-          <span className="relative flex h-10 w-10 items-center justify-center">
+          <span className="relative flex h-10 w-10 items-center justify-center rounded-full bg-primary/10">
             <svg
               className="absolute inset-0 h-10 w-10 animate-spin"
               viewBox="0 0 40 40"
@@ -66,26 +66,24 @@ export function ChecksWidget({
               <circle
                 cx="20"
                 cy="20"
-                r="14"
+                r="15"
                 fill="none"
-                stroke="#D1D5DB"
-                strokeWidth="4"
+                stroke="#E5EDFF"
+                strokeWidth="3"
               />
               <circle
                 cx="20"
                 cy="20"
-                r="14"
+                r="15"
                 fill="none"
                 stroke="url(#checkGradient)"
-                strokeWidth="4"
+                strokeWidth="3"
                 strokeLinecap="round"
-                strokeDasharray="87.9"
-                strokeDashoffset="50"
+                strokeDasharray="94.2"
+                strokeDashoffset="55"
               />
             </svg>
-            <span className="relative flex h-7 w-7 items-center justify-center rounded-full bg-white text-primary shadow-sm">
-              <Sparkles className="h-4 w-4" />
-            </span>
+            <Sparkles className="relative h-4 w-4 text-primary" />
           </span>
         )}
       </span>
