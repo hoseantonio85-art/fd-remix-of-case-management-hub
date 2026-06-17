@@ -33,6 +33,8 @@ import { toast } from "sonner";
 import { DrpaDataUpdateDrawer, type DrpaCardData } from "@/components/counterparty/DrpaDataUpdateDrawer";
 import { RunCheckDialog } from "@/components/counterparty/RunCheckDialog";
 import { PendingAssessmentModal } from "@/components/counterparty/PendingAssessmentModal";
+import { CheckProcessPill } from "@/components/counterparty/CheckProcessPill";
+import { CheckProcessDrawer, type CheckProcess } from "@/components/counterparty/CheckProcessDrawer";
 
 function buildNewCounterparty(inn: string, today: string): Counterparty {
   return {
@@ -284,6 +286,12 @@ export default function Index() {
   const [runDialogOpen, setRunDialogOpen] = useState(false);
   const [pendingCp, setPendingCp] = useState<Counterparty | null>(null);
   const [pendingCpOpen, setPendingCpOpen] = useState(false);
+  const [checkProcess, setCheckProcess] = useState<CheckProcess | null>(null);
+  const [checkDrawerOpen, setCheckDrawerOpen] = useState(false);
+  const [checkAssessment, setCheckAssessment] = useState<Assessment | null>(null);
+  const [checkAssessmentOpen, setCheckAssessmentOpen] = useState(false);
+  const [searchOpen, setSearchOpen] = useState(false);
+  const [searchValue, setSearchValue] = useState("");
   // Legacy manual assessment flow (kept for AssessmentModal scenarios from existing cards)
   const [manualAssessment, setManualAssessment] = useState<Assessment | null>(null);
   const [manualAssessmentOpen, setManualAssessmentOpen] = useState(false);
@@ -594,12 +602,13 @@ export default function Index() {
                 <h1 className="text-3xl font-semibold tracking-tight">Контрагенты</h1>
                 <span className="text-sm text-muted-foreground">1002</span>
               </div>
-              <div className="relative w-full max-w-xs">
-                <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-                <input
-                  placeholder="Найти…"
-                  className="h-10 w-full rounded-full border border-border bg-white pl-9 pr-4 text-sm outline-none focus:border-primary"
-                />
+              <div className="flex min-h-[40px] items-center">
+                {checkProcess && (
+                  <CheckProcessPill
+                    status={checkProcess.status}
+                    onClick={() => setCheckDrawerOpen(true)}
+                  />
+                )}
               </div>
             </div>
 
@@ -720,7 +729,7 @@ export default function Index() {
               </div>
             )}
 
-            <div className="mb-5 flex flex-wrap gap-2">
+            <div className="mb-5 flex flex-wrap items-center gap-2">
               {(["all", ...problemChips.map((c) => c.key)] as RiskChipKey[]).map((key) => {
                 const meta = key === "all" ? allChipMeta : problemChips.find((c) => c.key === key)!.meta;
                 const Icon = meta.icon;
@@ -756,6 +765,38 @@ export default function Index() {
                   </button>
                 );
               })}
+              <div className="ml-auto">
+                {searchOpen ? (
+                  <div className="relative w-56 animate-in fade-in slide-in-from-right-2 duration-200">
+                    <Search className="absolute left-2.5 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-muted-foreground" />
+                    <input
+                      autoFocus
+                      value={searchValue}
+                      onChange={(e) => setSearchValue(e.target.value)}
+                      placeholder="Поиск…"
+                      className="h-8 w-full rounded-full border border-slate-200 bg-white pl-8 pr-8 text-xs outline-none focus:border-primary"
+                    />
+                    <button
+                      onClick={() => {
+                        setSearchOpen(false);
+                        setSearchValue("");
+                      }}
+                      className="absolute right-1.5 top-1/2 -translate-y-1/2 rounded-full p-0.5 text-muted-foreground hover:bg-muted"
+                      aria-label="Закрыть поиск"
+                    >
+                      <X className="h-3 w-3" />
+                    </button>
+                  </div>
+                ) : (
+                  <button
+                    onClick={() => setSearchOpen(true)}
+                    className="inline-flex items-center gap-1.5 rounded-full border border-slate-200 bg-white px-3 py-1.5 text-xs font-medium text-slate-600 transition hover:bg-slate-50"
+                  >
+                    <Search className="h-3.5 w-3.5" />
+                    Поиск
+                  </button>
+                )}
+              </div>
             </div>
 
 
@@ -878,22 +919,17 @@ export default function Index() {
       <RunCheckDialog
         open={runDialogOpen}
         onOpenChange={setRunDialogOpen}
-        onSubmit={(inn) => {
-          const today = new Date().toLocaleDateString("ru-RU");
-          const pendingCp: Counterparty = {
-            ...buildNewCounterparty(inn, today),
-            name: `Контрагент по ИНН ${inn}`,
-            tag: "На оценке",
-          };
-          setAddedCounterparties((prev) =>
-            prev.some((c) => c.inn === inn && c.tag === "На оценке")
-              ? prev
-              : [pendingCp, ...prev],
-          );
+        onSubmit={(inn, files) => {
           setRunDialogOpen(false);
-          setPendingCp(pendingCp);
-          setPendingCpOpen(true);
-          toast.success("Оценка успешно создана");
+          const proc: CheckProcess = {
+            inn,
+            fileNames: files.map((f) => f.name),
+            status: "running",
+          };
+          setCheckProcess(proc);
+          window.setTimeout(() => {
+            setCheckProcess((prev) => (prev && prev.inn === inn ? { ...prev, status: "done" } : prev));
+          }, 2800);
         }}
       />
 
@@ -905,6 +941,62 @@ export default function Index() {
           if (!o) setPendingCp(null);
         }}
       />
+
+      <CheckProcessDrawer
+        open={checkDrawerOpen}
+        onOpenChange={setCheckDrawerOpen}
+        process={checkProcess}
+        onOpenAssessment={() => {
+          if (!checkProcess) return;
+          const a = buildAssessment(
+            `Контрагент по ИНН ${checkProcess.inn}`,
+            checkProcess.inn,
+            "auto",
+          );
+          setCheckAssessment(a);
+          setCheckDrawerOpen(false);
+          setCheckAssessmentOpen(true);
+        }}
+      />
+
+      <AssessmentModal
+        assessment={checkAssessment}
+        open={checkAssessmentOpen}
+        onOpenChange={(o) => {
+          setCheckAssessmentOpen(o);
+          if (!o) setCheckAssessment(null);
+        }}
+        status="updated"
+        disagreement={null}
+        defaultInn={checkAssessment?.inn}
+        onConfirm={() => {}}
+        onDisagree={() => {}}
+        completionMode
+        onDeleteResult={() => {
+          setCheckAssessmentOpen(false);
+          setCheckAssessment(null);
+          setCheckProcess(null);
+          toast("Результат проверки удалён");
+        }}
+        onAddToList={() => {
+          if (!checkProcess) return;
+          const today = new Date().toLocaleDateString("ru-RU");
+          const cp: Counterparty = {
+            ...buildNewCounterparty(checkProcess.inn, today),
+            name: `Контрагент по ИНН ${checkProcess.inn}`,
+            tag: "Нет риска",
+            status: "no_risk",
+          };
+          setAddedCounterparties((prev) =>
+            prev.some((c) => c.inn === cp.inn) ? prev : [cp, ...prev],
+          );
+          setCheckAssessmentOpen(false);
+          setCheckAssessment(null);
+          setCheckProcess(null);
+          toast.success("Контрагент добавлен в список дебиторов");
+        }}
+      />
+
 
       <AssessmentModal
         assessment={manualAssessment}

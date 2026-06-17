@@ -104,6 +104,9 @@ export function AssessmentModal({
   onCloseFlow,
   positive = false,
   onStatusChange,
+  completionMode = false,
+  onDeleteResult,
+  onAddToList,
 }: {
   assessment: Assessment | null;
   open: boolean;
@@ -119,6 +122,9 @@ export function AssessmentModal({
   onCloseFlow?: () => void;
   positive?: boolean;
   onStatusChange?: (status: CounterpartyStatus) => void;
+  completionMode?: boolean;
+  onDeleteResult?: () => void;
+  onAddToList?: () => void;
 }) {
   
   const [groupDrawer, setGroupDrawer] = useState<AssessmentGroup | null>(null);
@@ -285,13 +291,31 @@ export function AssessmentModal({
 
           {/* Footer actions */}
           <div className="shrink-0 border-t border-border bg-white px-5 py-4 lg:px-10">
-            <Button
-              variant="outline"
-              onClick={() => setCommentOpen(true)}
-              className="h-12 w-full rounded-full text-sm font-medium"
-            >
-              Оставить комментарий
-            </Button>
+            {completionMode ? (
+              <div className="flex gap-3">
+                <Button
+                  variant="outline"
+                  onClick={onDeleteResult}
+                  className="h-12 flex-1 rounded-full text-sm font-medium"
+                >
+                  Удалить
+                </Button>
+                <Button
+                  onClick={onAddToList}
+                  className="h-12 flex-1 rounded-full text-sm font-medium"
+                >
+                  Добавить в список дебиторов
+                </Button>
+              </div>
+            ) : (
+              <Button
+                variant="outline"
+                onClick={() => setCommentOpen(true)}
+                className="h-12 w-full rounded-full text-sm font-medium"
+              >
+                Оставить комментарий
+              </Button>
+            )}
           </div>
 
 
