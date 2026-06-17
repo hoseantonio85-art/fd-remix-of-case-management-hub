@@ -1,4 +1,6 @@
 import { useState } from "react";
+import { ChevronDown, MessageSquare } from "lucide-react";
+import { cn } from "@/lib/utils";
 import { InModalDrawer } from "./InModalDrawer";
 import { NormAssistantIcon } from "./NormAssistantIcon";
 import {
@@ -11,14 +13,22 @@ import {
 } from "@/lib/assessment-data";
 import { assessmentCountMeta, type AssessmentCountKind } from "./assessment-count-meta";
 
+export type GroupComment = {
+  text: string;
+  author: string;
+  createdAt: string;
+};
+
 export function AssessmentGroupDrawer({
   group,
   open,
   onOpenChange,
+  comment,
 }: {
   group: AssessmentGroup | null;
   open: boolean;
   onOpenChange: (o: boolean) => void;
+  comment?: GroupComment;
 }) {
   if (!group) return null;
   const counts = groupCounts(group);
