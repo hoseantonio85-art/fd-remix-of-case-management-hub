@@ -17,7 +17,8 @@ export function RunCheckDialog({
   const [inn, setInn] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [files, setFiles] = useState<File[]>([]);
-  const [loading, setLoading] = useState(false);
+  const [isSending, setIsSending] = useState(false);
+  const [flying, setFlying] = useState(false);
   const [dragOver, setDragOver] = useState(false);
   const fileRef = useRef<HTMLInputElement>(null);
 
@@ -25,7 +26,8 @@ export function RunCheckDialog({
     setInn("");
     setError(null);
     setFiles([]);
-    setLoading(false);
+    setIsSending(false);
+    setFlying(false);
     setDragOver(false);
   };
 
@@ -33,7 +35,7 @@ export function RunCheckDialog({
   const isValid = innDigits.length === 10 || innDigits.length === 12;
 
   const handleClose = (o: boolean) => {
-    if (loading) return;
+    if (isSending) return;
     onOpenChange(o);
     if (!o) reset();
   };
@@ -44,11 +46,14 @@ export function RunCheckDialog({
       return;
     }
     setError(null);
-    setLoading(true);
+    setIsSending(true);
+    setFlying(true);
+    const innSnap = innDigits;
+    const filesSnap = files;
     setTimeout(() => {
-      onSubmit(innDigits, files);
+      onSubmit(innSnap, filesSnap);
       reset();
-    }, 1500);
+    }, 700);
   };
 
   const addFiles = (list: FileList | null) => {
