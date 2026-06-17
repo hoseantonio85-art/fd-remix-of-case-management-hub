@@ -604,12 +604,11 @@ export default function Index() {
                 <span className="text-sm text-muted-foreground">1002</span>
               </div>
               <div className="flex min-h-[40px] items-center">
-                {checkProcess && (
-                  <CheckProcessPill
-                    status={checkProcess.status}
-                    onClick={() => setCheckDrawerOpen(true)}
-                  />
-                )}
+                <ChecksWidget
+                  runningCount={checks.filter((c) => c.status === "running").length}
+                  doneCount={checks.filter((c) => c.status === "done").length}
+                  onClick={() => setCheckDrawerOpen(true)}
+                />
               </div>
             </div>
 
