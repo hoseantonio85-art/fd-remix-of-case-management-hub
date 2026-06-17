@@ -128,13 +128,14 @@ export function AssessmentModal({
 
   // History blocks (persist per-counterparty within the session)
   const [commentHistoryOpen, setCommentHistoryOpen] = useState(false);
-  const [infoExpanded, setInfoExpanded] = useState(false);
   const [commentHistoryMap, setCommentHistoryMap] = useState<Record<string, CommentRecord[]>>({});
-  const [commentedGroupsMap, setCommentedGroupsMap] = useState<Record<string, AssessmentGroupId[]>>({});
+  const [groupCommentsMap, setGroupCommentsMap] = useState<
+    Record<string, Partial<Record<AssessmentGroupId, GroupComment>>>
+  >({});
 
   const inn = assessment?.inn ?? "";
   const commentHistory = commentHistoryMap[inn] ?? [];
-  
+  const groupComments = groupCommentsMap[inn] ?? {};
 
   // Only reset transient UI state when modal closes.
   useEffect(() => {
@@ -151,27 +152,30 @@ export function AssessmentModal({
     return `Сегодня, ${hh}:${mm}`;
   };
 
-  const currentTagLabel = positive ? "Нет риска" : "Риск дефолта";
-
   const handleCommentSubmit = (payload: AssessmentCommentPayload) => {
-    if (!inn) return;
+    if (!inn || payload.comments.length === 0) return;
+    const createdAt = nowLabel();
+    const author = "Измайлова Л.Д. • Инициатор";
+    setGroupCommentsMap((prev) => {
+      const existing = { ...(prev[inn] ?? {}) };
+      payload.comments.forEach((c) => {
+        existing[c.groupId] = { text: c.text, author, createdAt };
+      });
+      return { ...prev, [inn]: existing };
+    });
+    // Keep general history in sync (one record summarizing this batch).
     const record: CommentRecord = {
       id: `c-${Date.now()}`,
-      dateTime: nowLabel(),
-      author: "Измайлова Л.Д. • Инициатор",
-      groupTitles: payload.groupTitles,
-      comment: payload.comment,
+      dateTime: createdAt,
+      author,
+      groupTitles: payload.comments.map((c) => c.groupTitle),
+      comment: payload.comments.map((c) => `${c.groupTitle}: ${c.text}`).join("\n\n"),
     };
     setCommentHistoryMap((prev) => ({
       ...prev,
       [inn]: [record, ...(prev[inn] ?? [])],
     }));
-    setCommentedGroupsMap((prev) => {
-      const existing = prev[inn] ?? [];
-      const merged = Array.from(new Set([...existing, ...payload.groupIds]));
-      return { ...prev, [inn]: merged };
-    });
-    toast("Замечание сохранено в блоке «Замечания к оценке»");
+    toast("Замечания сохранены");
   };
 
 
