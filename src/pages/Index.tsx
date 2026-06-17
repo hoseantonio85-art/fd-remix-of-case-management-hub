@@ -283,6 +283,8 @@ export default function Index() {
   const [processStage, setProcessStage] = useState<ProcessStage | null>(null);
   const [processDrawerOpen, setProcessDrawerOpen] = useState(false);
   const [runDialogOpen, setRunDialogOpen] = useState(false);
+  const [pendingCp, setPendingCp] = useState<Counterparty | null>(null);
+  const [pendingCpOpen, setPendingCpOpen] = useState(false);
   const [checkProcess, setCheckProcess] = useState<CheckProcess | null>(null);
   const [checkDrawerOpen, setCheckDrawerOpen] = useState(false);
   const [checkAssessment, setCheckAssessment] = useState<Assessment | null>(null);
