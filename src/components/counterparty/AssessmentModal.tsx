@@ -301,7 +301,9 @@ export function AssessmentModal({
             group={groupDrawer}
             open={!!groupDrawer}
             onOpenChange={(o) => !o && setGroupDrawer(null)}
+            comment={groupDrawer ? groupComments[groupDrawer.id] : undefined}
           />
+
 
           <RegistrationInfoDrawer
             open={registrationOpen}
