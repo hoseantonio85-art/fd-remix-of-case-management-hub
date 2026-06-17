@@ -585,7 +585,8 @@ export function CounterpartyModal({
                   const amount = toFiniteNumber(c.amount);
                   const debt = toFiniteNumber(c.debt);
                   const overdueAmount = toFiniteNumber(c.overdue);
-                  const overdueDays = toFiniteNumber(c.overdueDays);
+                  const historyDays = (c.overdueHistory ?? []).map((h) => toFiniteNumber(h.days));
+                  const overdueDays = historyDays.length > 0 ? Math.max(...historyDays) : toFiniteNumber(c.overdueDays);
                   const overdue = overdueAmount > 0;
                   return (
                     <button
