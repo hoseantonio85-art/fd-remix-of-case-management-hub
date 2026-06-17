@@ -520,7 +520,7 @@ export function CounterpartyModal({
                   })}
                 </div>
                 <h2 className="mt-3 text-2xl font-semibold tracking-tight text-foreground min-w-0 truncate">{counterparty.name}</h2>
-                <p className="mt-1 text-xs text-muted-foreground">ИНН {counterparty.inn}</p>
+                <CounterpartyHeaderMeta inn={counterparty.inn} />
               </div>
             );
           })()}
