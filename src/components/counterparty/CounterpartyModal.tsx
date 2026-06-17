@@ -40,6 +40,7 @@ import { buildAssessment, type Assessment } from "@/lib/assessment-data";
 import { defaultOgrn, defaultRegistrationInfo } from "./RegistrationInfoWidget";
 import { RegistrationInfoDrawer } from "./RegistrationInfoDrawer";
 import { AddContractDrawer } from "./AddContractDrawer";
+import { CounterpartyHeaderMeta } from "./CounterpartyHeaderMeta";
 
 const toFiniteNumber = (value: unknown) => {
   const numberValue = Number(value ?? 0);
@@ -520,14 +521,14 @@ export function CounterpartyModal({
                   })}
                 </div>
                 <h2 className="mt-3 text-2xl font-semibold tracking-tight text-foreground min-w-0 truncate">{counterparty.name}</h2>
-                <p className="mt-1 text-xs text-muted-foreground">ИНН {counterparty.inn}</p>
+                <CounterpartyHeaderMeta inn={counterparty.inn} />
               </div>
             );
           })()}
 
 
 
-          <div className="grid grid-cols-1 gap-y-6 gap-x-6 bg-white px-5 py-6 lg:grid-cols-[minmax(0,1fr)_340px] lg:gap-x-12 lg:px-10 min-h-0 flex-1 overflow-y-auto">
+          <div className="grid grid-cols-1 gap-y-6 gap-x-6 bg-white px-5 py-6 lg:gap-x-12 lg:px-10 min-h-0 flex-1 overflow-y-auto">
             <div className="space-y-6 min-w-0">
             {counterparty.status === "no_risk" ? (
               <ResolutionCard
@@ -635,37 +636,8 @@ export function CounterpartyModal({
             </section>
             </div>
 
-            {/* Right column: meta */}
-            <aside className="space-y-4 lg:sticky lg:top-4 lg:self-start">
-              <div className="rounded-2xl border border-border bg-white p-5">
-                <h3 className="text-sm font-semibold">Информация</h3>
-                <div className="mt-3 space-y-2.5">
-                  <InfoRow label="ИНН" value={counterparty.inn} />
-                  <InfoRow label="ОГРН" value={defaultOgrn} />
-                  <InfoRow
-                    label="Дата регистрации"
-                    value={`${defaultRegistrationInfo.registrationDate} (${defaultRegistrationInfo.businessAge})`}
-                  />
-                  <InfoRow label="Текущий статус ЕГРЮЛ" value={defaultRegistrationInfo.egrulStatus} />
-                  {infoExpanded && (
-                    <>
-                      <InfoRow
-                        label="Основной ОКВЭД"
-                        value={`${defaultRegistrationInfo.okvedCode} · ${defaultRegistrationInfo.okvedName}`}
-                      />
-                      <InfoRow label="Юридический адрес" value={defaultRegistrationInfo.legalAddress} />
-                    </>
-                  )}
-                </div>
-                <button
-                  type="button"
-                  onClick={() => setInfoExpanded((p) => !p)}
-                  className="mt-4 w-full rounded-lg border border-border bg-white px-3 py-2 text-sm font-medium text-foreground transition hover:bg-muted/40"
-                >
-                  {infoExpanded ? "Свернуть" : "Подробнее"}
-                </button>
-              </div>
-            </aside>
+
+
 
           </div>
         </div>
