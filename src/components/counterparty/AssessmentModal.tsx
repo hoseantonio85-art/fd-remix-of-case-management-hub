@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import * as DialogPrimitive from "@radix-ui/react-dialog";
-import { X, ArrowLeft, ChevronRight, AlertTriangle } from "lucide-react";
+import { X, ArrowLeft, ChevronRight, AlertTriangle, MessageSquare } from "lucide-react";
 import { toast } from "sonner";
 import { NormAssistantIcon } from "./NormAssistantIcon";
 import { Button } from "@/components/ui/button";
@@ -18,7 +18,8 @@ import {
   OTHER_GROUP_IDS,
 } from "@/lib/assessment-data";
 import { ChevronDown } from "lucide-react";
-import { AssessmentGroupDrawer } from "./AssessmentGroupDrawer";
+import { AssessmentGroupDrawer, type GroupComment } from "./AssessmentGroupDrawer";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { defaultOgrn, defaultRegistrationInfo } from "./RegistrationInfoWidget";
 import { RegistrationInfoDrawer } from "./RegistrationInfoDrawer";
 import { KeyAnomaliesWidget } from "./KeyAnomaliesWidget";
@@ -128,13 +129,14 @@ export function AssessmentModal({
 
   // History blocks (persist per-counterparty within the session)
   const [commentHistoryOpen, setCommentHistoryOpen] = useState(false);
-  const [infoExpanded, setInfoExpanded] = useState(false);
   const [commentHistoryMap, setCommentHistoryMap] = useState<Record<string, CommentRecord[]>>({});
-  const [commentedGroupsMap, setCommentedGroupsMap] = useState<Record<string, AssessmentGroupId[]>>({});
+  const [groupCommentsMap, setGroupCommentsMap] = useState<
+    Record<string, Partial<Record<AssessmentGroupId, GroupComment>>>
+  >({});
 
   const inn = assessment?.inn ?? "";
   const commentHistory = commentHistoryMap[inn] ?? [];
-  
+  const groupComments = groupCommentsMap[inn] ?? {};
 
   // Only reset transient UI state when modal closes.
   useEffect(() => {
@@ -151,27 +153,30 @@ export function AssessmentModal({
     return `Сегодня, ${hh}:${mm}`;
   };
 
-  const currentTagLabel = positive ? "Нет риска" : "Риск дефолта";
-
   const handleCommentSubmit = (payload: AssessmentCommentPayload) => {
-    if (!inn) return;
+    if (!inn || payload.comments.length === 0) return;
+    const createdAt = nowLabel();
+    const author = "Измайлова Л.Д. • Инициатор";
+    setGroupCommentsMap((prev) => {
+      const existing = { ...(prev[inn] ?? {}) };
+      payload.comments.forEach((c) => {
+        existing[c.groupId] = { text: c.text, author, createdAt };
+      });
+      return { ...prev, [inn]: existing };
+    });
+    // Keep general history in sync (one record summarizing this batch).
     const record: CommentRecord = {
       id: `c-${Date.now()}`,
-      dateTime: nowLabel(),
-      author: "Измайлова Л.Д. • Инициатор",
-      groupTitles: payload.groupTitles,
-      comment: payload.comment,
+      dateTime: createdAt,
+      author,
+      groupTitles: payload.comments.map((c) => c.groupTitle),
+      comment: payload.comments.map((c) => `${c.groupTitle}: ${c.text}`).join("\n\n"),
     };
     setCommentHistoryMap((prev) => ({
       ...prev,
       [inn]: [record, ...(prev[inn] ?? [])],
     }));
-    setCommentedGroupsMap((prev) => {
-      const existing = prev[inn] ?? [];
-      const merged = Array.from(new Set([...existing, ...payload.groupIds]));
-      return { ...prev, [inn]: merged };
-    });
-    toast("Замечание сохранено в блоке «Замечания к оценке»");
+    toast("Замечания сохранены");
   };
 
 
@@ -259,6 +264,7 @@ export function AssessmentModal({
                         key={g.id}
                         group={g}
                         onOpen={setGroupDrawer}
+                        hasComment={!!groupComments[g.id]}
                       />
                     );
                   })}
@@ -267,7 +273,7 @@ export function AssessmentModal({
                       .map((id) => assessment.groups.find((x) => x.id === id))
                       .filter((g): g is AssessmentGroup => !!g);
                     return otherGroups.length > 0 ? (
-                      <OtherGroupsAccordion groups={otherGroups} onOpen={setGroupDrawer} />
+                      <OtherGroupsAccordion groups={otherGroups} onOpen={setGroupDrawer} groupComments={groupComments} />
                     ) : null;
                   })()}
                 </div>
@@ -295,7 +301,9 @@ export function AssessmentModal({
             group={groupDrawer}
             open={!!groupDrawer}
             onOpenChange={(o) => !o && setGroupDrawer(null)}
+            comment={groupDrawer ? groupComments[groupDrawer.id] : undefined}
           />
+
 
           <RegistrationInfoDrawer
             open={registrationOpen}
@@ -354,10 +362,12 @@ function GroupCard({
   group,
   onOpen,
   compact = false,
+  hasComment = false,
 }: {
   group: AssessmentGroup;
   onOpen: (g: AssessmentGroup) => void;
   compact?: boolean;
+  hasComment?: boolean;
 }) {
   const counts = groupCounts(group);
   const negatives = group.criteria.filter((c) => c.passed === false);
@@ -390,6 +400,21 @@ function GroupCard({
           </div>
         </div>
         <div className="flex shrink-0 items-center gap-2">
+          {hasComment && (
+            <TooltipProvider delayDuration={150}>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <span
+                    className="inline-flex h-6 w-6 items-center justify-center rounded-full bg-primary/10 text-primary"
+                    aria-label="Есть замечание к группе"
+                  >
+                    <MessageSquare className="h-3.5 w-3.5" />
+                  </span>
+                </TooltipTrigger>
+                <TooltipContent>Есть замечание к группе</TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
+          )}
           <ChevronRight className="h-4 w-4 shrink-0 text-muted-foreground transition group-hover:text-foreground" />
         </div>
       </div>
@@ -440,9 +465,11 @@ function pluralCriteria(n: number) {
 function OtherGroupsAccordion({
   groups,
   onOpen,
+  groupComments = {},
 }: {
   groups: AssessmentGroup[];
   onOpen: (g: AssessmentGroup) => void;
+  groupComments?: Partial<Record<AssessmentGroupId, GroupComment>>;
 }) {
   const [open, setOpen] = useState(false);
   const totals = sumGroupCounts(groups);
@@ -476,7 +503,7 @@ function OtherGroupsAccordion({
       {open && (
         <div className="border-t border-slate-100 bg-slate-50/40 p-2 space-y-2">
           {groups.map((g) => (
-            <GroupCard key={g.id} group={g} onOpen={onOpen} compact />
+            <GroupCard key={g.id} group={g} onOpen={onOpen} compact hasComment={!!groupComments[g.id]} />
           ))}
         </div>
       )}

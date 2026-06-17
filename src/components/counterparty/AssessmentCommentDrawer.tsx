@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Check } from "lucide-react";
+import { ChevronDown, MessageSquare } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { cn } from "@/lib/utils";
@@ -7,57 +7,57 @@ import { InModalDrawer } from "./InModalDrawer";
 import {
   type AssessmentGroup,
   type AssessmentGroupId,
-  groupCounts,
 } from "@/lib/assessment-data";
 
 export type AssessmentCommentPayload = {
-  groupIds: AssessmentGroupId[];
-  groupTitles: string[];
-  comment: string;
+  comments: { groupId: AssessmentGroupId; groupTitle: string; text: string }[];
 };
 
 export function AssessmentCommentDrawer({
   open,
   onOpenChange,
   groups,
+  initialComments,
   onSubmit,
 }: {
   open: boolean;
   onOpenChange: (o: boolean) => void;
   groups: AssessmentGroup[];
+  initialComments?: Partial<Record<AssessmentGroupId, string>>;
   onSubmit: (p: AssessmentCommentPayload) => void;
 }) {
-  const [selected, setSelected] = useState<AssessmentGroupId[]>([]);
-  const [comment, setComment] = useState("");
+  const [drafts, setDrafts] = useState<Record<string, string>>({});
+  const [expanded, setExpanded] = useState<Record<string, boolean>>({});
   const [submitted, setSubmitted] = useState(false);
 
   useEffect(() => {
     if (open) {
-      setSelected([]);
-      setComment("");
+      const init: Record<string, string> = {};
+      const exp: Record<string, boolean> = {};
+      groups.forEach((g) => {
+        const v = initialComments?.[g.id] ?? "";
+        init[g.id] = v;
+        exp[g.id] = !!v;
+      });
+      setDrafts(init);
+      setExpanded(exp);
       setSubmitted(false);
     }
-  }, [open]);
+  }, [open, groups, initialComments]);
 
-  const toggle = (id: AssessmentGroupId) =>
-    setSelected((prev) =>
-      prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id],
-    );
-
-  const errors = {
-    groups: selected.length === 0,
-    comment: !comment.trim(),
-  };
+  const hasAny = Object.values(drafts).some((v) => v.trim().length > 0);
 
   const handleSave = () => {
     setSubmitted(true);
-    if (errors.groups || errors.comment) return;
-    const chosen = groups.filter((g) => selected.includes(g.id));
-    onSubmit({
-      groupIds: chosen.map((g) => g.id),
-      groupTitles: chosen.map((g) => g.title),
-      comment: comment.trim(),
-    });
+    if (!hasAny) return;
+    const comments = groups
+      .filter((g) => (drafts[g.id] ?? "").trim().length > 0)
+      .map((g) => ({
+        groupId: g.id,
+        groupTitle: g.title,
+        text: drafts[g.id].trim(),
+      }));
+    onSubmit({ comments });
     onOpenChange(false);
   };
 
@@ -67,97 +67,75 @@ export function AssessmentCommentDrawer({
         <div className="flex-1 overflow-y-auto p-6 pb-4">
           <h2 className="text-lg font-semibold">Замечание к оценке</h2>
           <p className="mt-1 text-sm text-muted-foreground">
-            Выберите группы оценки, к которым относится замечание, и опишите,
-            с чем вы не согласны.
+            Выберите группы оценки и оставьте комментарий по каждой из них.
           </p>
 
-          <div className="mt-6">
-            <label className="mb-2 block text-sm font-medium">
-              Группы оценки
-            </label>
-            <div className="grid grid-cols-1 gap-2">
-              {groups.map((g) => {
-                const isSelected = selected.includes(g.id);
-                const counts = groupCounts(g);
-                const negatives = g.criteria
-                  .filter((c) => c.passed === false)
-                  .slice(0, 2);
-                return (
+          <div className="mt-6 space-y-2">
+            {groups.map((g) => {
+              const isOpen = !!expanded[g.id];
+              const value = drafts[g.id] ?? "";
+              const filled = value.trim().length > 0;
+              return (
+                <div
+                  key={g.id}
+                  className={cn(
+                    "rounded-xl border bg-white transition",
+                    filled ? "border-primary/40" : "border-slate-200",
+                  )}
+                >
                   <button
-                    key={g.id}
                     type="button"
-                    onClick={() => toggle(g.id)}
-                    className={cn(
-                      "flex items-start gap-3 rounded-xl border px-3 py-2.5 text-left transition",
-                      isSelected
-                        ? "border-primary bg-primary/5"
-                        : "border-slate-200 bg-white hover:border-slate-300",
-                    )}
+                    onClick={() =>
+                      setExpanded((p) => ({ ...p, [g.id]: !p[g.id] }))
+                    }
+                    className="flex w-full items-center gap-3 px-3 py-3 text-left"
                   >
-                    <span
-                      className={cn(
-                        "mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full border",
-                        isSelected
-                          ? "border-primary bg-primary text-white"
-                          : "border-slate-300 bg-white",
-                      )}
-                    >
-                      {isSelected && <Check className="h-3.5 w-3.5" />}
-                    </span>
                     <span className="min-w-0 flex-1">
                       <span className="block text-sm font-medium text-foreground">
                         {g.title}
                       </span>
-                      <span className="mt-0.5 block text-xs text-muted-foreground">
-                        {counts.risk} риск(ов) · {counts.clear} без нарушений ·{" "}
-                        {counts.no_data} нет данных
-                      </span>
-                      {negatives.length > 0 && (
-                        <span className="mt-2 block space-y-1">
-                          {negatives.map((c) => (
-                            <span
-                              key={c.number}
-                              className="block rounded-md bg-rose-50/70 px-2 py-1 text-xs text-rose-900"
-                            >
-                              {c.title}
-                            </span>
-                          ))}
+                      {filled && (
+                        <span className="mt-0.5 block text-xs text-muted-foreground line-clamp-1">
+                          {value.trim()}
                         </span>
                       )}
                     </span>
+                    {filled && (
+                      <MessageSquare className="h-4 w-4 shrink-0 text-primary" />
+                    )}
+                    <ChevronDown
+                      className={cn(
+                        "h-4 w-4 shrink-0 text-muted-foreground transition",
+                        isOpen && "rotate-180",
+                      )}
+                    />
                   </button>
-                );
-              })}
-            </div>
-            {submitted && errors.groups && (
-              <div className="mt-1.5 text-xs text-rose-600">
-                Выберите хотя бы одну группу
-              </div>
-            )}
+                  {isOpen && (
+                    <div className="border-t border-slate-100 px-3 py-3">
+                      <label className="mb-1.5 block text-xs font-medium text-muted-foreground">
+                        Комментарий по группе
+                      </label>
+                      <Textarea
+                        rows={4}
+                        placeholder="Опишите, с чем вы не согласны в этой группе"
+                        value={value}
+                        onChange={(e) =>
+                          setDrafts((p) => ({ ...p, [g.id]: e.target.value }))
+                        }
+                        className="min-h-[96px]"
+                      />
+                    </div>
+                  )}
+                </div>
+              );
+            })}
           </div>
 
-          <div className="mt-6">
-            <label className="mb-1.5 block text-sm font-medium">
-              Замечание
-            </label>
-            <Textarea
-              rows={5}
-              placeholder="Опишите, с чем вы не согласны в выбранных группах оценки"
-              value={comment}
-              onChange={(e) => setComment(e.target.value)}
-              className={cn(
-                "min-h-[120px]",
-                submitted &&
-                  errors.comment &&
-                  "border-rose-400 focus-visible:ring-rose-300",
-              )}
-            />
-            {submitted && errors.comment && (
-              <div className="mt-1 text-xs text-rose-600">
-                Добавьте замечание
-              </div>
-            )}
-          </div>
+          {submitted && !hasAny && (
+            <div className="mt-3 text-xs text-rose-600">
+              Добавьте хотя бы один комментарий
+            </div>
+          )}
         </div>
 
         <div className="sticky bottom-0 z-10 mt-auto flex shrink-0 gap-3 border-t border-border bg-white px-6 py-4">
@@ -169,7 +147,7 @@ export function AssessmentCommentDrawer({
             Отменить
           </Button>
           <Button className="flex-1" onClick={handleSave}>
-            Сохранить замечание
+            Сохранить замечания
           </Button>
         </div>
       </div>

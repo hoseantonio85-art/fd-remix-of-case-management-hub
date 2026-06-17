@@ -1,4 +1,6 @@
 import { useState } from "react";
+import { ChevronDown, MessageSquare } from "lucide-react";
+import { cn } from "@/lib/utils";
 import { InModalDrawer } from "./InModalDrawer";
 import { NormAssistantIcon } from "./NormAssistantIcon";
 import {
@@ -11,14 +13,22 @@ import {
 } from "@/lib/assessment-data";
 import { assessmentCountMeta, type AssessmentCountKind } from "./assessment-count-meta";
 
+export type GroupComment = {
+  text: string;
+  author: string;
+  createdAt: string;
+};
+
 export function AssessmentGroupDrawer({
   group,
   open,
   onOpenChange,
+  comment,
 }: {
   group: AssessmentGroup | null;
   open: boolean;
   onOpenChange: (o: boolean) => void;
+  comment?: GroupComment;
 }) {
   if (!group) return null;
   const counts = groupCounts(group);
@@ -88,6 +98,7 @@ export function AssessmentGroupDrawer({
 
       {/* Body — flat list of criteria, no category sections */}
       <div className="px-6 pb-6">
+        {comment && <GroupCommentBlock comment={comment} />}
         <div className="space-y-3">
           {filteredCriteria.map((c) => (
             <CriterionCard key={`${c.number}-${activeFilter ?? "all"}`} c={c} />
@@ -102,6 +113,41 @@ export function AssessmentGroupDrawer({
         </div>
       </div>
     </InModalDrawer>
+  );
+}
+
+function GroupCommentBlock({ comment }: { comment: GroupComment }) {
+  const [open, setOpen] = useState(false);
+  return (
+    <div className="mb-4 rounded-2xl border border-slate-200 bg-white">
+      <button
+        type="button"
+        onClick={() => setOpen((v) => !v)}
+        aria-expanded={open}
+        className="flex w-full items-center gap-3 px-4 py-3 text-left"
+      >
+        <MessageSquare className="h-4 w-4 shrink-0 text-primary" />
+        <span className="flex-1 text-sm font-medium text-slate-900">
+          Замечание к группе
+        </span>
+        <ChevronDown
+          className={cn(
+            "h-4 w-4 shrink-0 text-muted-foreground transition",
+            open && "rotate-180",
+          )}
+        />
+      </button>
+      {open && (
+        <div className="border-t border-slate-100 px-4 py-3">
+          <div className="text-xs text-muted-foreground">
+            {comment.author} · {comment.createdAt}
+          </div>
+          <div className="mt-2 whitespace-pre-wrap text-sm text-slate-900">
+            {comment.text}
+          </div>
+        </div>
+      )}
+    </div>
   );
 }
 
