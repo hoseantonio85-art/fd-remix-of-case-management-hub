@@ -4,6 +4,7 @@ import { CounterpartyStatusBadge } from "./CounterpartyStatusBadge";
 import { Clock, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import type { Counterparty } from "@/lib/mock-data";
+import { CounterpartyHeaderMeta } from "./CounterpartyHeaderMeta";
 
 export function PendingAssessmentModal({
   counterparty,
