@@ -1117,6 +1117,7 @@ export function ContractDrawer({
             )}
           </div>
         </div>
+      )}
       </div>
     </InModalDrawer>
   );
