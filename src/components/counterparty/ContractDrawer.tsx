@@ -150,6 +150,7 @@ export function ContractDrawer({
   const [editAdjDate, setEditAdjDate] = useState("");
   const [editAdjType, setEditAdjType] = useState<"increase" | "decrease">("increase");
   const [editAdjError, setEditAdjError] = useState<string | null>(null);
+  const [expandedAdjustments, setExpandedAdjustments] = useState<Record<string, boolean>>({});
 
   // Change history
   const [historyOpen, setHistoryOpen] = useState(false);
