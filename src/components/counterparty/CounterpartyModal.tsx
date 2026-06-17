@@ -636,37 +636,8 @@ export function CounterpartyModal({
             </section>
             </div>
 
-            {/* Right column: meta */}
-            <aside className="space-y-4 lg:sticky lg:top-4 lg:self-start">
-              <div className="rounded-2xl border border-border bg-white p-5">
-                <h3 className="text-sm font-semibold">Информация</h3>
-                <div className="mt-3 space-y-2.5">
-                  <InfoRow label="ИНН" value={counterparty.inn} />
-                  <InfoRow label="ОГРН" value={defaultOgrn} />
-                  <InfoRow
-                    label="Дата регистрации"
-                    value={`${defaultRegistrationInfo.registrationDate} (${defaultRegistrationInfo.businessAge})`}
-                  />
-                  <InfoRow label="Текущий статус ЕГРЮЛ" value={defaultRegistrationInfo.egrulStatus} />
-                  {infoExpanded && (
-                    <>
-                      <InfoRow
-                        label="Основной ОКВЭД"
-                        value={`${defaultRegistrationInfo.okvedCode} · ${defaultRegistrationInfo.okvedName}`}
-                      />
-                      <InfoRow label="Юридический адрес" value={defaultRegistrationInfo.legalAddress} />
-                    </>
-                  )}
-                </div>
-                <button
-                  type="button"
-                  onClick={() => setInfoExpanded((p) => !p)}
-                  className="mt-4 w-full rounded-lg border border-border bg-white px-3 py-2 text-sm font-medium text-foreground transition hover:bg-muted/40"
-                >
-                  {infoExpanded ? "Свернуть" : "Подробнее"}
-                </button>
-              </div>
-            </aside>
+
+
 
           </div>
         </div>
