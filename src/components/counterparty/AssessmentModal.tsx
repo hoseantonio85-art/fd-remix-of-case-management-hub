@@ -557,7 +557,7 @@ export function AssessmentInfoWidget({
   inn?: string;
   contractFile?: string;
 } = {}) {
-  const hasSource = !!inn || !!contractFile;
+  const hasSource = !!contractFile;
   return (
     <div className="rounded-2xl border border-border bg-white p-4">
       <h4 className="text-base font-semibold">Информация</h4>
@@ -571,11 +571,6 @@ export function AssessmentInfoWidget({
               Источник
             </div>
             <div className="mt-1 space-y-1.5">
-              {inn && (
-                <div className="text-sm leading-snug text-foreground break-words">
-                  ИНН {inn}
-                </div>
-              )}
               {contractFile && (
                 <a
                   href="#"
