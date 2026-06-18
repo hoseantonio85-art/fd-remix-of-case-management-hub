@@ -1,5 +1,7 @@
+import { useState } from "react";
 import { Sheet, SheetContent } from "@/components/ui/sheet";
 import { CheckCircle2, Loader2, ClipboardList } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 export type CheckProcessStatus = "running" | "done";
 export type CheckRecordType = "counterparty" | "contract" | "complex";
@@ -13,16 +15,7 @@ export type CheckRecord = {
   type?: CheckRecordType;
 };
 
-function formatDate(ts: number) {
-  const d = new Date(ts);
-  return d.toLocaleString("ru-RU", {
-    day: "2-digit",
-    month: "2-digit",
-    year: "numeric",
-    hour: "2-digit",
-    minute: "2-digit",
-  });
-}
+type CheckTypeFilter = "all" | CheckRecordType;
 
 function formatDateOnly(ts: number) {
   const d = new Date(ts);
@@ -32,6 +25,25 @@ function formatDateOnly(ts: number) {
     year: "numeric",
   });
 }
+
+function getRecordType(c: CheckRecord): CheckRecordType {
+  const hasInn = !!c.inn;
+  const hasFiles = c.fileNames.length > 0;
+  return c.type ?? (hasInn && hasFiles ? "complex" : hasInn ? "counterparty" : "contract");
+}
+
+const typeBadgeLabel: Record<CheckRecordType, string> = {
+  counterparty: "По ИНН",
+  complex: "Комплексная",
+  contract: "По договору",
+};
+
+const FILTERS: { value: CheckTypeFilter; label: string }[] = [
+  { value: "all", label: "Все" },
+  { value: "counterparty", label: "По ИНН" },
+  { value: "complex", label: "Комплексная" },
+  { value: "contract", label: "По договору" },
+];
 
 export function ChecksDrawer({
   open,
@@ -44,17 +56,59 @@ export function ChecksDrawer({
   checks: CheckRecord[];
   onOpenCheck: (c: CheckRecord) => void;
 }) {
+  const [filter, setFilter] = useState<CheckTypeFilter>("all");
+
+  const counts: Record<CheckTypeFilter, number> = {
+    all: checks.length,
+    counterparty: checks.filter((c) => getRecordType(c) === "counterparty").length,
+    complex: checks.filter((c) => getRecordType(c) === "complex").length,
+    contract: checks.filter((c) => getRecordType(c) === "contract").length,
+  };
+
+  const filtered = filter === "all" ? checks : checks.filter((c) => getRecordType(c) === filter);
+
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent side="right" className="flex w-full flex-col gap-0 p-0 sm:max-w-md">
         <div className="border-b border-border px-6 pt-6 pb-4">
           <div className="text-base font-semibold tracking-tight">Проверки</div>
           <div className="mt-1 text-[12px] text-muted-foreground">
-            {checks.length === 0
-              ? "Нет активных проверок"
-              : `Всего: ${checks.length}`}
+            {checks.length === 0 ? "Нет активных проверок" : `Всего: ${checks.length}`}
           </div>
         </div>
+
+        {checks.length > 0 && (
+          <div className="border-b border-border px-6 py-3">
+            <div className="flex flex-wrap gap-1.5">
+              {FILTERS.map((f) => {
+                const active = filter === f.value;
+                return (
+                  <button
+                    key={f.value}
+                    type="button"
+                    onClick={() => setFilter(f.value)}
+                    className={cn(
+                      "inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-[11px] font-medium transition",
+                      active
+                        ? "border-primary/30 bg-primary/5 text-primary"
+                        : "border-slate-200 bg-white text-slate-600 hover:bg-slate-50",
+                    )}
+                  >
+                    {f.label}
+                    <span
+                      className={cn(
+                        "rounded-full px-1.5 py-px text-[10px]",
+                        active ? "bg-white/70 text-primary" : "bg-slate-100 text-slate-600",
+                      )}
+                    >
+                      {counts[f.value]}
+                    </span>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        )}
 
         <div className="flex-1 overflow-y-auto px-6 py-5">
           {checks.length === 0 ? (
@@ -67,23 +121,24 @@ export function ChecksDrawer({
                 Запустите проверку по ИНН и документам, чтобы получить результат оценки.
               </p>
             </div>
+          ) : filtered.length === 0 ? (
+            <div className="py-8 text-center text-[12px] text-muted-foreground">
+              Нет проверок этого типа
+            </div>
           ) : (
             <ul className="space-y-2.5">
-              {checks.map((c) => {
+              {filtered.map((c) => {
                 const isDone = c.status === "done";
-                const hasInn = !!c.inn;
-                const hasFiles = c.fileNames.length > 0;
-                const recordType: CheckRecordType =
-                  c.type ?? (hasInn && hasFiles ? "complex" : hasInn ? "counterparty" : "contract");
+                const recordType = getRecordType(c);
                 const isContract = recordType === "contract";
                 const isComplex = recordType === "complex";
                 const clickable = isDone;
                 const title = isContract ? "Договор № 24/06-У" : "ООО „Альтаир Логистик“";
                 const meta = isComplex
-                  ? `ИНН ${c.inn} · Комплексная проверка · ${formatDateOnly(c.createdAt)} · Измайлова Л.Д.`
+                  ? `ИНН ${c.inn} · ${formatDateOnly(c.createdAt)} · Измайлова Л.Д.`
                   : isContract
-                    ? `Договор об оказании услуг · Проверка по договору · ${formatDateOnly(c.createdAt)} · Измайлова Л.Д.`
-                    : `ИНН ${c.inn} · Проверка по ИНН · ${formatDateOnly(c.createdAt)} · Измайлова Л.Д.`;
+                    ? `Договор об оказании услуг · ${formatDateOnly(c.createdAt)} · Измайлова Л.Д.`
+                    : `ИНН ${c.inn} · ${formatDateOnly(c.createdAt)} · Измайлова Л.Д.`;
                 return (
                   <li key={c.id}>
                     <button
@@ -95,7 +150,7 @@ export function ChecksDrawer({
                           : "border-border cursor-default"
                       }`}
                     >
-                      <div>
+                      <div className="flex flex-wrap items-center gap-1.5">
                         {isDone ? (
                           <span className="inline-flex items-center gap-1 rounded-full bg-emerald-50 px-2 py-0.5 text-[11px] font-medium text-emerald-700">
                             <CheckCircle2 className="h-3 w-3" />
@@ -107,13 +162,12 @@ export function ChecksDrawer({
                             На проверке
                           </span>
                         )}
+                        <span className="inline-flex items-center rounded-full border border-violet-100 bg-violet-50 px-2 py-0.5 text-[11px] font-medium text-violet-700">
+                          {typeBadgeLabel[recordType]}
+                        </span>
                       </div>
-                      <div className="text-sm font-semibold text-foreground">
-                        {title}
-                      </div>
-                      <div className="text-[11px] text-muted-foreground">
-                        {meta}
-                      </div>
+                      <div className="text-sm font-semibold text-foreground">{title}</div>
+                      <div className="text-[11px] text-muted-foreground">{meta}</div>
                       {!isDone && (
                         <div className="text-[11px] text-muted-foreground">
                           Результат формируется
