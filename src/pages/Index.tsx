@@ -1075,6 +1075,7 @@ export default function Index() {
         onConfirm={() => {}}
         onDisagree={() => {}}
         completionMode
+        positive
         onDeleteResult={() => {
           if (activeCheckId) {
             setChecks((prev) => prev.filter((c) => c.id !== activeCheckId));

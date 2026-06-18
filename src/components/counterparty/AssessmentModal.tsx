@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import * as DialogPrimitive from "@radix-ui/react-dialog";
-import { X, ArrowLeft, ChevronRight, AlertTriangle, MessageSquare } from "lucide-react";
+import { X, ArrowLeft, ChevronRight, AlertTriangle, MessageSquare, Download } from "lucide-react";
 import { toast } from "sonner";
 import { NormAssistantIcon } from "./NormAssistantIcon";
 import { Button } from "@/components/ui/button";
@@ -191,7 +191,9 @@ export function AssessmentModal({
 
   const headerBg = positive
     ? "bg-gradient-to-b from-emerald-50 via-emerald-50/40 to-transparent"
-    : statusMeta[status].headerBg;
+    : completionMode
+      ? "bg-gradient-to-b from-rose-50 via-rose-50/40 to-transparent"
+      : statusMeta[status].headerBg;
   const resolutionBadge = positive
     ? { label: "Сделки заключать можно", chip: "bg-emerald-100 text-emerald-900" }
     : { label: "Не заключать сделки", chip: "bg-rose-100 text-rose-900" };
@@ -251,7 +253,7 @@ export function AssessmentModal({
               {/* What changed — right column */}
               <aside className="order-2 lg:col-start-2 lg:row-start-1">
                 <div className="space-y-3 lg:sticky lg:top-0">
-                  <AssessmentInfoWidget />
+                  <AssessmentInfoWidget inn={assessment.inn} />
                 </div>
               </aside>
 
@@ -548,7 +550,13 @@ function InfoRow({ label, value }: { label: string; value: React.ReactNode }) {
   );
 }
 
-export function AssessmentInfoWidget() {
+export function AssessmentInfoWidget({
+  inn,
+  contractFile,
+}: {
+  inn?: string;
+  contractFile?: string;
+} = {}) {
   return (
     <div className="rounded-2xl border border-border bg-white p-4">
       <h4 className="text-base font-semibold">Информация</h4>
@@ -556,6 +564,22 @@ export function AssessmentInfoWidget() {
         <InfoRow label="Дата проверки" value="18.06.2026" />
         <InfoRow label="Инициатор" value="Измайлова Л.Д." />
         <InfoRow label="Автор" value="Норм" />
+        {inn && <InfoRow label="Источник" value={`ИНН ${inn}`} />}
+        {contractFile && (
+          <InfoRow
+            label="Источник"
+            value={
+              <a
+                href="#"
+                onClick={(e) => e.preventDefault()}
+                className="inline-flex items-center gap-1.5 text-foreground hover:text-primary"
+              >
+                <Download className="h-3.5 w-3.5 text-muted-foreground" />
+                {contractFile}
+              </a>
+            }
+          />
+        )}
       </div>
     </div>
   );
