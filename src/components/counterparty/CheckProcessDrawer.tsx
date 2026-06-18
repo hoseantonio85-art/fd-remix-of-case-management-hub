@@ -71,8 +71,19 @@ export function ChecksDrawer({
             <ul className="space-y-2.5">
               {checks.map((c) => {
                 const isDone = c.status === "done";
-                const isContract = c.type === "contract" || (!c.inn && c.fileNames.length > 0);
+                const hasInn = !!c.inn;
+                const hasFiles = c.fileNames.length > 0;
+                const recordType: CheckRecordType =
+                  c.type ?? (hasInn && hasFiles ? "complex" : hasInn ? "counterparty" : "contract");
+                const isContract = recordType === "contract";
+                const isComplex = recordType === "complex";
                 const clickable = isDone;
+                const title = isContract ? "Договор № 24/06-У" : "ООО „Альтаир Логистик“";
+                const meta = isComplex
+                  ? `ИНН ${c.inn} · Комплексная проверка · ${formatDateOnly(c.createdAt)} · Измайлова Л.Д.`
+                  : isContract
+                    ? `Договор об оказании услуг · Проверка по договору · ${formatDateOnly(c.createdAt)} · Измайлова Л.Д.`
+                    : `ИНН ${c.inn} · Проверка по ИНН · ${formatDateOnly(c.createdAt)} · Измайлова Л.Д.`;
                 return (
                   <li key={c.id}>
                     <button
@@ -98,12 +109,10 @@ export function ChecksDrawer({
                         )}
                       </div>
                       <div className="text-sm font-semibold text-foreground">
-                        {isContract ? "Договор № 24/06-У" : "ООО „Альтаир Логистик“"}
+                        {title}
                       </div>
                       <div className="text-[11px] text-muted-foreground">
-                      {isContract
-                        ? `Договор об оказании услуг · ${formatDateOnly(c.createdAt)} · Измайлова Л.Д.`
-                        : `ИНН ${c.inn} · ${formatDateOnly(c.createdAt)} · Измайлова Л.Д.`}
+                        {meta}
                       </div>
                       {!isDone && (
                         <div className="text-[11px] text-muted-foreground">
