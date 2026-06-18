@@ -1,10 +1,96 @@
 import { useState } from "react";
 import * as DialogPrimitive from "@radix-ui/react-dialog";
-import { X, ChevronDown, ArrowUp, Flame, Download } from "lucide-react";
+import { X, ChevronDown, ArrowUp, Flame, Download, AlertTriangle, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { largeModalContentClass } from "@/lib/modal-styles";
 import { AssessmentInfoWidget } from "./AssessmentModal";
+import { InModalDrawer } from "./InModalDrawer";
+
+type ContractError = { id: string; title: string; summary: string; description: string; justification: string };
+
+const CONTRACT_ERRORS: ContractError[] = [
+  {
+    id: "e1",
+    title: "Ошибка 1",
+    summary: "Некорректные подписи и опечатки в Приложении №2.",
+    description:
+      "В подписях Приложения №2 со стороны Исполнителя указана подпись «И.П.», хотя сторона является ООО. Также допущены опечатки в фамилии и должности.",
+    justification:
+      "Приложение №2: Исполнитель, Заказчик, ООО «Инстамарт Сервис», Генеральный директор, «/Блухов П.А./ И.П.», «Фиансовый лиректор».",
+  },
+  {
+    id: "e2",
+    title: "Ошибка 2",
+    summary: "Дублирование отчетного периода с разными суммами в п. 4.1.",
+    description:
+      "В таблице расчета вознаграждения в пункте 4.1 дважды указан отчетный период «октябрь 2021 г.» с разными суммами.",
+    justification:
+      "Пункт 4.1: в таблице указано «октябрь 2021 г.» с суммами 51 739 441,98 и 7 841 398,79 без пояснения разбивки.",
+  },
+  {
+    id: "e3",
+    title: "Ошибка 3",
+    summary: "В шапке Приложения №2 дата окончания периода раньше даты начала.",
+    description:
+      "В шапке Приложения №2 указан период претензии, где дата окончания раньше даты начала.",
+    justification: "Приложение №2: «за период с 01.....2022 по 30......2021 г.».",
+  },
+  {
+    id: "e4",
+    title: "Ошибка 4",
+    summary: "Ошибки в реквизитах и подписях, «И.П.» для ООО.",
+    description:
+      "В реквизитах и подписях допущены ошибки в написании должности и фамилии, а также указана подпись «И.П.» для ООО.",
+    justification: "Приложение №2: «Фиансовый лиректор /Иванов Д.А./», «/Блухов П.А./ И.П.».",
+  },
+  {
+    id: "e5",
+    title: "Ошибка 5",
+    summary: "Ошибка в нумерации этапов программы лояльности в п. 3.2.25.",
+    description:
+      "В пункте 3.2.25 допущена ошибка в нумерации этапов программы лояльности.",
+    justification:
+      "Пункт 3.2.25: «Программа лояльности реализуется в 2 этапа: 1ый этап ... 20й этап списание баллов ... Плановая дата реализации _ Зий, 4ый квартал 2022 года».",
+  },
+];
+
+function ErrorCard({ err }: { err: ContractError }) {
+  const [open, setOpen] = useState(false);
+  return (
+    <div className="rounded-xl border border-slate-200 bg-white hover:bg-slate-50/50 transition">
+      <button
+        type="button"
+        onClick={() => setOpen((o) => !o)}
+        className="flex w-full items-start gap-3 px-3 py-3 text-left"
+      >
+        <div className="min-w-0 flex-1">
+          <div className="text-sm font-medium text-foreground">{err.title}</div>
+          <div className="mt-0.5 line-clamp-2 text-[12px] text-muted-foreground">{err.summary}</div>
+        </div>
+        <ChevronDown
+          className={cn("mt-1 h-4 w-4 shrink-0 text-muted-foreground transition", open && "rotate-180")}
+        />
+      </button>
+      {open && (
+        <div className="space-y-3 border-t border-slate-100 px-3 py-3">
+          <div>
+            <div className="text-[11px] font-medium uppercase tracking-wide text-muted-foreground">
+              Описание
+            </div>
+            <div className="mt-1 text-sm leading-relaxed text-foreground">{err.description}</div>
+          </div>
+          <div>
+            <div className="text-[11px] font-medium uppercase tracking-wide text-muted-foreground">
+              Обоснование
+            </div>
+            <div className="mt-1 text-sm leading-relaxed text-foreground">{err.justification}</div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
 
 export type Level = "very_high" | "high" | "medium" | "low";
 
