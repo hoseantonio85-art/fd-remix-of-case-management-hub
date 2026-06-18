@@ -921,13 +921,15 @@ export default function Index() {
         onOpenChange={setRunDialogOpen}
         onSubmit={(inn, files) => {
           setRunDialogOpen(false);
-          const id = `check-${inn}-${Date.now()}`;
+          const isContract = !inn && files.length > 0;
+          const id = `check-${inn || "contract"}-${Date.now()}`;
           const rec: CheckRecord = {
             id,
-            inn,
+            inn: inn || undefined,
             fileNames: files.map((f) => f.name),
             status: "running",
             createdAt: Date.now(),
+            type: isContract ? "contract" : "counterparty",
           };
           setChecks((prev) => [rec, ...prev]);
           window.setTimeout(() => {
