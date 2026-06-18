@@ -313,21 +313,13 @@ export function ContractAssessmentModal({
 
             {/* Footer */}
             <div className="shrink-0 border-t border-border bg-white px-5 py-4 lg:px-10">
-              <div className="flex gap-3">
-                <Button
-                  variant="outline"
-                  onClick={onDelete}
-                  className="h-12 flex-1 rounded-full text-sm font-medium"
-                >
-                  Удалить
-                </Button>
-                <Button
-                  onClick={() => onOpenChange(false)}
-                  className="h-12 flex-1 rounded-full bg-emerald-600 text-sm font-medium text-white hover:bg-emerald-700"
-                >
-                  Закрыть
-                </Button>
-              </div>
+              <Button
+                variant="outline"
+                onClick={onDelete}
+                className="h-12 w-full rounded-full text-sm font-medium"
+              >
+                Удалить
+              </Button>
             </div>
           </div>
         </DialogPrimitive.Content>
