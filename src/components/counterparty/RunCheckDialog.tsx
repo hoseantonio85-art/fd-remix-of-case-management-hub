@@ -32,7 +32,10 @@ export function RunCheckDialog({
   };
 
   const innDigits = inn.replace(/\D/g, "");
-  const isValid = innDigits.length === 10 || innDigits.length === 12;
+  const innFilled = innDigits.length > 0;
+  const innValid = innDigits.length === 10 || innDigits.length === 12;
+  const hasFiles = files.length > 0;
+  const canSubmit = innValid || (!innFilled && hasFiles);
 
   const handleClose = (o: boolean) => {
     if (isSending) return;
@@ -41,14 +44,18 @@ export function RunCheckDialog({
   };
 
   const handleStart = () => {
-    if (!isValid) {
+    if (!innFilled && !hasFiles) {
+      setError("Укажите ИНН или загрузите документ");
+      return;
+    }
+    if (innFilled && !innValid) {
       setError("Введите корректный ИНН");
       return;
     }
     setError(null);
     setIsSending(true);
     setFlying(true);
-    const innSnap = innDigits;
+    const innSnap = innValid ? innDigits : "";
     const filesSnap = files;
     setTimeout(() => {
       onSubmit(innSnap, filesSnap);
