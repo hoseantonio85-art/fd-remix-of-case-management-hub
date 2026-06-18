@@ -99,6 +99,22 @@ export const RISKS: ContractRisk[] = [
 
 export const LEVEL_ORDER: Level[] = ["very_high", "high", "medium", "low"];
 
+export function pluralRisk(n: number) {
+  const mod10 = n % 10;
+  const mod100 = n % 100;
+  if (mod10 === 1 && mod100 !== 11) return "риск";
+  if (mod10 >= 2 && mod10 <= 4 && (mod100 < 12 || mod100 > 14)) return "риска";
+  return "рисков";
+}
+
+export function RisksCounter({ count }: { count: number }) {
+  return (
+    <span className="rounded-full bg-slate-100 px-2 py-0.5 text-[11px] font-medium text-slate-600">
+      {count} {pluralRisk(count)}
+    </span>
+  );
+}
+
 function HeaderLevelTag({ level }: { level: Level }) {
   const m = levelMeta[level];
   return (
@@ -295,6 +311,10 @@ export function ContractAssessmentModal({
             <div className="min-h-0 flex-1 overflow-y-auto bg-white px-5 py-6 lg:px-10">
               <div className="grid gap-y-5 gap-x-5 lg:grid-cols-[minmax(0,1fr)_320px] lg:gap-x-12">
                 <section className="order-1 space-y-3 lg:col-start-1 lg:row-start-1">
+                  <div className="flex items-center gap-2">
+                    <h3 className="text-base font-semibold text-foreground">Риски</h3>
+                    <RisksCounter count={RISKS.length} />
+                  </div>
                   {LEVEL_ORDER.map((lvl) => (
                     <LevelAccordion
                       key={lvl}

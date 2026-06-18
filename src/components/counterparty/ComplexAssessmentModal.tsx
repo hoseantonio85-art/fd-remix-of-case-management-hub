@@ -13,6 +13,7 @@ import {
   LEVEL_ORDER,
   LevelAccordion,
   RISKS,
+  RisksCounter,
   levelMeta,
   type Level,
 } from "./ContractAssessmentModal";
@@ -128,8 +129,9 @@ export function ComplexAssessmentModal({
                   <div>
                     <div className="flex flex-wrap items-center gap-2">
                       <h3 className="text-base font-semibold text-foreground">
-                        Оценка договора
+                        Оценка договоров
                       </h3>
+                      <RisksCounter count={RISKS.length} />
                       <span
                         className={cn(
                           "inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-[11px] font-medium",
