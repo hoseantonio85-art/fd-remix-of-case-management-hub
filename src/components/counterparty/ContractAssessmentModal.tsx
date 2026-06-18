@@ -1,10 +1,96 @@
 import { useState } from "react";
 import * as DialogPrimitive from "@radix-ui/react-dialog";
-import { X, ChevronDown, ArrowUp, Flame, Download } from "lucide-react";
+import { X, ChevronDown, ArrowUp, Flame, Download, AlertTriangle, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { largeModalContentClass } from "@/lib/modal-styles";
 import { AssessmentInfoWidget } from "./AssessmentModal";
+import { InModalDrawer } from "./InModalDrawer";
+
+type ContractError = { id: string; title: string; summary: string; description: string; justification: string };
+
+const CONTRACT_ERRORS: ContractError[] = [
+  {
+    id: "e1",
+    title: "Ошибка 1",
+    summary: "Некорректные подписи и опечатки в Приложении №2.",
+    description:
+      "В подписях Приложения №2 со стороны Исполнителя указана подпись «И.П.», хотя сторона является ООО. Также допущены опечатки в фамилии и должности.",
+    justification:
+      "Приложение №2: Исполнитель, Заказчик, ООО «Инстамарт Сервис», Генеральный директор, «/Блухов П.А./ И.П.», «Фиансовый лиректор».",
+  },
+  {
+    id: "e2",
+    title: "Ошибка 2",
+    summary: "Дублирование отчетного периода с разными суммами в п. 4.1.",
+    description:
+      "В таблице расчета вознаграждения в пункте 4.1 дважды указан отчетный период «октябрь 2021 г.» с разными суммами.",
+    justification:
+      "Пункт 4.1: в таблице указано «октябрь 2021 г.» с суммами 51 739 441,98 и 7 841 398,79 без пояснения разбивки.",
+  },
+  {
+    id: "e3",
+    title: "Ошибка 3",
+    summary: "В шапке Приложения №2 дата окончания периода раньше даты начала.",
+    description:
+      "В шапке Приложения №2 указан период претензии, где дата окончания раньше даты начала.",
+    justification: "Приложение №2: «за период с 01.....2022 по 30......2021 г.».",
+  },
+  {
+    id: "e4",
+    title: "Ошибка 4",
+    summary: "Ошибки в реквизитах и подписях, «И.П.» для ООО.",
+    description:
+      "В реквизитах и подписях допущены ошибки в написании должности и фамилии, а также указана подпись «И.П.» для ООО.",
+    justification: "Приложение №2: «Фиансовый лиректор /Иванов Д.А./», «/Блухов П.А./ И.П.».",
+  },
+  {
+    id: "e5",
+    title: "Ошибка 5",
+    summary: "Ошибка в нумерации этапов программы лояльности в п. 3.2.25.",
+    description:
+      "В пункте 3.2.25 допущена ошибка в нумерации этапов программы лояльности.",
+    justification:
+      "Пункт 3.2.25: «Программа лояльности реализуется в 2 этапа: 1ый этап ... 20й этап списание баллов ... Плановая дата реализации _ Зий, 4ый квартал 2022 года».",
+  },
+];
+
+function ErrorCard({ err }: { err: ContractError }) {
+  const [open, setOpen] = useState(false);
+  return (
+    <div className="rounded-xl border border-slate-200 bg-white hover:bg-slate-50/50 transition">
+      <button
+        type="button"
+        onClick={() => setOpen((o) => !o)}
+        className="flex w-full items-start gap-3 px-3 py-3 text-left"
+      >
+        <div className="min-w-0 flex-1">
+          <div className="text-sm font-medium text-foreground">{err.title}</div>
+          <div className="mt-0.5 line-clamp-2 text-[12px] text-muted-foreground">{err.summary}</div>
+        </div>
+        <ChevronDown
+          className={cn("mt-1 h-4 w-4 shrink-0 text-muted-foreground transition", open && "rotate-180")}
+        />
+      </button>
+      {open && (
+        <div className="space-y-3 border-t border-slate-100 px-3 py-3">
+          <div>
+            <div className="text-[11px] font-medium uppercase tracking-wide text-muted-foreground">
+              Описание
+            </div>
+            <div className="mt-1 text-sm leading-relaxed text-foreground">{err.description}</div>
+          </div>
+          <div>
+            <div className="text-[11px] font-medium uppercase tracking-wide text-muted-foreground">
+              Обоснование
+            </div>
+            <div className="mt-1 text-sm leading-relaxed text-foreground">{err.justification}</div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
 
 export type Level = "very_high" | "high" | "medium" | "low";
 
@@ -243,6 +329,7 @@ export function ContractAssessmentModal({
   onOpenChange: (o: boolean) => void;
   onDelete?: () => void;
 }) {
+  const [errorsOpen, setErrorsOpen] = useState(false);
   const grouped: Record<Level, ContractRisk[]> = {
     very_high: RISKS.filter((r) => r.level === "very_high"),
     high: RISKS.filter((r) => r.level === "high"),
@@ -302,7 +389,23 @@ export function ContractAssessmentModal({
             {/* Body */}
             <div className="min-h-0 flex-1 overflow-y-auto bg-white px-5 py-6 lg:px-10">
               <div className="grid gap-y-5 gap-x-5 lg:grid-cols-[minmax(0,1fr)_320px] lg:gap-x-12">
-                <section className="order-1 space-y-3 lg:col-start-1 lg:row-start-1">
+                <div className="order-1 lg:col-start-1 lg:row-start-1">
+                  <button
+                    type="button"
+                    onClick={() => setErrorsOpen(true)}
+                    className="flex w-full items-center gap-3 rounded-2xl border border-rose-100 bg-rose-50 px-4 py-3 text-left text-rose-900 transition hover:bg-rose-100/70"
+                  >
+                    <AlertTriangle className="h-4 w-4 shrink-0" />
+                    <span className="flex-1 text-sm font-medium">
+                      Обнаружено {CONTRACT_ERRORS.length} ошибок в документе
+                    </span>
+                    <span className="inline-flex items-center gap-1 text-[12px] font-medium">
+                      Перейти
+                      <ChevronRight className="h-4 w-4" />
+                    </span>
+                  </button>
+                </div>
+                <section className="order-2 space-y-3 lg:col-start-1 lg:row-start-2">
                   <div className="flex items-center gap-2">
                     <h3 className="text-base font-semibold text-foreground">Риски</h3>
                     <RisksCounter count={RISKS.length} />
@@ -315,13 +418,27 @@ export function ContractAssessmentModal({
                     />
                   ))}
                 </section>
-                <aside className="order-2 lg:col-start-2 lg:row-start-1 lg:pt-8">
+                <aside className="order-3 lg:col-start-2 lg:row-start-2 lg:pt-8">
                   <div className="lg:sticky lg:top-0">
                     <AssessmentInfoWidget contractFile="dogovor_uslugi_v3.pdf" />
                   </div>
                 </aside>
               </div>
             </div>
+
+            <InModalDrawer open={errorsOpen} onOpenChange={setErrorsOpen}>
+              <div className="px-6 pt-6 pb-4">
+                <h3 className="text-lg font-semibold text-foreground">Ошибки документа</h3>
+                <p className="mt-1 text-[13px] text-muted-foreground">
+                  Найдено {CONTRACT_ERRORS.length} ошибок, которые могут повлиять на корректность договора.
+                </p>
+              </div>
+              <div className="space-y-2 px-6 pb-6">
+                {CONTRACT_ERRORS.map((e) => (
+                  <ErrorCard key={e.id} err={e} />
+                ))}
+              </div>
+            </InModalDrawer>
 
             {/* Footer */}
             <div className="shrink-0 border-t border-border bg-white px-5 py-4 lg:px-10">
