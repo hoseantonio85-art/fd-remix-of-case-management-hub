@@ -180,27 +180,3 @@ export function ComplexAssessmentModal({
     </DialogPrimitive.Root>
   );
 }
-
-function SourcesBlock({ inn }: { inn: string }) {
-  return (
-    <div className="rounded-2xl border border-border bg-white p-4">
-      <div className="text-sm font-semibold text-foreground">Источники</div>
-      <div className="mt-3 space-y-2 text-[13px]">
-        <div className="rounded-lg border border-slate-200 bg-slate-50 px-2.5 py-1.5">
-          <div className="text-[11px] uppercase tracking-wide text-muted-foreground">
-            ИНН
-          </div>
-          <div className="mt-0.5 text-foreground">{inn}</div>
-        </div>
-        <a
-          href="#"
-          onClick={(e) => e.preventDefault()}
-          className="flex items-center gap-2 rounded-lg border border-slate-200 bg-slate-50 px-2.5 py-1.5 text-[12px] font-medium text-foreground hover:bg-slate-100"
-        >
-          <Download className="h-3.5 w-3.5 text-muted-foreground" />
-          dogovor_uslugi_v3.pdf
-        </a>
-      </div>
-    </div>
-  );
-}
