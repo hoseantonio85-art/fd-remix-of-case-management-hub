@@ -389,7 +389,7 @@ export function ContractAssessmentModal({
             {/* Body */}
             <div className="min-h-0 flex-1 overflow-y-auto bg-white px-5 py-6 lg:px-10">
               <div className="grid gap-y-5 gap-x-5 lg:grid-cols-[minmax(0,1fr)_320px] lg:gap-x-12">
-                <div className="order-1 lg:col-start-1 lg:row-start-1">
+                <section className="order-1 space-y-3 lg:col-start-1 lg:row-start-1">
                   <button
                     type="button"
                     onClick={() => setErrorsOpen(true)}
@@ -404,8 +404,6 @@ export function ContractAssessmentModal({
                       <ChevronRight className="h-4 w-4" />
                     </span>
                   </button>
-                </div>
-                <section className="order-2 space-y-3 lg:col-start-1 lg:row-start-2">
                   <div className="flex items-center gap-2">
                     <h3 className="text-base font-semibold text-foreground">Риски</h3>
                     <RisksCounter count={RISKS.length} />
@@ -418,7 +416,7 @@ export function ContractAssessmentModal({
                     />
                   ))}
                 </section>
-                <aside className="order-3 lg:col-start-2 lg:row-start-2 lg:pt-8">
+                <aside className="order-2 lg:col-start-2 lg:row-start-1">
                   <div className="lg:sticky lg:top-0">
                     <AssessmentInfoWidget contractFile="dogovor_uslugi_v3.pdf" />
                   </div>
