@@ -96,7 +96,7 @@ export const RISKS: ContractRisk[] = [
   },
 ];
 
-const LEVEL_ORDER: Level[] = ["very_high", "high", "medium", "low"];
+export const LEVEL_ORDER: Level[] = ["very_high", "high", "medium", "low"];
 
 function HeaderLevelTag({ level }: { level: Level }) {
   const m = levelMeta[level];
