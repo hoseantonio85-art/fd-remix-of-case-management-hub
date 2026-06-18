@@ -1,6 +1,8 @@
+import { useState } from "react";
 import * as DialogPrimitive from "@radix-ui/react-dialog";
-import { X, ArrowUp } from "lucide-react";
+import { X, AlertTriangle, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { cn } from "@/lib/utils";
 import { largeModalContentClass } from "@/lib/modal-styles";
 import {
@@ -14,9 +16,11 @@ import {
   LevelAccordion,
   RISKS,
   RisksCounter,
-  levelMeta,
+  CONTRACT_ERRORS,
+  ErrorCard,
   type Level,
 } from "./ContractAssessmentModal";
+import { InModalDrawer } from "./InModalDrawer";
 
 export function ComplexAssessmentModal({
   assessment,
