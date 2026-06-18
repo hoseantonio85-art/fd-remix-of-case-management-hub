@@ -957,6 +957,13 @@ export default function Index() {
         onOpenChange={setCheckDrawerOpen}
         checks={checks}
         onOpenCheck={(c) => {
+          const isContract = c.type === "contract" || (!c.inn && c.fileNames.length > 0);
+          if (isContract) {
+            setActiveContractCheckId(c.id);
+            setCheckDrawerOpen(false);
+            setContractModalOpen(true);
+            return;
+          }
           const a = buildAssessment(
             `ООО „Альтаир Логистик“`,
             c.inn ?? "",
