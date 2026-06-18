@@ -292,6 +292,8 @@ export default function Index() {
   const [activeCheckId, setActiveCheckId] = useState<string | null>(null);
   const [checkAssessment, setCheckAssessment] = useState<Assessment | null>(null);
   const [checkAssessmentOpen, setCheckAssessmentOpen] = useState(false);
+  const [contractModalOpen, setContractModalOpen] = useState(false);
+  const [activeContractCheckId, setActiveContractCheckId] = useState<string | null>(null);
   const [searchOpen, setSearchOpen] = useState(false);
   const [searchValue, setSearchValue] = useState("");
   // Legacy manual assessment flow (kept for AssessmentModal scenarios from existing cards)
