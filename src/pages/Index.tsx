@@ -35,6 +35,7 @@ import { RunCheckDialog } from "@/components/counterparty/RunCheckDialog";
 import { PendingAssessmentModal } from "@/components/counterparty/PendingAssessmentModal";
 import { ChecksWidget } from "@/components/counterparty/CheckProcessPill";
 import { ChecksDrawer, type CheckRecord } from "@/components/counterparty/CheckProcessDrawer";
+import { ContractAssessmentModal } from "@/components/counterparty/ContractAssessmentModal";
 
 function buildNewCounterparty(inn: string, today: string): Counterparty {
   return {
