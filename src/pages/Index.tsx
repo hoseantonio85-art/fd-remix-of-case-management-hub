@@ -996,7 +996,7 @@ export default function Index() {
           if (!check) return;
           const today = new Date().toLocaleDateString("ru-RU");
           const cp: Counterparty = {
-            ...buildNewCounterparty(check.inn, today),
+            ...buildNewCounterparty(check.inn ?? "", today),
             name: `ООО „Альтаир Логистик“`,
             tag: "Нет риска",
             status: "no_risk",
