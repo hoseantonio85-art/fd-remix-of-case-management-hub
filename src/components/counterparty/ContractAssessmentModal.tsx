@@ -164,7 +164,7 @@ function RiskCard({ risk }: { risk: ContractRisk }) {
   );
 }
 
-function LevelAccordion({
+export function LevelAccordion({
   level,
   risks,
 }: {
