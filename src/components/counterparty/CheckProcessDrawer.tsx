@@ -22,6 +22,15 @@ function formatDate(ts: number) {
   });
 }
 
+function formatDateOnly(ts: number) {
+  const d = new Date(ts);
+  return d.toLocaleDateString("ru-RU", {
+    day: "2-digit",
+    month: "2-digit",
+    year: "numeric",
+  });
+}
+
 export function ChecksDrawer({
   open,
   onOpenChange,
@@ -72,26 +81,24 @@ export function ChecksDrawer({
                           : "border-border cursor-default"
                       }`}
                     >
-                      <div className="flex items-center justify-between gap-2">
-                        <div className="min-w-0">
-                          <div className="truncate text-sm font-semibold text-foreground">
-                            Контрагент по ИНН {c.inn}
-                          </div>
-                          <div className="mt-0.5 text-[11px] text-muted-foreground">
-                            ИНН {c.inn} · {formatDate(c.createdAt)}
-                          </div>
-                        </div>
+                      <div>
                         {isDone ? (
-                          <span className="inline-flex shrink-0 items-center gap-1 rounded-full bg-emerald-50 px-2 py-0.5 text-[11px] font-medium text-emerald-700">
+                          <span className="inline-flex items-center gap-1 rounded-full bg-emerald-50 px-2 py-0.5 text-[11px] font-medium text-emerald-700">
                             <CheckCircle2 className="h-3 w-3" />
                             Проверка завершена
                           </span>
                         ) : (
-                          <span className="inline-flex shrink-0 items-center gap-1 rounded-full bg-slate-100 px-2 py-0.5 text-[11px] font-medium text-slate-700">
+                          <span className="inline-flex items-center gap-1 rounded-full bg-slate-100 px-2 py-0.5 text-[11px] font-medium text-slate-700">
                             <Loader2 className="h-3 w-3 animate-spin text-primary" />
                             На проверке
                           </span>
                         )}
+                      </div>
+                      <div className="text-sm font-semibold text-foreground">
+                        ООО „Альтаир Логистик“
+                      </div>
+                      <div className="text-[11px] text-muted-foreground">
+                        ИНН {c.inn} · Дата оценки: {formatDateOnly(c.createdAt)} · Инициатор: Измайлова Л.Д.
                       </div>
                       {!isDone && (
                         <div className="text-[11px] text-muted-foreground">

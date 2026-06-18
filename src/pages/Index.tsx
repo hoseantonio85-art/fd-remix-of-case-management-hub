@@ -953,7 +953,7 @@ export default function Index() {
         checks={checks}
         onOpenCheck={(c) => {
           const a = buildAssessment(
-            `Контрагент по ИНН ${c.inn}`,
+            `ООО „Альтаир Логистик“`,
             c.inn,
             "auto",
           );
@@ -995,7 +995,7 @@ export default function Index() {
           const today = new Date().toLocaleDateString("ru-RU");
           const cp: Counterparty = {
             ...buildNewCounterparty(check.inn, today),
-            name: `Контрагент по ИНН ${check.inn}`,
+            name: `ООО „Альтаир Логистик“`,
             tag: "Нет риска",
             status: "no_risk",
           };
