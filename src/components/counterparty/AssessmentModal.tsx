@@ -253,7 +253,7 @@ export function AssessmentModal({
               {/* What changed — right column */}
               <aside className="order-2 lg:col-start-2 lg:row-start-1">
                 <div className="space-y-3 lg:sticky lg:top-0">
-                  <AssessmentInfoWidget />
+                  <AssessmentInfoWidget inn={assessment.inn} />
                 </div>
               </aside>
 
