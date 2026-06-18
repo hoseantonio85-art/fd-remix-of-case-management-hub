@@ -2,13 +2,15 @@ import { Sheet, SheetContent } from "@/components/ui/sheet";
 import { CheckCircle2, Loader2, ClipboardList } from "lucide-react";
 
 export type CheckProcessStatus = "running" | "done";
+export type CheckRecordType = "counterparty" | "contract";
 
 export type CheckRecord = {
   id: string;
-  inn: string;
+  inn?: string;
   fileNames: string[];
   status: CheckProcessStatus;
   createdAt: number;
+  type?: CheckRecordType;
 };
 
 function formatDate(ts: number) {
