@@ -71,7 +71,7 @@ export function RunCheckDialog({
           <div className="min-w-0 flex-1">
             <div className="text-sm font-semibold text-foreground">Запуск проверки</div>
             <p className="mt-0.5 text-[12px] text-muted-foreground">
-              Укажите ИНН и/или загрузите документы для анализа. Система автоматически определит тип проверки.
+              Укажите ИНН и/или загрузите документы для анализа. Система автоматически определит тип проверки. Если заполнить оба поля, будут сформированы результаты по контрагенту и документу.
             </p>
           </div>
           {!isSending && (
@@ -101,6 +101,9 @@ export function RunCheckDialog({
                 if (e.key === "Enter" && isValid && !isSending) handleStart();
               }}
             />
+            <p className="mt-1.5 text-[12px] text-muted-foreground">
+              По ИНН будет сформирована оценка контрагента.
+            </p>
             {error && <div className="mt-1.5 text-[12px] text-rose-600">{error}</div>}
           </div>
 
@@ -165,23 +168,15 @@ export function RunCheckDialog({
                 ))}
               </ul>
             )}
-          </div>
-
-          <div className="flex items-start gap-2 text-[12px] text-muted-foreground">
-            <Info className="mt-0.5 h-3.5 w-3.5 shrink-0 text-muted-foreground" />
-            <p>
-              ИНН — оценка контрагента. Документы — оценка рисков документа. При загрузке обоих источников будут созданы две проверки.
+            <p className="mt-2 text-[12px] text-muted-foreground">
+              По документам будет сформирована оценка рисков документа.
             </p>
           </div>
-
 
           <div className="flex items-start gap-2.5 rounded-xl border border-primary/20 bg-primary/5 px-3 py-2.5">
             <Info className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
             <div className="min-w-0 text-[12px]">
               <div className="font-medium text-foreground">Проверка займёт до 10 минут</div>
-              <p className="mt-0.5 text-muted-foreground">
-                Когда оценка будет готова, мы отправим уведомление на почту.
-              </p>
             </div>
           </div>
         </div>
