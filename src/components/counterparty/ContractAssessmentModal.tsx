@@ -99,18 +99,10 @@ export const RISKS: ContractRisk[] = [
 
 export const LEVEL_ORDER: Level[] = ["very_high", "high", "medium", "low"];
 
-export function pluralRisk(n: number) {
-  const mod10 = n % 10;
-  const mod100 = n % 100;
-  if (mod10 === 1 && mod100 !== 11) return "риск";
-  if (mod10 >= 2 && mod10 <= 4 && (mod100 < 12 || mod100 > 14)) return "риска";
-  return "рисков";
-}
-
 export function RisksCounter({ count }: { count: number }) {
   return (
-    <span className="rounded-full bg-slate-100 px-2 py-0.5 text-[11px] font-medium text-slate-600">
-      {count} {pluralRisk(count)}
+    <span className="inline-flex h-5 min-w-5 items-center justify-center rounded-full border border-slate-200 bg-white px-1.5 text-xs font-semibold text-foreground">
+      {count}
     </span>
   );
 }
@@ -323,7 +315,7 @@ export function ContractAssessmentModal({
                     />
                   ))}
                 </section>
-                <aside className="order-2 lg:col-start-2 lg:row-start-1">
+                <aside className="order-2 lg:col-start-2 lg:row-start-1 lg:pt-8">
                   <div className="lg:sticky lg:top-0">
                     <AssessmentInfoWidget contractFile="dogovor_uslugi_v3.pdf" />
                   </div>
