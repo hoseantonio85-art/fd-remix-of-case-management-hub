@@ -976,6 +976,23 @@ export default function Index() {
         }}
       />
 
+      <ContractAssessmentModal
+        open={contractModalOpen}
+        onOpenChange={(o) => {
+          setContractModalOpen(o);
+          if (!o) setActiveContractCheckId(null);
+        }}
+        onDelete={() => {
+          if (activeContractCheckId) {
+            setChecks((prev) => prev.filter((c) => c.id !== activeContractCheckId));
+          }
+          setContractModalOpen(false);
+          setActiveContractCheckId(null);
+          toast("Результат проверки удалён");
+        }}
+      />
+
+
       <AssessmentModal
         assessment={checkAssessment}
         open={checkAssessmentOpen}
