@@ -191,7 +191,9 @@ export function AssessmentModal({
 
   const headerBg = positive
     ? "bg-gradient-to-b from-emerald-50 via-emerald-50/40 to-transparent"
-    : statusMeta[status].headerBg;
+    : completionMode
+      ? "bg-gradient-to-b from-rose-50 via-rose-50/40 to-transparent"
+      : statusMeta[status].headerBg;
   const resolutionBadge = positive
     ? { label: "Сделки заключать можно", chip: "bg-emerald-100 text-emerald-900" }
     : { label: "Не заключать сделки", chip: "bg-rose-100 text-rose-900" };
