@@ -953,7 +953,7 @@ export default function Index() {
         checks={checks}
         onOpenCheck={(c) => {
           const a = buildAssessment(
-            `Контрагент по ИНН ${c.inn}`,
+            `ООО „Альтаир Логистик“`,
             c.inn,
             "auto",
           );
