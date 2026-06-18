@@ -235,15 +235,6 @@ function RiskCard({ risk }: { risk: ContractRisk }) {
             <span>{risk.category}</span>
           </div>
         </div>
-        <span
-          className={cn(
-            "inline-flex shrink-0 items-center gap-1 rounded-full px-2.5 py-1 text-[11px] font-medium",
-            m.chip,
-          )}
-        >
-          {risk.level === "very_high" && <ArrowUp className="h-3 w-3" />}
-          {m.label}
-        </span>
       </button>
       {open && (
         <div className="border-t border-slate-100 px-3 pb-3 pt-2">
