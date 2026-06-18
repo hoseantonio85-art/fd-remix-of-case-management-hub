@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { largeModalContentClass } from "@/lib/modal-styles";
 
-type Level = "very_high" | "high" | "medium" | "low";
+export type Level = "very_high" | "high" | "medium" | "low";
 
 type ContractRisk = {
   id: string;
@@ -15,7 +15,7 @@ type ContractRisk = {
   description: string;
 };
 
-const levelMeta: Record<
+export const levelMeta: Record<
   Level,
   { label: string; chip: string; iconWrap: string; icon: string }
 > = {
@@ -45,7 +45,7 @@ const levelMeta: Record<
   },
 };
 
-const RISKS: ContractRisk[] = [
+export const RISKS: ContractRisk[] = [
   {
     id: "vh-1",
     level: "very_high",
@@ -96,7 +96,7 @@ const RISKS: ContractRisk[] = [
   },
 ];
 
-const LEVEL_ORDER: Level[] = ["very_high", "high", "medium", "low"];
+export const LEVEL_ORDER: Level[] = ["very_high", "high", "medium", "low"];
 
 function HeaderLevelTag({ level }: { level: Level }) {
   const m = levelMeta[level];
@@ -164,7 +164,7 @@ function RiskCard({ risk }: { risk: ContractRisk }) {
   );
 }
 
-function LevelAccordion({
+export function LevelAccordion({
   level,
   risks,
 }: {

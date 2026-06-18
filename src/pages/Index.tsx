@@ -36,6 +36,7 @@ import { PendingAssessmentModal } from "@/components/counterparty/PendingAssessm
 import { ChecksWidget } from "@/components/counterparty/CheckProcessPill";
 import { ChecksDrawer, type CheckRecord } from "@/components/counterparty/CheckProcessDrawer";
 import { ContractAssessmentModal } from "@/components/counterparty/ContractAssessmentModal";
+import { ComplexAssessmentModal } from "@/components/counterparty/ComplexAssessmentModal";
 
 function buildNewCounterparty(inn: string, today: string): Counterparty {
   return {
@@ -294,6 +295,9 @@ export default function Index() {
   const [checkAssessmentOpen, setCheckAssessmentOpen] = useState(false);
   const [contractModalOpen, setContractModalOpen] = useState(false);
   const [activeContractCheckId, setActiveContractCheckId] = useState<string | null>(null);
+  const [complexModalOpen, setComplexModalOpen] = useState(false);
+  const [activeComplexCheckId, setActiveComplexCheckId] = useState<string | null>(null);
+  const [complexAssessment, setComplexAssessment] = useState<Assessment | null>(null);
   const [searchOpen, setSearchOpen] = useState(false);
   const [searchValue, setSearchValue] = useState("");
   // Legacy manual assessment flow (kept for AssessmentModal scenarios from existing cards)
@@ -924,7 +928,10 @@ export default function Index() {
         onOpenChange={setRunDialogOpen}
         onSubmit={(inn, files) => {
           setRunDialogOpen(false);
-          const isContract = !inn && files.length > 0;
+          const hasInn = !!inn;
+          const hasFiles = files.length > 0;
+          const recordType: "counterparty" | "contract" | "complex" =
+            hasInn && hasFiles ? "complex" : hasInn ? "counterparty" : "contract";
           const id = `check-${inn || "contract"}-${Date.now()}`;
           const rec: CheckRecord = {
             id,
@@ -932,7 +939,7 @@ export default function Index() {
             fileNames: files.map((f) => f.name),
             status: "running",
             createdAt: Date.now(),
-            type: isContract ? "contract" : "counterparty",
+            type: recordType,
           };
           setChecks((prev) => [rec, ...prev]);
           window.setTimeout(() => {
@@ -957,8 +964,23 @@ export default function Index() {
         onOpenChange={setCheckDrawerOpen}
         checks={checks}
         onOpenCheck={(c) => {
-          const isContract = c.type === "contract" || (!c.inn && c.fileNames.length > 0);
-          if (isContract) {
+          const hasInn = !!c.inn;
+          const hasFiles = c.fileNames.length > 0;
+          const recordType =
+            c.type ?? (hasInn && hasFiles ? "complex" : hasInn ? "counterparty" : "contract");
+          if (recordType === "complex") {
+            const a = buildAssessment(
+              `ООО „Альтаир Логистик“`,
+              c.inn ?? "",
+              "auto",
+            );
+            setActiveComplexCheckId(c.id);
+            setComplexAssessment(a);
+            setCheckDrawerOpen(false);
+            setComplexModalOpen(true);
+            return;
+          }
+          if (recordType === "contract") {
             setActiveContractCheckId(c.id);
             setCheckDrawerOpen(false);
             setContractModalOpen(true);
@@ -989,6 +1011,50 @@ export default function Index() {
           setContractModalOpen(false);
           setActiveContractCheckId(null);
           toast("Результат проверки удалён");
+        }}
+      />
+
+      <ComplexAssessmentModal
+        assessment={complexAssessment}
+        open={complexModalOpen}
+        onOpenChange={(o) => {
+          setComplexModalOpen(o);
+          if (!o) {
+            setActiveComplexCheckId(null);
+            setComplexAssessment(null);
+          }
+        }}
+        positive
+        onDelete={() => {
+          if (activeComplexCheckId) {
+            setChecks((prev) => prev.filter((c) => c.id !== activeComplexCheckId));
+          }
+          setComplexModalOpen(false);
+          setActiveComplexCheckId(null);
+          setComplexAssessment(null);
+          toast("Результат проверки удалён");
+        }}
+        onAddToList={() => {
+          const check = checks.find((c) => c.id === activeComplexCheckId);
+          if (!check) {
+            setComplexModalOpen(false);
+            return;
+          }
+          const today = new Date().toLocaleDateString("ru-RU");
+          const cp: Counterparty = {
+            ...buildNewCounterparty(check.inn ?? "", today),
+            name: `ООО „Альтаир Логистик“`,
+            tag: "Нет риска",
+            status: "no_risk",
+          };
+          setAddedCounterparties((prev) =>
+            prev.some((c) => c.inn === cp.inn) ? prev : [cp, ...prev],
+          );
+          setChecks((prev) => prev.filter((c) => c.id !== check.id));
+          setComplexModalOpen(false);
+          setActiveComplexCheckId(null);
+          setComplexAssessment(null);
+          toast.success("Контрагент добавлен в список дебиторов");
         }}
       />
 
