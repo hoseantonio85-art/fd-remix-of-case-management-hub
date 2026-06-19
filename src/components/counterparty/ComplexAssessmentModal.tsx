@@ -92,8 +92,12 @@ export function ComplexAssessmentModal({
               <h2 className="mt-3 text-2xl font-semibold tracking-tight text-foreground">
                 Оценка контрагента {assessment.counterpartyName}
               </h2>
-              <div className="mt-1 text-xs text-muted-foreground">
-                ИНН {assessment.inn}
+              <div className="mt-1">
+                <CounterpartyHeaderMeta
+                  inn={assessment.inn}
+                  status="действующая"
+                  contractType="Договор об оказании услуг"
+                />
               </div>
             </div>
 
