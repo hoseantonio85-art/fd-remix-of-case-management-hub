@@ -34,6 +34,9 @@ export function ComplexAssessmentModal({
   onDelete?: () => void;
   onAddToList?: () => void;
 }) {
+  const [tab, setTab] = useState<"counterparty" | "contract">("counterparty");
+  const [errorsOpen, setErrorsOpen] = useState(false);
+
   if (!assessment) return null;
 
   const headerBg = positive
@@ -42,9 +45,6 @@ export function ComplexAssessmentModal({
   const resolutionBadge = positive
     ? { label: "Сделки заключать можно", chip: "bg-emerald-100 text-emerald-900" }
     : { label: "Не заключать сделки", chip: "bg-rose-100 text-rose-900" };
-
-  const [tab, setTab] = useState<"counterparty" | "contract">("counterparty");
-  const [errorsOpen, setErrorsOpen] = useState(false);
 
   const grouped: Record<Level, typeof RISKS> = {
     very_high: RISKS.filter((r) => r.level === "very_high"),
