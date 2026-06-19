@@ -1,0 +1,58 @@
+.dataSimplebarInit {
+  min-height: 0;
+}
+
+.trackContainer {
+  background-color: var(--backgroundBasicDefault);
+  transition: visibility 0s 0s linear;
+
+  &.trackVertical {
+    width: 16px !important;
+
+    border-left: 1px solid var(--scrollDefault);
+    border-right: 1px solid var(--scrollDefault);
+
+    & .scrollbarContainer:before {
+      left: 4px;
+      right: 4px;
+    }
+  }
+  &.trackHorizontal {
+    height: 16px !important;
+
+    border-top: 1px solid var(--scrollDefault);
+    border-bottom: 1px solid var(--scrollDefault);
+
+    & .scrollbarContainer:before {
+      top: 4px;
+      bottom: 4px;
+    }
+  }
+}
+
+.contentWrapperContainer {
+  :global(.simplebar-scrollable-y) & {
+    padding-right: 18px;
+  }
+  :global(.simplebar-scrollable-x) & {
+    padding-bottom: 18px;
+  }
+}
+
+
+.scrollbarContainer {
+  &::before {
+    background-color: var(--scrollDefault) !important;
+    border-radius: 8px !important;
+  }
+
+  .scrollbarHover & {
+    &.scrollbarHover::before {
+      background-color: var(--scrollHover) !important;
+    }
+  }
+
+  &.scrollbarVisible::before {
+    opacity: 1 !important;
+  }
+}

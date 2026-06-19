@@ -1,0 +1,53 @@
+@mixin surface {
+  // Basic
+  --surfaceBasicDefault: #FFF;
+  --surfaceBasicHover: #3750690A;
+  --surfaceBasicActive: #0526580F;
+  
+  // Secondary
+  --surfaceSecondaryDefault: #3750690A;
+  --surfaceSecondaryHover: #0526580F;
+  --surfaceSecondaryActive: #09203721;
+  
+  // Tertiary
+  --surfaceTertiaryDefault: #0526580F;
+  --surfaceTertiaryHover: #09203721;
+  --surfaceTertiaryActive: #03163045;
+
+  // Ghost
+  --surfaceGhostDefault: #FFFFFF00;
+  --surfaceGhostHover: #3750690A;
+  --surfaceGhostActive: #0526580F;
+
+  // Primary
+  --surfacePrimaryDefault: #32D5A7;
+  --surfacePrimaryHover: #11AD81;
+  --surfacePrimaryActive: #05996F;
+
+  // Dark
+  --surfaceDarkDefault: #15171A;
+  --surfaceDarkHover: #24292E;
+  --surfaceDarkActive: #2F363D;
+
+  // Status
+  --surfaceAccentStatusSuccess: #ECFDF8;
+  --surfaceAccentStatusWarning: #FFFAEB;
+  --surfaceAccentStatusDanger: #FEF3F2;
+  --surfaceAccentStatusInfo: #EFF8FF;
+  --surfaceAccentStatusDiscovery: #F9F5FF;
+
+  // Alert
+  --surfaceAccentAlertSuccess: #D1FAEF;
+  --surfaceAccentAlertWarning: #FEF0C7;
+  --surfaceAccentAlertDanger: #FEE4E2;
+  --surfaceAccentAlertInfo: #D1E9FF;
+  --surfaceAccentAlertDiscovery: #F4EBFF;
+
+  // Accent
+  --surfaceAccentSuccess: #11AD81;
+  --surfaceAccentInfo: #2E90FA;
+  --surfaceAccentWarning: #F79009;
+  --surfaceAccentDanger: #F04438;
+  --surfaceAccentNeutral: #F7F8F9;
+  --surfaceAccentDisable: #3750690A;
+}

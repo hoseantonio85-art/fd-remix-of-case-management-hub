@@ -1,0 +1,10 @@
+@mixin droplist {
+    --droplistBackgroundDefault: #FFFFFF;
+    --droplistBackgroundHover: #0526580F;
+    --droplistBackgroundActive: #09203721;
+    --droplistBackgroundSelect: #0526580F;
+    --droplistPrimaryDefault: #11AD81;
+    --droplistPrimaryHover: #05996F;
+    --droplistPrimaryLight: #D1FAEF;
+    --droplistPrimaryLightHover: #A6F4DE;
+}

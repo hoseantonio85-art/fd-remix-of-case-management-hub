@@ -1,0 +1,115 @@
+@mixin unknown {
+  // Red
+  --red50: #FEF3F2;
+  --red100: #FEE4E2;
+  --red200: #FECDCA;
+  --red300: #FDA29B;
+  --red400: #f97066;
+  --red500: #f04438;
+  --red600: #D92D20;
+  --red700: #B42318;
+  --red800: #912018;
+  --red900: #7A1202;
+
+  // Red Alpha
+  --redAlpha400: #FF5346CC;
+
+  // Gray
+  --gray50: #f7f8f9;
+  --gray100: #F2F5F7;
+  --gray200: #DFE2E6;
+  --gray300: #D1D5DA;
+  --gray400: #959DA5;
+  --gray500: #6A737D;
+  --gray600: #586069;
+  --gray700: #444D56;
+  --gray800: #2F363D;
+  --gray900: #24292E;
+
+  // Gray Alpha
+  --grayAlpha50: #3750690A;
+  --grayAlpha100: #0526580F;
+  --grayAlpha200: #09203721;
+  --grayAlpha300: #03163044;
+  --grayAlpha400: #0316296B;
+  --grayAlpha500: #02122396;
+  --grayAlpha600: #020E1CA8;
+  --grayAlpha700: #020E1BBC;
+  --grayAlpha800: #010A12D1;
+  --grayAlpha900: #00060CDB;
+
+  // Orange
+  --orange50: #FFF6ED;
+  --orange100: #ffead5;
+  --orange200: #FFD1AC;
+  --orange300: #FEB273;
+  --orange400: #fd853a;
+  --orange500: #fb6514;
+  --orange600: #EC4A0A;
+  --orange700: #C4320A;
+  --orange800: #9C2A10;
+  --orange900: #7E2410;
+
+  // Purple
+  --purple50: #F9F5FF;
+  --purple100: #F4EBFF;
+  --purple200: #E9D7FE;
+  --purple300: #D6BBFB;
+  --purple400: #B692F6;
+  --purple500: #9E77ED;
+  --purple600: #7f56d9;
+  --purple700: #6941C6;
+  --purple800: #53389E;
+  --purple900: #42307D;
+
+  // Brand
+  --brand25: #F6FEFC;
+  --brand50: #ECFDF8;
+  --brand100: #D1FAEF;
+  --brand200: #A6F4DE;
+  --brand300: #6CE8C5;
+  --brand400: #32D5A7;
+  --brand500: #11AD81;
+  --brand600: #05996F;
+  --brand700: #027A58;
+  --brand800: #056046;
+  --brand900: #054F3A;
+  --brand950: #093E2F;
+  --brand1000: #072B21;
+
+  // Yellow
+  --yellow50: #FFFAEB;
+  --yellow100: #FEF0C7;
+  --yellow200: #FEDF89;
+  --yellow300: #FEC84B;
+  --yellow400: #FDB022;
+  --yellow500: #F79009;
+  --yellow600: #DC6803;
+  --yellow700: #B54708;
+  --yellow800: #93370D;
+  --yellow900: #7A2E0E;
+
+  // Blue
+  --blue50: #EFF8FF;
+  --blue100: #D1E9FF;
+  --blue200: #B2DDFF;
+  --blue300: #84CAFF;
+  --blue400: #53B1FD;
+  --blue500: #2E90FA;
+  --blue600: #1570EF;
+  --blue700: #175CD3;
+  --blue800: #1849A9;
+  --blue900: #194185;
+
+  // Green
+  --green50: #ECFDF3;
+  --green100: #D1FADF;
+  --green200: #A6F4C5;
+  --green300: #6CE9A6;
+  --green400: #32D583;
+  --green500: #12B76A;
+  --green600: #039855;
+  --green700: #027A48;
+  --green800: #05603A;
+  --green900: #054F31;
+}

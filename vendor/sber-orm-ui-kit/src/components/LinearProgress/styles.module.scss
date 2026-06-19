@@ -1,0 +1,101 @@
+.root {
+  flex: 1;
+
+  .path {
+    transition: width 1s;
+  }
+}
+
+.success {
+  .track {
+    background-color: var(--backgroundLightSuccess) !important;
+  }
+
+  .indeterminate:after {
+    background-image: linear-gradient(90deg, var(--backgroundTechSuccess) 12.5%, transparent 12.5%);
+  }
+
+  .path {
+    background-color: var(--backgroundTechSuccess) !important;
+  }
+
+  &.filled {
+    padding: 5px;
+
+    .track {
+      box-shadow: 0 0 0 5px var(--backgroundLightSuccessLight);
+    }
+  }
+}
+
+.warning {
+  .track {
+    background-color: var(--backgroundLightWarning) !important;
+  }
+
+  .indeterminate:after {
+    background-image: linear-gradient(90deg, var(--backgroundTechWarning) 12.5%, transparent 12.5%);
+  }
+
+  .path {
+    background-color: var(--backgroundTechWarning) !important;
+  }
+
+  &.filled {
+    padding: 5px;
+
+    .track {
+      box-shadow: 0 0 0 5px var(--backgroundLightWarningLight);
+    }
+  }
+}
+
+.danger {
+  .track {
+    background-color: var(--backgroundLightDanger) !important;
+  }
+
+  .indeterminate:after {
+    background-image: linear-gradient(90deg, var(--backgroundTechDanger) 12.5%, transparent 12.5%);
+  }
+
+  .path {
+    background-color: var(--backgroundTechDanger) !important;
+  }
+
+  &.filled {
+    padding: 5px;
+
+    .track {
+      box-shadow: 0 0 0 5px var(--backgroundLightDangerLight);
+    }
+  }
+}
+
+.violet {
+  .track {
+    background-color: var(--backgroundLightQuest) !important;
+  }
+
+  .indeterminate:after {
+    background-image: linear-gradient(90deg, var(--purple500) 12.5%, transparent 12.5%);
+  }
+
+  .path {
+    background-color: var(--purple500) !important;
+  }
+
+  &.filled {
+    padding: 5px;
+
+    .track {
+      box-shadow: 0 0 0 5px var(--backgroundLightQuestLight);
+    }
+  }
+}
+
+.md {
+  .track {
+    height: 6px !important;
+  }
+}

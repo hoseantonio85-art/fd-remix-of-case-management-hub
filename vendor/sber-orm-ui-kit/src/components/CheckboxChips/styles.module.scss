@@ -1,0 +1,186 @@
+.wrapper {
+  position: relative;
+
+  &Inline {
+    display: contents;
+  }
+}
+
+.primary {
+  padding: 8px 16px !important;
+
+  background-color: var(--backgroundBasicDefault) !important;
+  transition: background-color 0.3s !important;
+
+  .counter {
+    padding: 2px 8px;
+
+    border-radius: 100px;
+  }
+
+  .text {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+
+    font-weight: 500 !important;
+    color: var(--textBaseSecondary);
+  }
+
+  &::after {
+    border-color: var(--borderDefault) !important;
+  }
+
+  &.selected {
+    .text {
+      color: var(--textBaseDefault);
+    }
+
+    &::after {
+      border: none !important;
+    }
+  }
+
+  &:hover::after {
+    border-width: 1px !important;
+  }
+}
+
+.color-gray {
+  &.primary {
+    &.selected {
+      background-color: var(--backgroundSecondaryDefault) !important;
+
+      .counter {
+        background-color: var(--backgroundBasicDefault);
+      }
+    }
+
+    .counter {
+      background-color: var(--backgroundSecondaryDefault);
+    }
+  }
+}
+
+.color-red {
+  &.primary.selected {
+    background-color: var(--backgroundLightDanger) !important;
+
+    .counter {
+      background-color: var(--backgroundLightDangerLight);
+    }
+  }
+
+  .counter {
+    color: var(--textBadgeDanger);
+    background-color: var(--backgroundLightDanger);
+  }
+}
+
+.color-outlined {
+  &.primary.selected {
+    background-color: var(--backgroundBasicDefault) !important;
+
+    &::after {
+      border: 1px solid var(--borderFocus) !important;
+    }
+
+    .counter {
+      background-color: var(--backgroundLightSuccessLight);
+    }
+  }
+
+  .counter {
+    color: var(--textBadgeSuccess);
+    background-color: var(--backgroundLightSuccess);
+  }
+
+  .text {
+    font-weight: 400 !important;
+  }
+}
+
+.color-yellow {
+  &.primary.selected {
+    background-color: var(--backgroundLightWarning) !important;
+
+    .counter {
+      background-color: var(--backgroundLightWarningLight);
+    }
+  }
+
+  .counter {
+    color: var(--textBadgeWarning);
+    background-color: var(--backgroundLightWarning);
+  }
+}
+
+.color-green {
+  &.primary.selected {
+    background-color: var(--backgroundLightSuccess) !important;
+
+    .counter {
+      background-color: var(--backgroundLightSuccessLight);
+    }
+  }
+
+  .counter {
+    color: var(--textBadgeSuccess);
+    background-color: var(--backgroundLightSuccess);
+  }
+}
+
+.color-brand {
+  &.primary.selected {
+    background-color: var(--backgroundLightBrand) !important;
+
+    .counter {
+      background-color: var(--backgroundLightBrandLight);
+    }
+  }
+
+  .counter {
+    color: var(--textBadgeBrand);
+    background-color: var(--backgroundLightBrand);
+  }
+}
+
+.color-blue {
+  &.primary.selected {
+    background-color: var(--backgroundLightInfo) !important;
+
+    .counter {
+      background-color: var(--backgroundLightInfoLight);
+    }
+  }
+
+  .counter {
+    color: var(--textBadgeInfo);
+    background-color: var(--backgroundLightInfo);
+  }
+}
+
+.color-violet {
+  &.primary.selected {
+    background-color: var(--backgroundLightQuest) !important;
+
+    .counter {
+      background-color: var(--backgroundLightQuestLight);
+    }
+  }
+
+  .counter {
+    color: var(--textBadgeDiscovery);
+    background-color: var(--backgroundLightQuest);
+  }
+}
+
+.helperText {
+  margin-top: 4px;
+
+  color: var(--textBaseSecondary) !important;
+
+  &Error {
+    color: var(--borderError) !important;
+  }
+}

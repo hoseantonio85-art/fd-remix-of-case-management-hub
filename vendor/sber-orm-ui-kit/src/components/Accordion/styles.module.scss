@@ -1,0 +1,60 @@
+.accordion {
+  border: none !important;
+
+  &.editable {
+    display: grid;
+    gap: 16px;
+  }
+
+  &FullWidth {
+    flex: 1;
+  }
+}
+
+.accordionItem {
+  padding: 10px 0;
+
+  .editable > & {
+    padding: 24px;
+
+    border: 1px solid var(--borderDefault);
+    border-radius: var(--controlBorderRadius);
+  }
+}
+
+.accordionHeader {
+  flex-direction: row-reverse;
+  padding: 0 !important;
+  gap: 8px;
+    
+  &:hover {
+    background: none !important;
+  }
+
+  &::after {
+    border: none !important;
+  }
+
+  &Text {
+    flex: 1;
+  }
+
+  & .headerIcon {
+    transition: transform 100ms linear;
+
+    .accordionExpanded & {
+      transform: rotate(90deg);
+    }
+  }
+}
+
+.accordionContent {
+  margin: 16px 0 0;
+  padding: 0 !important;
+
+  .editable & {
+    margin-top: 16px;
+    padding-top: 16px !important;
+    border-top: 1px solid var(--borderDefault);
+  }
+}

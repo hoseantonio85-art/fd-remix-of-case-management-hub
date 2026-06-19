@@ -1,0 +1,32 @@
+@mixin button {
+  --buttonPrimaryDefault: linear-gradient(#32D5A7, #32D583);
+  --buttonPrimaryHover: #11AD81;
+  --buttonPrimaryActive: #05996F;
+  --buttonSecondaryDefault: #ffffff;
+  --buttonSecondaryHover: #0526580f;
+  --buttonSecondaryActive: #09203721;
+  --buttonTertiaryDefault: #0526580f;
+  --buttonTertiaryHover: #09203721;
+  --buttonTertiaryActive: #03163044;
+  --buttonGhostDefault: #ffffff00;
+  --buttonGhostHover: #0526580f;
+  --buttonGhostActive: #09203721;
+  --buttonWarningDefault: #fec84b;
+  --buttonWarningHover: #fdB022;
+  --buttonWarningActive: #f79009;
+  --buttonDangerDefault: #f97066;
+  --buttonDangerHover: #f04438;
+  --buttonDangerActive: #d92d20;
+  --buttonBorder: #09203721;
+  --buttonUtilityBorder: #09203721;
+  --buttonDisabled: #3750690A;
+  --buttonPadding: 8px 16px;
+  --buttonBorderRadiusSm: 12px;
+  --buttonBorderRadiusMd: 12px;
+  --buttonBorderRadiusLg: 12px;
+
+  // Norm
+  --buttonGradientDefault: linear-gradient(rgb(50, 213, 167), rgb(50, 213, 131));
+  --buttonGradientHover: linear-gradient(rgb(42, 187, 138), rgb(42, 187, 114));
+  --buttonGradientActive: linear-gradient(rgb(42, 187, 138), rgb(42, 187, 114));
+}

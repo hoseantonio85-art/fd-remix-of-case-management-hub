@@ -1,0 +1,42 @@
+.shimmer {
+  background-color: var(--iconAccentNeutral);
+
+  $sizeMap:
+    "14" 8px 14px,
+    "16" 12px 16px,
+    "20" 14px 20px,
+    "24" 20px 24px,
+    "28" 22px 28px,
+    "32" 24px 32px,
+    "40" 32px 40px;
+
+  @each $name, $height, $rowHeight in $sizeMap {
+    &.size-#{$name} {
+      height: $rowHeight;
+      margin: calc(($rowHeight - $height) / 2) 0px;
+    }
+  }
+
+  &.animation {
+    background: linear-gradient(
+      90deg,
+      var(--iconAccentNeutral) 25%,
+      var(--iconBaseDisabled) 37%,
+      var(--iconAccentNeutral) 63%
+    );
+    background-size: 400% 100%;
+    animation-name: shimmer;
+    animation-duration: 1.4s;
+    animation-timing-function: ease;
+    animation-iteration-count: infinite;
+  }
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0 50%;
+  }
+}

@@ -1,0 +1,91 @@
+.level {
+  padding: 2px 0;
+
+  width: fit-content;
+
+  position: static;
+  display: flex;
+  gap: 4px;
+  font-weight: 500;
+  border-radius: 99px;
+  box-sizing: border-box;
+
+  &.iconRight {
+    flex-direction: row-reverse;
+  }
+
+  .iconWrapper {
+    padding: 2px;
+
+    .icon {
+      width: 14px;
+      height: 14px;
+      border-radius: 16px;
+    }
+  }
+
+  $stateMap: 'default' var(--backgroundBasicDefault) var(--iconBaseTertiary) var(--borderDefault) var(--textBaseTertiary),
+    'low' var(--backgroundTertiaryDefault) var(--iconBaseTertiary) transparent var(--textBaseDefault),
+    'medium' var(--backgroundLightWarning) var(--iconTechWarning) transparent var(--textBaseDefault),
+    'high' var(--backgroundLightDanger) var(--iconTechDanger) transparent var(--textBaseDefault),
+    'critical' var(--backgroundTechDanger) var(--iconBaseInverse) transparent var(--textTechDanger);
+
+  @each $name, $bgColor, $color, $borderColor, $textColor in $stateMap {
+    &.state-#{$name} {
+      .icon {
+        background-color: $bgColor;
+        color: $color;
+        border: 1px solid $borderColor;
+      }
+
+      .text {
+        color: $textColor !important;
+      }
+    }
+  }
+
+  $badgeStateMap: 'default' var(--backgroundBasicDefault) var(--iconBaseTertiary) var(--borderDefault) var(--textBaseTertiary),
+    'low' var(--backgroundBasicDefault) var(--iconBaseTertiary) transparent var(--textBaseDefault),
+    'medium' var(--backgroundBasicDefault) var(--iconTechWarning) transparent var(--textBaseDefault),
+    'high' var(--backgroundBasicDefault) var(--iconTechDanger) transparent var(--textBaseDefault),
+    'critical' var(--backgroundBasicDefault) var(--iconTechDanger) transparent var(--textBaseInverse);
+
+  @each $name, $bgColor, $color, $borderColor, $textColor in $badgeStateMap {
+    &.withBadge.state-#{$name} {
+      .icon {
+        background-color: $bgColor;
+        color: $color;
+        border: 1px solid $borderColor;
+      }
+
+      .text {
+        color: $textColor !important;
+      }
+    }
+  }
+}
+
+.badge {
+  padding: 0 8px 0 4px !important;
+
+  &Critical {
+    background-color: var(--backgroundTechDanger) !important;
+  }
+
+  &Reverse {
+    padding: 2px 4px 2px 8px !important;
+  }
+}
+
+.size-sm {
+  height: 20px;
+
+  .iconWrapper {
+    padding: 1px;
+
+    .icon {
+      width: 12px;
+      height: 12px;
+    }
+  }
+}

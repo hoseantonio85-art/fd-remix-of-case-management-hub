@@ -1,0 +1,22 @@
+@mixin icon {
+  --iconBaseDefault: #24292e;
+  --iconBaseSecondary: #6A737D;
+  --iconBaseTertiary: #959da5;
+  --iconBaseDisabled: #09203721;
+  --iconBaseInverse: #ffffff;
+  --iconAccentSuccess: #11AD81;
+  --iconAccentWarning: #F79009;
+  --iconAccentDanger: #F04438;
+  --iconAccentNeutral: #0526580f;
+  --iconAccentDiscovery: #9e77ed;
+  --iconAccentInfo: #2e90fa;
+  // Deprecated icon colors
+  --iconBrandDefault: #11ad81;
+  --iconBrandLight: #32d5a7;
+  --iconBrandLabel: #1849a9;
+  --iconBrandMenu: #24292e;
+  --iconTechSuccess: #039855;
+  --iconTechInfo: #1570ef;
+  --iconTechWarning: #dc6803;
+  --iconTechDanger: #d92d20;
+}
