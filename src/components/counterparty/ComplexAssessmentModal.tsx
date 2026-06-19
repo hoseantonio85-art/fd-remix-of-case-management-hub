@@ -21,6 +21,7 @@ import {
   type Level,
 } from "./ContractAssessmentModal";
 import { InModalDrawer } from "./InModalDrawer";
+import { CounterpartyHeaderMeta } from "./CounterpartyHeaderMeta";
 
 export function ComplexAssessmentModal({
   assessment,
