@@ -25,8 +25,7 @@ export const processMeta: Record<ProcessStage, ProcessMeta> = {
     key: "monitoring",
     step: 1,
     label: "Мониторинг",
-    description:
-      "Есть ДЗ, признаков дефолта нет. Плановое наблюдение до возникновения просрочки.",
+    description: "Есть ДЗ, признаков дефолта нет. Плановое наблюдение до возникновения просрочки.",
     icon: Eye,
     allowedCategories: ["no_risk"],
     accentBg: "bg-emerald-50",
@@ -66,8 +65,7 @@ export const processMeta: Record<ProcessStage, ProcessMeta> = {
     key: "writeoff",
     step: 4,
     label: "Списание / резерв",
-    description:
-      "ПДЗ без перспективы взыскания. Подготовка к списанию с указанием основания.",
+    description: "ПДЗ без перспективы взыскания. Подготовка к списанию с указанием основания.",
     icon: Archive,
     allowedCategories: ["overdue", "overdue_risk"],
     accentBg: "bg-slate-100",

@@ -86,7 +86,9 @@ export function AssistantSummaryCard({
             <div className="text-[11px] font-medium uppercase tracking-wide text-muted-foreground">
               NORM AI · Оценка благонадёжности
             </div>
-            <span className={`inline-flex items-center rounded-full border px-2 py-0.5 text-[10px] font-medium ${m.badgeCls}`}>
+            <span
+              className={`inline-flex items-center rounded-full border px-2 py-0.5 text-[10px] font-medium ${m.badgeCls}`}
+            >
               {m.badgeLabel}
             </span>
           </div>
@@ -94,17 +96,35 @@ export function AssistantSummaryCard({
 
           {status === "confirmed" && (confirmedAt || confirmedBy) && (
             <div className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-0.5 text-[11px] text-muted-foreground">
-              <span>Статус: <b className="font-medium text-emerald-700">Оценка подтверждена</b></span>
-              {confirmedBy && <span>· Подтвердил: <b className="font-medium text-foreground">{confirmedBy}</b></span>}
-              {confirmedAt && <span>· Дата: <b className="font-medium text-foreground">{confirmedAt}</b></span>}
+              <span>
+                Статус: <b className="font-medium text-emerald-700">Оценка подтверждена</b>
+              </span>
+              {confirmedBy && (
+                <span>
+                  · Подтвердил: <b className="font-medium text-foreground">{confirmedBy}</b>
+                </span>
+              )}
+              {confirmedAt && (
+                <span>
+                  · Дата: <b className="font-medium text-foreground">{confirmedAt}</b>
+                </span>
+              )}
             </div>
           )}
 
           {status === "disagreed" && disagreement && (
             <div className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-0.5 text-[11px] text-muted-foreground">
-              <span>Статус: <b className="font-medium text-foreground">Не согласовано</b></span>
-              <span>· Причина: <b className="font-medium text-foreground">{disagreement.reason}</b></span>
-              {confirmedBy && <span>· Автор: <b className="font-medium text-foreground">{confirmedBy}</b></span>}
+              <span>
+                Статус: <b className="font-medium text-foreground">Не согласовано</b>
+              </span>
+              <span>
+                · Причина: <b className="font-medium text-foreground">{disagreement.reason}</b>
+              </span>
+              {confirmedBy && (
+                <span>
+                  · Автор: <b className="font-medium text-foreground">{confirmedBy}</b>
+                </span>
+              )}
             </div>
           )}
 

@@ -4,10 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { cn } from "@/lib/utils";
 import { InModalDrawer } from "./InModalDrawer";
-import {
-  type AssessmentGroup,
-  type AssessmentGroupId,
-} from "@/lib/assessment-data";
+import { type AssessmentGroup, type AssessmentGroupId } from "@/lib/assessment-data";
 
 export type AssessmentCommentPayload = {
   comments: { groupId: AssessmentGroupId; groupTitle: string; text: string }[];
@@ -85,24 +82,18 @@ export function AssessmentCommentDrawer({
                 >
                   <button
                     type="button"
-                    onClick={() =>
-                      setExpanded((p) => ({ ...p, [g.id]: !p[g.id] }))
-                    }
+                    onClick={() => setExpanded((p) => ({ ...p, [g.id]: !p[g.id] }))}
                     className="flex w-full items-center gap-3 px-3 py-3 text-left"
                   >
                     <span className="min-w-0 flex-1">
-                      <span className="block text-sm font-medium text-foreground">
-                        {g.title}
-                      </span>
+                      <span className="block text-sm font-medium text-foreground">{g.title}</span>
                       {filled && (
                         <span className="mt-0.5 block text-xs text-muted-foreground line-clamp-1">
                           {value.trim()}
                         </span>
                       )}
                     </span>
-                    {filled && (
-                      <MessageSquare className="h-4 w-4 shrink-0 text-primary" />
-                    )}
+                    {filled && <MessageSquare className="h-4 w-4 shrink-0 text-primary" />}
                     <ChevronDown
                       className={cn(
                         "h-4 w-4 shrink-0 text-muted-foreground transition",
@@ -119,9 +110,7 @@ export function AssessmentCommentDrawer({
                         rows={4}
                         placeholder="Опишите, с чем вы не согласны в этой группе"
                         value={value}
-                        onChange={(e) =>
-                          setDrafts((p) => ({ ...p, [g.id]: e.target.value }))
-                        }
+                        onChange={(e) => setDrafts((p) => ({ ...p, [g.id]: e.target.value }))}
                         className="min-h-[96px]"
                       />
                     </div>
@@ -132,18 +121,12 @@ export function AssessmentCommentDrawer({
           </div>
 
           {submitted && !hasAny && (
-            <div className="mt-3 text-xs text-rose-600">
-              Добавьте хотя бы один комментарий
-            </div>
+            <div className="mt-3 text-xs text-rose-600">Добавьте хотя бы один комментарий</div>
           )}
         </div>
 
         <div className="sticky bottom-0 z-10 mt-auto flex shrink-0 gap-3 border-t border-border bg-white px-6 py-4">
-          <Button
-            variant="ghost"
-            className="flex-1"
-            onClick={() => onOpenChange(false)}
-          >
+          <Button variant="ghost" className="flex-1" onClick={() => onOpenChange(false)}>
             Отменить
           </Button>
           <Button className="flex-1" onClick={handleSave}>

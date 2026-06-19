@@ -2,7 +2,8 @@ export type HeaderTone = "danger" | "warn" | "caution" | "safe" | "neutral";
 
 export function getToneForTag(tag: string): HeaderTone {
   const t = tag.toLowerCase();
-  if (t.includes("просрочено с риском") || t.includes("дефолт") && t.includes("просроч")) return "danger";
+  if (t.includes("просрочено с риском") || (t.includes("дефолт") && t.includes("просроч")))
+    return "danger";
   if (t.includes("риск дефолта")) return "caution";
   if (t.includes("просроч")) return "warn";
   if (t.includes("нет риска")) return "safe";

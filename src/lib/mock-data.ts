@@ -96,14 +96,30 @@ export type RiskType =
 export const measuresByRisk: Record<RiskType, MeasureDef[]> = {
   "Ухудшилось финансовое состояние": [
     { name: "Блокировка поставок", hint: "Приостановить отгрузку до погашения", kind: "required" },
-    { name: "Реструктуризация долга", hint: "Согласовать новый график платежей", kind: "recommended" },
-    { name: "Запрос обеспечения", hint: "Залог, поручительство, банковская гарантия", kind: "recommended" },
+    {
+      name: "Реструктуризация долга",
+      hint: "Согласовать новый график платежей",
+      kind: "recommended",
+    },
+    {
+      name: "Запрос обеспечения",
+      hint: "Залог, поручительство, банковская гарантия",
+      kind: "recommended",
+    },
     { name: "Уступка прав требования", hint: "Передать долг третьему лицу", kind: "situational" },
     { name: "Ускоренное взыскание", hint: "Сократить досудебные сроки", kind: "situational" },
-    { name: "Контроль движения средств", hint: "Мониторинг операций по счетам", kind: "recommended" },
+    {
+      name: "Контроль движения средств",
+      hint: "Мониторинг операций по счетам",
+      kind: "recommended",
+    },
   ],
   "Уголовное дело": [
-    { name: "Подача заявления в правоохранительные органы", hint: "Зафиксировать ущерб", kind: "required" },
+    {
+      name: "Подача заявления в правоохранительные органы",
+      hint: "Зафиксировать ущерб",
+      kind: "required",
+    },
     { name: "Арест имущества", hint: "Через обеспечительные меры суда", kind: "recommended" },
     { name: "Оспаривание сделок", hint: "Проверить подозрительные операции", kind: "recommended" },
     { name: "Гражданский иск", hint: "Заявить в рамках уголовного дела", kind: "situational" },
@@ -111,8 +127,16 @@ export const measuresByRisk: Record<RiskType, MeasureDef[]> = {
   ],
   "Банкротство / ликвидация": [
     { name: "Подать иск о признании банкротом", hint: "Если есть основания", kind: "situational" },
-    { name: "Включиться в реестр требований кредиторов", hint: "В установленный срок", kind: "required" },
-    { name: "Оспорить сделки должника", hint: "Сделки за период подозрительности", kind: "recommended" },
+    {
+      name: "Включиться в реестр требований кредиторов",
+      hint: "В установленный срок",
+      kind: "required",
+    },
+    {
+      name: "Оспорить сделки должника",
+      hint: "Сделки за период подозрительности",
+      kind: "recommended",
+    },
   ],
   "Административные нарушения": [
     { name: "Приостановка отгрузок", hint: "До устранения нарушений", kind: "recommended" },
@@ -126,10 +150,22 @@ export const measuresByRisk: Record<RiskType, MeasureDef[]> = {
     { name: "Ускоренное взыскание", hint: "По всем договорам группы", kind: "situational" },
   ],
   "Ограничения деятельности": [
-    { name: "Проверка полномочий подписанта", hint: "Актуальность доверенностей", kind: "required" },
+    {
+      name: "Проверка полномочий подписанта",
+      hint: "Актуальность доверенностей",
+      kind: "required",
+    },
     { name: "Оспаривание договора", hint: "Если заключен с нарушением", kind: "situational" },
-    { name: "Запрос подтверждения факта запрета", hint: "Официальный запрос в орган", kind: "recommended" },
-    { name: "Подача заявления о принудительной ликвидации", hint: "При систематических нарушениях", kind: "situational" },
+    {
+      name: "Запрос подтверждения факта запрета",
+      hint: "Официальный запрос в орган",
+      kind: "recommended",
+    },
+    {
+      name: "Подача заявления о принудительной ликвидации",
+      hint: "При систематических нарушениях",
+      kind: "situational",
+    },
   ],
 };
 
@@ -162,8 +198,28 @@ export const counterparties: Counterparty[] = [
           { date: "24.05.2026", amount: 0.1, days: 15, comment: "Не оплачена накладная №158" },
         ],
       },
-      { id: "c2", number: "№ 09-Г/2023", date: "01.07.2023", amount: 0.7, debt: 0.7, overdue: 0, overdueDays: 0, measures: "—", overdueHistory: [] },
-      { id: "c3", number: "№ 10-Г/2023", date: "20.11.2023", amount: 0.3, debt: 0.3, overdue: 0, overdueDays: 0, measures: "—", overdueHistory: [] },
+      {
+        id: "c2",
+        number: "№ 09-Г/2023",
+        date: "01.07.2023",
+        amount: 0.7,
+        debt: 0.7,
+        overdue: 0,
+        overdueDays: 0,
+        measures: "—",
+        overdueHistory: [],
+      },
+      {
+        id: "c3",
+        number: "№ 10-Г/2023",
+        date: "20.11.2023",
+        amount: 0.3,
+        debt: 0.3,
+        overdue: 0,
+        overdueDays: 0,
+        measures: "—",
+        overdueHistory: [],
+      },
     ],
     risks: [
       {
@@ -207,7 +263,13 @@ export const counterparties: Counterparty[] = [
         recommendedAction: "Подготовка к включению в реестр кредиторов",
       },
     ],
-    collection: makeCollection("Сверка взаиморасчетов", { startDate: "28.05.2026", sla: "10 дней", plannedDate: "07.06.2026", overdue: false, nextAction: "Получить подписанный акт сверки" }),
+    collection: makeCollection("Сверка взаиморасчетов", {
+      startDate: "28.05.2026",
+      sla: "10 дней",
+      plannedDate: "07.06.2026",
+      overdue: false,
+      nextAction: "Получить подписанный акт сверки",
+    }),
     processStage: "settlement",
   },
   {
@@ -221,13 +283,51 @@ export const counterparties: Counterparty[] = [
     overdueAmountNum: 0.1,
     lastUpdate: "01.06.2026",
     contracts: [
-      { id: "g1", number: "№ 11-Г/2024", date: "15.02.2024", amount: 0.6, debt: 0.6, overdue: 0.1, overdueDays: 12, measures: "Направлена претензия", collectionStage: "Досудебное урегулирование",
-        overdueHistory: [{ date: "22.05.2026", amount: 0.1, days: 12, comment: "Не оплачен этап работ" }] },
-      { id: "g2", number: "№ 12-Г/2024", date: "10.05.2024", amount: 0.4, debt: 0.4, overdue: 0, overdueDays: 0, measures: "—", overdueHistory: [] },
-      { id: "g3", number: "№ 13-Г/2024", date: "01.09.2024", amount: 0.2, debt: 0.2, overdue: 0, overdueDays: 0, measures: "—", overdueHistory: [] },
+      {
+        id: "g1",
+        number: "№ 11-Г/2024",
+        date: "15.02.2024",
+        amount: 0.6,
+        debt: 0.6,
+        overdue: 0.1,
+        overdueDays: 12,
+        measures: "Направлена претензия",
+        collectionStage: "Досудебное урегулирование",
+        overdueHistory: [
+          { date: "22.05.2026", amount: 0.1, days: 12, comment: "Не оплачен этап работ" },
+        ],
+      },
+      {
+        id: "g2",
+        number: "№ 12-Г/2024",
+        date: "10.05.2024",
+        amount: 0.4,
+        debt: 0.4,
+        overdue: 0,
+        overdueDays: 0,
+        measures: "—",
+        overdueHistory: [],
+      },
+      {
+        id: "g3",
+        number: "№ 13-Г/2024",
+        date: "01.09.2024",
+        amount: 0.2,
+        debt: 0.2,
+        overdue: 0,
+        overdueDays: 0,
+        measures: "—",
+        overdueHistory: [],
+      },
     ],
     risks: [],
-    collection: makeCollection("Коммуникация с должником", { startDate: "20.05.2026", sla: "7 дней", plannedDate: "27.05.2026", overdue: true, nextAction: "Направить повторное требование" }),
+    collection: makeCollection("Коммуникация с должником", {
+      startDate: "20.05.2026",
+      sla: "7 дней",
+      plannedDate: "27.05.2026",
+      overdue: true,
+      nextAction: "Направить повторное требование",
+    }),
     processStage: "writeoff",
   },
   {
@@ -241,8 +341,28 @@ export const counterparties: Counterparty[] = [
     overdueAmountNum: 0,
     lastUpdate: "30.05.2026",
     contracts: [
-      { id: "d1", number: "№ 22-С/2024", date: "10.01.2024", amount: 2.0, debt: 2.0, overdue: 0, overdueDays: 0, measures: "Запрос обеспечения", overdueHistory: [] },
-      { id: "d2", number: "№ 23-С/2024", date: "01.04.2024", amount: 1.4, debt: 1.4, overdue: 0, overdueDays: 0, measures: "—", overdueHistory: [] },
+      {
+        id: "d1",
+        number: "№ 22-С/2024",
+        date: "10.01.2024",
+        amount: 2.0,
+        debt: 2.0,
+        overdue: 0,
+        overdueDays: 0,
+        measures: "Запрос обеспечения",
+        overdueHistory: [],
+      },
+      {
+        id: "d2",
+        number: "№ 23-С/2024",
+        date: "01.04.2024",
+        amount: 1.4,
+        debt: 1.4,
+        overdue: 0,
+        overdueDays: 0,
+        measures: "—",
+        overdueHistory: [],
+      },
     ],
     risks: [
       {
@@ -262,7 +382,13 @@ export const counterparties: Counterparty[] = [
         },
       },
     ],
-    collection: makeCollection("Коммуникация с должником", { startDate: "15.05.2026", sla: "14 дней", plannedDate: "29.05.2026", overdue: false, nextAction: "Запросить документы по обеспечению" }),
+    collection: makeCollection("Коммуникация с должником", {
+      startDate: "15.05.2026",
+      sla: "14 дней",
+      plannedDate: "29.05.2026",
+      overdue: false,
+      nextAction: "Запросить документы по обеспечению",
+    }),
     processStage: "risk_confirmation",
   },
   {
@@ -276,7 +402,17 @@ export const counterparties: Counterparty[] = [
     overdueAmountNum: 0,
     lastUpdate: "28.05.2026",
     contracts: [
-      { id: "sg1", number: "№ 05-Л/2024", date: "20.02.2024", amount: 0.8, debt: 0.8, overdue: 0, overdueDays: 0, measures: "—", overdueHistory: [] },
+      {
+        id: "sg1",
+        number: "№ 05-Л/2024",
+        date: "20.02.2024",
+        amount: 0.8,
+        debt: 0.8,
+        overdue: 0,
+        overdueDays: 0,
+        measures: "—",
+        overdueHistory: [],
+      },
     ],
     risks: [
       {
@@ -309,8 +445,28 @@ export const counterparties: Counterparty[] = [
     overdueAmountNum: 0,
     lastUpdate: "29.05.2026",
     contracts: [
-      { id: "v1", number: "№ 14-Т/2024", date: "11.03.2024", amount: 1.2, debt: 1.2, overdue: 0, overdueDays: 0, measures: "—", overdueHistory: [] },
-      { id: "v2", number: "№ 15-Т/2024", date: "22.05.2024", amount: 0.9, debt: 0.9, overdue: 0, overdueDays: 0, measures: "—", overdueHistory: [] },
+      {
+        id: "v1",
+        number: "№ 14-Т/2024",
+        date: "11.03.2024",
+        amount: 1.2,
+        debt: 1.2,
+        overdue: 0,
+        overdueDays: 0,
+        measures: "—",
+        overdueHistory: [],
+      },
+      {
+        id: "v2",
+        number: "№ 15-Т/2024",
+        date: "22.05.2024",
+        amount: 0.9,
+        debt: 0.9,
+        overdue: 0,
+        overdueDays: 0,
+        measures: "—",
+        overdueHistory: [],
+      },
     ],
     risks: [
       {
@@ -367,7 +523,14 @@ function makeCollection(
       id: `s${i + 1}`,
       title: s.title,
       stage: s.stage,
-      status: currentIdx === -1 ? "upcoming" : i < currentIdx ? "done" : i === currentIdx ? "current" : "upcoming",
+      status:
+        currentIdx === -1
+          ? "upcoming"
+          : i < currentIdx
+            ? "done"
+            : i === currentIdx
+              ? "current"
+              : "upcoming",
     };
     if (i === currentIdx && meta) return { ...base, ...meta };
     return base;

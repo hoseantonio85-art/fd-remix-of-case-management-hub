@@ -12,7 +12,10 @@ export default defineConfig({
   resolve: {
     alias: {
       // Корпоративный UI-kit, vendor-копия. dist уже собран — используем его.
-      "@sber-orm/ui-kit/index.css": path.resolve(__dirname, "vendor/sber-orm-ui-kit/dist/index.css"),
+      "@sber-orm/ui-kit/index.css": path.resolve(
+        __dirname,
+        "vendor/sber-orm-ui-kit/dist/index.css",
+      ),
       "@sber-orm/ui-kit": path.resolve(__dirname, "vendor/sber-orm-ui-kit/dist/index.js"),
       // Гарантируем единый runtime React / react-dom (защита от двойного React)
       react: path.resolve(__dirname, "node_modules/react"),

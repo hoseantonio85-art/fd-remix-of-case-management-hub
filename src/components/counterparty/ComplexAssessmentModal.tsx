@@ -5,11 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { cn } from "@/lib/utils";
 import { largeModalContentClass } from "@/lib/modal-styles";
-import {
-  type Assessment,
-  type AssessmentGroup,
-  MAIN_GROUP_IDS,
-} from "@/lib/assessment-data";
+import { type Assessment, type AssessmentGroup, MAIN_GROUP_IDS } from "@/lib/assessment-data";
 import { GroupCard, AssessmentInfoWidget } from "./AssessmentModal";
 import {
   LEVEL_ORDER,
@@ -119,11 +115,7 @@ export function ComplexAssessmentModal({
                           const g = assessment.groups.find((x) => x.id === id);
                           if (!g) return null;
                           return (
-                            <GroupCard
-                              key={g.id}
-                              group={g as AssessmentGroup}
-                              onOpen={() => {}}
-                            />
+                            <GroupCard key={g.id} group={g as AssessmentGroup} onOpen={() => {}} />
                           );
                         })}
                       </div>
@@ -167,7 +159,8 @@ export function ComplexAssessmentModal({
               <div className="px-6 pt-6 pb-4">
                 <h3 className="text-lg font-semibold text-foreground">Ошибки документа</h3>
                 <p className="mt-1 text-[13px] text-muted-foreground">
-                  Найдено {CONTRACT_ERRORS.length} ошибок, которые могут повлиять на корректность договора.
+                  Найдено {CONTRACT_ERRORS.length} ошибок, которые могут повлиять на корректность
+                  договора.
                 </p>
               </div>
               <div className="space-y-2 px-6 pb-6">
@@ -176,7 +169,6 @@ export function ComplexAssessmentModal({
                 ))}
               </div>
             </InModalDrawer>
-
 
             {/* Footer */}
             <div className="shrink-0 border-t border-border bg-white px-5 py-4 lg:px-10">

@@ -25,8 +25,4 @@ export {
   ETextSize,
 } from "@sber-orm/ui-kit";
 
-export type {
-  IButtonProperties,
-  TButtonVariants,
-  TButtonSizes,
-} from "@sber-orm/ui-kit";
+export type { IButtonProperties, TButtonVariants, TButtonSizes } from "@sber-orm/ui-kit";

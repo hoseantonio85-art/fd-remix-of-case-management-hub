@@ -57,7 +57,6 @@ export function AssessmentGroupDrawer({
           {group.criteria.length} {pluralCriteria(group.criteria.length)}
         </div>
 
-
         {/* Summary filters */}
         <div className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-3">
           <SummaryStat
@@ -127,14 +126,9 @@ function GroupCommentBlock({ comment }: { comment: GroupComment }) {
         className="flex w-full items-center gap-3 px-4 py-3 text-left"
       >
         <MessageSquare className="h-4 w-4 shrink-0 text-primary" />
-        <span className="flex-1 text-sm font-medium text-slate-900">
-          Замечание к группе
-        </span>
+        <span className="flex-1 text-sm font-medium text-slate-900">Замечание к группе</span>
         <ChevronDown
-          className={cn(
-            "h-4 w-4 shrink-0 text-muted-foreground transition",
-            open && "rotate-180",
-          )}
+          className={cn("h-4 w-4 shrink-0 text-muted-foreground transition", open && "rotate-180")}
         />
       </button>
       {open && (
@@ -142,9 +136,7 @@ function GroupCommentBlock({ comment }: { comment: GroupComment }) {
           <div className="text-xs text-muted-foreground">
             {comment.author} · {comment.createdAt}
           </div>
-          <div className="mt-2 whitespace-pre-wrap text-sm text-slate-900">
-            {comment.text}
-          </div>
+          <div className="mt-2 whitespace-pre-wrap text-sm text-slate-900">{comment.text}</div>
         </div>
       )}
     </div>
@@ -205,13 +197,13 @@ function SummaryStat({
         <div className={`flex h-8 w-8 items-center justify-center rounded-full ${iconBg}`}>
           <Ico className={`h-4 w-4 ${iconColor}`} />
         </div>
-        <div className={`text-2xl font-semibold leading-none ${isActive ? numColor : "text-slate-900"}`}>
+        <div
+          className={`text-2xl font-semibold leading-none ${isActive ? numColor : "text-slate-900"}`}
+        >
           {value}
         </div>
       </div>
-      <div className={`mt-3 text-xs leading-snug ${labelColor}`}>
-        {m.label}
-      </div>
+      <div className={`mt-3 text-xs leading-snug ${labelColor}`}>{m.label}</div>
     </button>
   );
 }
@@ -230,9 +222,7 @@ function CriterionCard({ c }: { c: AssessmentCriterion }) {
       >
         {m.label}
       </span>
-      <div className="mt-1.5 text-sm font-medium leading-snug text-slate-900">
-        {c.title}
-      </div>
+      <div className="mt-1.5 text-sm font-medium leading-snug text-slate-900">{c.title}</div>
       {showReason && reason && (
         <>
           <div

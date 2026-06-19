@@ -48,9 +48,7 @@ export function ProcessFilterDrawer({
             <div className="text-lg font-semibold tracking-tight text-foreground">
               Фильтр по процессу
             </div>
-            <p className="mt-1 text-sm text-muted-foreground">
-              Выберите этап работы с дебитором
-            </p>
+            <p className="mt-1 text-sm text-muted-foreground">Выберите этап работы с дебитором</p>
           </div>
           <button
             onClick={() => onOpenChange(false)}
@@ -93,9 +91,7 @@ export function ProcessFilterDrawer({
 
                     <div className="min-w-0 flex-1">
                       <div className="flex items-start justify-between gap-2">
-                        <div className="text-sm font-semibold text-foreground">
-                          {m.label}
-                        </div>
+                        <div className="text-sm font-semibold text-foreground">{m.label}</div>
                         <span className="shrink-0 text-xs text-muted-foreground tabular-nums">
                           {count} {pluralDebtors(count)}
                         </span>

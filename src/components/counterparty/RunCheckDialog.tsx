@@ -78,7 +78,8 @@ export function RunCheckDialog({
           <div className="min-w-0 flex-1">
             <div className="text-sm font-semibold text-foreground">Запуск проверки</div>
             <p className="mt-0.5 text-[12px] text-muted-foreground">
-              Система автоматически определит тип проверки. Если заполнить оба поля, будут сформированы результаты по контрагенту и документу.
+              Система автоматически определит тип проверки. Если заполнить оба поля, будут
+              сформированы результаты по контрагенту и документу.
             </p>
           </div>
           {!isSending && (
@@ -203,7 +204,8 @@ export function RunCheckDialog({
           </Button>
         </div>
       </DialogContent>
-      {flying && typeof document !== "undefined" &&
+      {flying &&
+        typeof document !== "undefined" &&
         createPortal(
           <div className="pointer-events-none fixed inset-0 z-[100]">
             <div

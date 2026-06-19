@@ -66,7 +66,7 @@ export function RiskDrawer({
     }
   }, [open, risk?.id, mode]);
 
-  const measures = useMemo(() => (risk ? measuresByRisk[risk.type] ?? [] : []), [risk]);
+  const measures = useMemo(() => (risk ? (measuresByRisk[risk.type] ?? []) : []), [risk]);
 
   if (!risk) return null;
 
@@ -78,14 +78,15 @@ export function RiskDrawer({
       ? selected.length > 0
       : mode === "dismiss"
         ? comment.trim().length > 0
-        : comment.trim().length > 0 && responsible.trim().length > 0 && plannedDate.trim().length > 0;
+        : comment.trim().length > 0 &&
+          responsible.trim().length > 0 &&
+          plannedDate.trim().length > 0;
 
   const handleSave = () => {
     if (!canSave) return;
     if (mode === "confirm")
       onSave(risk.id, { kind: "confirm", date, measures: selected, comment, responsible });
-    else if (mode === "dismiss")
-      onSave(risk.id, { kind: "dismiss", date, comment, responsible });
+    else if (mode === "dismiss") onSave(risk.id, { kind: "dismiss", date, comment, responsible });
     else onSave(risk.id, { kind: "verify", date, plannedDate, comment, responsible });
     onOpenChange(false);
   };
@@ -97,7 +98,9 @@ export function RiskDrawer({
 
         <div className="mt-6 space-y-6">
           <div className="rounded-xl border border-border bg-slate-50/60 p-4">
-            <div className="text-[11px] uppercase tracking-wide text-muted-foreground">Выбранный риск</div>
+            <div className="text-[11px] uppercase tracking-wide text-muted-foreground">
+              Выбранный риск
+            </div>
             <div className="mt-1 font-semibold">{risk.type}</div>
             <div className="mt-1 text-sm text-muted-foreground">{risk.description}</div>
             <div className="mt-2 text-xs text-muted-foreground">
@@ -115,14 +118,22 @@ export function RiskDrawer({
                     <label
                       key={m.name}
                       className={`flex cursor-pointer items-start gap-3 rounded-lg border p-3 transition ${
-                        checked ? "border-primary bg-primary/5" : "border-border bg-card hover:bg-accent/40"
+                        checked
+                          ? "border-primary bg-primary/5"
+                          : "border-border bg-card hover:bg-accent/40"
                       }`}
                     >
-                      <Checkbox checked={checked} onCheckedChange={() => toggle(m.name)} className="mt-0.5" />
+                      <Checkbox
+                        checked={checked}
+                        onCheckedChange={() => toggle(m.name)}
+                        className="mt-0.5"
+                      />
                       <div className="min-w-0 flex-1">
                         <div className="flex flex-wrap items-center gap-2">
                           <span className="text-sm font-medium">{m.name}</span>
-                          <span className={`rounded-full px-2 py-0.5 text-[10px] ${kindBadge[m.kind]}`}>
+                          <span
+                            className={`rounded-full px-2 py-0.5 text-[10px] ${kindBadge[m.kind]}`}
+                          >
                             {kindLabel[m.kind]}
                           </span>
                         </div>

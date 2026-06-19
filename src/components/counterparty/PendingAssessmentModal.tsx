@@ -39,8 +39,8 @@ export function PendingAssessmentModal({
             </div>
             <h3 className="mt-4 text-base font-semibold text-foreground">Оценка формируется</h3>
             <p className="mt-2 text-sm text-muted-foreground">
-              Мы собираем данные из источников и анализируем документы. Обычно это занимает до 10 минут.
-              Уведомление придёт на почту.
+              Мы собираем данные из источников и анализируем документы. Обычно это занимает до 10
+              минут. Уведомление придёт на почту.
             </p>
           </div>
         </div>

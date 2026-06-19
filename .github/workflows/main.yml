@@ -3,7 +3,7 @@ name: Deploy to GitHub Pages
 on:
   # Триггер: запускать при пуше в main
   push:
-    branches: [ "main" ]
+    branches: ["main"]
   # Также можно запускать вручную
   workflow_dispatch:
 
@@ -46,7 +46,7 @@ jobs:
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: './dist' # Vite по умолчанию собирает проект в папку dist
+          path: "./dist" # Vite по умолчанию собирает проект в папку dist
 
       - name: Deploy to GitHub Pages
         id: deployment

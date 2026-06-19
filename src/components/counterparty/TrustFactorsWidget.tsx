@@ -119,7 +119,9 @@ export function TrustFactorsWidget() {
                     >
                       {f.tag}
                     </span>
-                    <div className="mt-1.5 text-[13px] font-medium leading-snug text-foreground">{f.title}</div>
+                    <div className="mt-1.5 text-[13px] font-medium leading-snug text-foreground">
+                      {f.title}
+                    </div>
                     <div
                       className={cn(
                         "mt-1 text-xs leading-5 text-slate-600",
@@ -129,7 +131,9 @@ export function TrustFactorsWidget() {
                       {f.short}
                     </div>
                     {isOpen && (
-                      <div className="mt-2 text-xs leading-relaxed text-foreground/80">{f.full}</div>
+                      <div className="mt-2 text-xs leading-relaxed text-foreground/80">
+                        {f.full}
+                      </div>
                     )}
                   </div>
                   <ChevronDown

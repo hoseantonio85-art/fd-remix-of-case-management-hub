@@ -5,15 +5,7 @@ import { largeModalContentClass } from "@/lib/modal-styles";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 
-import {
-  ChevronRight,
-  ChevronDown,
-  X,
-  CheckCircle2,
-  Info as InfoIcon,
-  Plus,
-} from "lucide-react";
-
+import { ChevronRight, ChevronDown, X, CheckCircle2, Info as InfoIcon, Plus } from "lucide-react";
 
 import type {
   Counterparty,
@@ -47,8 +39,6 @@ const toFiniteNumber = (value: unknown) => {
   return Number.isFinite(numberValue) ? numberValue : 0;
 };
 
-
-
 export function CounterpartyModal({
   counterparty,
   open,
@@ -68,14 +58,16 @@ export function CounterpartyModal({
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [contractDrawer, setContractDrawer] = useState<Contract | null>(null);
   const [stepperError, setStepperError] = useState<string | null>(null);
-  
+
   const [debtDrawerOpen, setDebtDrawerOpen] = useState(false);
-  const [notification, setNotification] = useState<
-    { tone: "success" | "info"; text: string } | null
-  >(null);
-  const [stepAnim, setStepAnim] = useState<
-    { direction: "forward" | "backward"; tick: number } | null
-  >(null);
+  const [notification, setNotification] = useState<{
+    tone: "success" | "info";
+    text: string;
+  } | null>(null);
+  const [stepAnim, setStepAnim] = useState<{
+    direction: "forward" | "backward";
+    tick: number;
+  } | null>(null);
   const [completedFields, setCompletedFields] = useState<CompletedFields>({});
   const [history, setHistory] = useState<DebtHistoryEntry[]>([]);
   const [assessmentOpen, setAssessmentOpen] = useState(false);
@@ -96,13 +88,23 @@ export function CounterpartyModal({
       const nextCollection = Array.isArray(counterparty.collection) ? counterparty.collection : [];
 
       setRisks(nextRisks.map((r) => ({ ...r })));
-      setContracts(nextContracts.map((c) => ({ ...c, overdueHistory: [...(c.overdueHistory ?? [])] })));
+      setContracts(
+        nextContracts.map((c) => ({ ...c, overdueHistory: [...(c.overdueHistory ?? [])] })),
+      );
       setSteps(nextCollection.map((s) => ({ ...s })));
       setStepperError(null);
       setNotification(null);
       setStepAnim(null);
       setCompletedFields({});
-      setAssessment(buildAssessment(counterparty.name, counterparty.inn, "auto", undefined, counterparty.status === "no_risk" ? "positive" : "negative"));
+      setAssessment(
+        buildAssessment(
+          counterparty.name,
+          counterparty.inn,
+          "auto",
+          undefined,
+          counterparty.status === "no_risk" ? "positive" : "negative",
+        ),
+      );
       setAssessmentStatus("pending");
       setAssessmentConfirmedAt(undefined);
       setAssessmentDisagreement(null);
@@ -121,7 +123,6 @@ export function CounterpartyModal({
             ]
           : [],
       );
-
     }
   }, [counterparty, open]);
 
@@ -166,9 +167,7 @@ export function CounterpartyModal({
     [contracts],
   );
 
-
   if (!counterparty) return null;
-
 
   const moveCurrentStep = (delta: 1 | -1) => {
     setSteps((prev) => {
@@ -217,7 +216,11 @@ export function CounterpartyModal({
           return {
             ...r,
             status: "dismissed",
-            dismissal: { date: payload.date, comment: payload.comment, responsible: payload.responsible },
+            dismissal: {
+              date: payload.date,
+              comment: payload.comment,
+              responsible: payload.responsible,
+            },
             decision: undefined,
             verification: undefined,
           };
@@ -299,8 +302,7 @@ export function CounterpartyModal({
     }, 0);
   };
 
-  const pushHistory = (entry: DebtHistoryEntry) =>
-    setHistory((prev) => [entry, ...prev]);
+  const pushHistory = (entry: DebtHistoryEntry) => setHistory((prev) => [entry, ...prev]);
 
   const handleFieldChange = (stepId: string, key: string, value: string) => {
     setCompletedFields((prev) => ({
@@ -332,10 +334,7 @@ export function CounterpartyModal({
     }
 
     // Rule 1: cannot enter "Судебная работа" stage without act of reconciliation
-    if (
-      next.stage === "Судебная работа" &&
-      cur.stage === "Досудебное урегулирование"
-    ) {
+    if (next.stage === "Судебная работа" && cur.stage === "Досудебное урегулирование") {
       const reconciliationStep = steps.find((s) => s.title === "Сверка взаиморасчетов");
       const reconciliationDone =
         reconciliationStep &&
@@ -416,10 +415,6 @@ export function CounterpartyModal({
     });
   };
 
-
-
-
-
   const advanceContractStage = (id: string) => {
     const stageOrder = [
       "Досудебное урегулирование",
@@ -431,7 +426,10 @@ export function CounterpartyModal({
       prev.map((c) => {
         if (c.id !== id) return c;
         const i = stageOrder.indexOf(c.collectionStage ?? "");
-        return { ...c, collectionStage: stageOrder[Math.min(i + 1, stageOrder.length - 1)] || stageOrder[0] };
+        return {
+          ...c,
+          collectionStage: stageOrder[Math.min(i + 1, stageOrder.length - 1)] || stageOrder[0],
+        };
       }),
     );
   };
@@ -463,7 +461,9 @@ export function CounterpartyModal({
 
   const problemIndicators = getCounterpartyProblemIndicators(counterparty)
     .map((key) => {
-      const meta = problemIndicatorMeta[key] as Partial<(typeof problemIndicatorMeta)[typeof key]> | undefined;
+      const meta = problemIndicatorMeta[key] as
+        | Partial<(typeof problemIndicatorMeta)[typeof key]>
+        | undefined;
       const Icon = meta?.icon;
       const label = meta?.label;
       if (!Icon || !label) return null;
@@ -481,7 +481,10 @@ export function CounterpartyModal({
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent
-        className={cn(largeModalContentClass, "gap-0 [&>button]:hidden sm:max-w-[calc(100vw-32px)] sm:rounded-3xl")}
+        className={cn(
+          largeModalContentClass,
+          "gap-0 [&>button]:hidden sm:max-w-[calc(100vw-32px)] sm:rounded-3xl",
+        )}
       >
         <div className="relative flex min-h-0 flex-1 flex-col">
           {/* Header */}
@@ -520,120 +523,126 @@ export function CounterpartyModal({
                     );
                   })}
                 </div>
-                <h2 className="mt-3 text-2xl font-semibold tracking-tight text-foreground min-w-0 truncate">{counterparty.name}</h2>
+                <h2 className="mt-3 text-2xl font-semibold tracking-tight text-foreground min-w-0 truncate">
+                  {counterparty.name}
+                </h2>
                 <CounterpartyHeaderMeta inn={counterparty.inn} />
               </div>
             );
           })()}
 
-
-
           <div className="grid grid-cols-1 gap-y-6 gap-x-6 bg-white px-5 py-6 lg:grid-cols-[minmax(0,1fr)_300px] lg:gap-x-8 lg:px-10 min-h-0 flex-1 overflow-y-auto">
             <div className="space-y-6 min-w-0">
-            {counterparty.status === "no_risk" ? (
-              <ResolutionCard
-                variant="positive"
-                title="Сделки заключать можно"
-                description="Критически значимых факторов риска не выявлено. Контрагент может быть допущен к заключению сделки в рамках стандартного процесса согласования."
-                onDetailsClick={() => setAssessmentOpen(true)}
-              />
-            ) : (
-              <ResolutionCard
-                title="Рекомендуется не заключать новые сделки"
-                description="По оценке благонадёжности выявлены критичные и финансовые маркеры. До проверки спорных критериев заключение новых сделок нежелательно."
-                onDetailsClick={() => setAssessmentOpen(true)}
-              />
-            )}
-            <div className="grid grid-cols-2 gap-3">
-              <DebtCard label="Общая задолженность" value={counterparty.totalDebt} />
-              <DebtCard
-                label="Просроченная задолженность"
-                value={totalOverdueLabel}
-                accent={totalOverdue > 0}
-              />
-            </div>
-            {notification && (
-              <div
-                className={`flex items-start gap-2.5 rounded-xl border px-3.5 py-3 text-sm ${
-                  notification.tone === "success"
-                    ? "border-emerald-200 bg-emerald-50/70 text-emerald-900"
-                    : "border-border bg-slate-50 text-foreground"
-                }`}
-                role="status"
-              >
-                {notification.tone === "success" ? (
-                  <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-emerald-600" />
-                ) : (
-                  <InfoIcon className="mt-0.5 h-4 w-4 shrink-0 text-muted-foreground" />
-                )}
-                <div className="flex-1 leading-snug">{notification.text}</div>
-                <button
-                  onClick={() => setNotification(null)}
-                  className="shrink-0 rounded p-0.5 text-muted-foreground transition hover:bg-black/5 hover:text-foreground"
-                  aria-label="Закрыть уведомление"
+              {counterparty.status === "no_risk" ? (
+                <ResolutionCard
+                  variant="positive"
+                  title="Сделки заключать можно"
+                  description="Критически значимых факторов риска не выявлено. Контрагент может быть допущен к заключению сделки в рамках стандартного процесса согласования."
+                  onDetailsClick={() => setAssessmentOpen(true)}
+                />
+              ) : (
+                <ResolutionCard
+                  title="Рекомендуется не заключать новые сделки"
+                  description="По оценке благонадёжности выявлены критичные и финансовые маркеры. До проверки спорных критериев заключение новых сделок нежелательно."
+                  onDetailsClick={() => setAssessmentOpen(true)}
+                />
+              )}
+              <div className="grid grid-cols-2 gap-3">
+                <DebtCard label="Общая задолженность" value={counterparty.totalDebt} />
+                <DebtCard
+                  label="Просроченная задолженность"
+                  value={totalOverdueLabel}
+                  accent={totalOverdue > 0}
+                />
+              </div>
+              {notification && (
+                <div
+                  className={`flex items-start gap-2.5 rounded-xl border px-3.5 py-3 text-sm ${
+                    notification.tone === "success"
+                      ? "border-emerald-200 bg-emerald-50/70 text-emerald-900"
+                      : "border-border bg-slate-50 text-foreground"
+                  }`}
+                  role="status"
                 >
-                  <X className="h-3.5 w-3.5" />
-                </button>
-              </div>
-            )}
+                  {notification.tone === "success" ? (
+                    <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-emerald-600" />
+                  ) : (
+                    <InfoIcon className="mt-0.5 h-4 w-4 shrink-0 text-muted-foreground" />
+                  )}
+                  <div className="flex-1 leading-snug">{notification.text}</div>
+                  <button
+                    onClick={() => setNotification(null)}
+                    className="shrink-0 rounded p-0.5 text-muted-foreground transition hover:bg-black/5 hover:text-foreground"
+                    aria-label="Закрыть уведомление"
+                  >
+                    <X className="h-3.5 w-3.5" />
+                  </button>
+                </div>
+              )}
 
-            {/* Section: Contracts */}
-            <section>
-              <SectionTitle title="Договоры" count={contracts.length} muted />
-              <div className="overflow-hidden rounded-xl border border-border bg-white">
-                {contracts.map((c, i) => {
-                  const amount = toFiniteNumber(c.amount);
-                  const debt = toFiniteNumber(c.debt);
-                  const overdueAmount = toFiniteNumber(c.overdue);
-                  const historyDays = (c.overdueHistory ?? []).map((h) => toFiniteNumber(h.days));
-                  const overdueDays = historyDays.length > 0 ? Math.max(...historyDays) : toFiniteNumber(c.overdueDays);
-                  const overdue = overdueAmount > 0;
-                  return (
-                    <button
-                      key={c.id ?? i}
-                      onClick={() => setContractDrawer(c)}
-                      className={`flex w-full items-center gap-4 px-4 py-3 text-left transition hover:bg-muted/40 ${
-                        i > 0 ? "border-t border-border" : ""
-                      }`}
-                    >
-                      <div className="grid min-w-0 flex-1 grid-cols-2 gap-3 sm:grid-cols-5">
-                        <Cell label="Договор" value={c.number ?? "—"} sub={`от ${c.date ?? "—"}`} />
-                        <Cell label="Сумма" value={`${amount.toFixed(1)} млн. ₽`} />
-                        <Cell label="Задолженность" value={`${debt.toFixed(1)} млн. ₽`} />
-                        <Cell
-                          label="Просрочено"
-                          value={overdue ? `${overdueAmount.toFixed(1)} млн. ₽` : "нет"}
-                          sub={overdue ? `${overdueDays} дн.` : undefined}
-                          accent={overdue}
-                        />
-                        <Cell label="Этап" value={c.collectionStage ?? "—"} />
-                      </div>
-                      <ChevronRight className="h-4 w-4 shrink-0 text-muted-foreground" />
-                    </button>
-                  );
-                })}
-              </div>
+              {/* Section: Contracts */}
+              <section>
+                <SectionTitle title="Договоры" count={contracts.length} muted />
+                <div className="overflow-hidden rounded-xl border border-border bg-white">
+                  {contracts.map((c, i) => {
+                    const amount = toFiniteNumber(c.amount);
+                    const debt = toFiniteNumber(c.debt);
+                    const overdueAmount = toFiniteNumber(c.overdue);
+                    const historyDays = (c.overdueHistory ?? []).map((h) => toFiniteNumber(h.days));
+                    const overdueDays =
+                      historyDays.length > 0
+                        ? Math.max(...historyDays)
+                        : toFiniteNumber(c.overdueDays);
+                    const overdue = overdueAmount > 0;
+                    return (
+                      <button
+                        key={c.id ?? i}
+                        onClick={() => setContractDrawer(c)}
+                        className={`flex w-full items-center gap-4 px-4 py-3 text-left transition hover:bg-muted/40 ${
+                          i > 0 ? "border-t border-border" : ""
+                        }`}
+                      >
+                        <div className="grid min-w-0 flex-1 grid-cols-2 gap-3 sm:grid-cols-5">
+                          <Cell
+                            label="Договор"
+                            value={c.number ?? "—"}
+                            sub={`от ${c.date ?? "—"}`}
+                          />
+                          <Cell label="Сумма" value={`${amount.toFixed(1)} млн. ₽`} />
+                          <Cell label="Задолженность" value={`${debt.toFixed(1)} млн. ₽`} />
+                          <Cell
+                            label="Просрочено"
+                            value={overdue ? `${overdueAmount.toFixed(1)} млн. ₽` : "нет"}
+                            sub={overdue ? `${overdueDays} дн.` : undefined}
+                            accent={overdue}
+                          />
+                          <Cell label="Этап" value={c.collectionStage ?? "—"} />
+                        </div>
+                        <ChevronRight className="h-4 w-4 shrink-0 text-muted-foreground" />
+                      </button>
+                    );
+                  })}
+                </div>
 
-              <Button
-                type="button"
-                variant="secondary"
-                onClick={() => setAddContractOpen(true)}
-                className="mt-3 h-11 w-full justify-center rounded-xl border border-border bg-slate-50 text-sm font-medium text-foreground hover:bg-slate-100"
-              >
-                <Plus className="mr-1.5 h-4 w-4" />
-                Добавить договор
-              </Button>
+                <Button
+                  type="button"
+                  variant="secondary"
+                  onClick={() => setAddContractOpen(true)}
+                  className="mt-3 h-11 w-full justify-center rounded-xl border border-border bg-slate-50 text-sm font-medium text-foreground hover:bg-slate-100"
+                >
+                  <Plus className="mr-1.5 h-4 w-4" />
+                  Добавить договор
+                </Button>
 
-              <AddContractDrawer
-                open={addContractOpen}
-                onOpenChange={setAddContractOpen}
-                onAdd={(c) => {
-                  setContracts((prev) => [...prev, c]);
-                  toast.success("Договор добавлен");
-                }}
-              />
-
-            </section>
+                <AddContractDrawer
+                  open={addContractOpen}
+                  onOpenChange={setAddContractOpen}
+                  onAdd={(c) => {
+                    setContracts((prev) => [...prev, c]);
+                    toast.success("Договор добавлен");
+                  }}
+                />
+              </section>
             </div>
 
             <div className="self-start">
@@ -693,7 +702,10 @@ export function CounterpartyModal({
                 "Завершение работы",
               ];
               const i = stages.indexOf(prev.collectionStage ?? "");
-              return { ...prev, collectionStage: stages[Math.min(i + 1, stages.length - 1)] || stages[0] };
+              return {
+                ...prev,
+                collectionStage: stages[Math.min(i + 1, stages.length - 1)] || stages[0],
+              };
             });
           }}
           onUpdateContract={(id, patch) => {
@@ -727,7 +739,15 @@ export function CounterpartyModal({
         onRun={(inn) => {
           setAssessmentRunning(true);
           setTimeout(() => {
-            setAssessment(buildAssessment(counterparty.name, inn, "manual", undefined, counterparty.status === "no_risk" ? "positive" : "negative"));
+            setAssessment(
+              buildAssessment(
+                counterparty.name,
+                inn,
+                "manual",
+                undefined,
+                counterparty.status === "no_risk" ? "positive" : "negative",
+              ),
+            );
             setAssessmentStatus("updated");
             setAssessmentConfirmedAt(undefined);
             setAssessmentDisagreement(null);
@@ -745,9 +765,7 @@ export function CounterpartyModal({
         }}
         onStatusChange={(s) => onStatusChange?.(counterparty.inn, s)}
       />
-
     </Dialog>
-
   );
 }
 
@@ -755,7 +773,9 @@ function Stat({ label, value, accent }: { label: string; value: string; accent?:
   return (
     <div>
       <div className="text-[11px] uppercase tracking-wide text-muted-foreground">{label}</div>
-      <div className={`mt-0.5 text-sm font-semibold ${accent ? "text-amber-700" : ""}`}>{value}</div>
+      <div className={`mt-0.5 text-sm font-semibold ${accent ? "text-amber-700" : ""}`}>
+        {value}
+      </div>
     </div>
   );
 }
@@ -827,7 +847,9 @@ function Cell({
   return (
     <div className="min-w-0">
       <div className="text-[10px] uppercase tracking-wide text-muted-foreground">{label}</div>
-      <div className={`truncate text-sm font-medium ${accent ? "text-amber-700" : ""}`}>{value}</div>
+      <div className={`truncate text-sm font-medium ${accent ? "text-amber-700" : ""}`}>
+        {value}
+      </div>
       {sub && <div className="text-[11px] text-muted-foreground">{sub}</div>}
     </div>
   );

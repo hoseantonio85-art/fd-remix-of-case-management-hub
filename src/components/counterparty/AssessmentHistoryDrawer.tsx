@@ -51,8 +51,7 @@ export function CorrectionHistoryEntry({
   onOpen: () => void;
 }) {
   if (count === 0) return null;
-  const label =
-    count === 1 ? "1 корректировка" : `${count} корректировки`;
+  const label = count === 1 ? "1 корректировка" : `${count} корректировки`;
   return (
     <div
       role="button"
@@ -99,10 +98,7 @@ export function CorrectionHistoryDrawer({
 
           <ol className="mt-6 space-y-4">
             {records.map((r) => (
-              <li
-                key={r.id}
-                className="rounded-2xl border border-slate-200 bg-white p-4"
-              >
+              <li key={r.id} className="rounded-2xl border border-slate-200 bg-white p-4">
                 <div className="flex flex-wrap items-center justify-between gap-2 text-xs text-muted-foreground">
                   <span>{r.dateTime}</span>
                   <span>{r.author}</span>
@@ -121,8 +117,8 @@ export function CorrectionHistoryDrawer({
                     {r.monitoringDate}
                   </div>
                   <div className="mt-1 text-xs text-muted-foreground">
-                    С этой даты агент возобновит мониторинг и будет обновлять оценку по
-                    новым данным.
+                    С этой даты агент возобновит мониторинг и будет обновлять оценку по новым
+                    данным.
                   </div>
                 </div>
               </li>
@@ -148,9 +144,9 @@ export function DownloadHistoryEntry({
   const sub =
     count === 0
       ? "Отчёты ещё не скачивали"
-      : `${count} ${count === 1 ? "файл" : "файла"} · последний скачан ${
-          (lastDate ?? "").toLowerCase()
-        }`;
+      : `${count} ${count === 1 ? "файл" : "файла"} · последний скачан ${(
+          lastDate ?? ""
+        ).toLowerCase()}`;
   return (
     <div
       role="button"
@@ -238,7 +234,7 @@ export function DownloadHistoryDrawer({
             <Button
               className={cn(
                 "w-full gap-2",
-                records.length === 0 && "opacity-50 cursor-not-allowed"
+                records.length === 0 && "opacity-50 cursor-not-allowed",
               )}
               disabled={records.length === 0}
               onClick={onDownloadAll}

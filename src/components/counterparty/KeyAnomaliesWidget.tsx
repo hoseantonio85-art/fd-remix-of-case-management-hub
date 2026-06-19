@@ -56,7 +56,6 @@ const anomalies: Anomaly[] = [
   },
 ];
 
-
 const VISIBLE_COUNT = 2;
 const DESCRIPTION = "Факторы, которые повлияли на резолюцию «Не заключать сделки».";
 
@@ -115,7 +114,9 @@ export function KeyAnomaliesWidget() {
                     >
                       {meta.label}
                     </span>
-                    <div className="mt-1.5 text-[13px] font-medium leading-snug text-foreground">{a.title}</div>
+                    <div className="mt-1.5 text-[13px] font-medium leading-snug text-foreground">
+                      {a.title}
+                    </div>
                     <div
                       className={cn(
                         "mt-1 text-xs leading-5 text-slate-600",
@@ -125,7 +126,9 @@ export function KeyAnomaliesWidget() {
                       {a.short}
                     </div>
                     {isOpen && (
-                      <div className="mt-2 text-xs leading-relaxed text-foreground/80">{a.full}</div>
+                      <div className="mt-2 text-xs leading-relaxed text-foreground/80">
+                        {a.full}
+                      </div>
                     )}
                   </div>
                   <ChevronDown
@@ -140,7 +143,6 @@ export function KeyAnomaliesWidget() {
           );
         })}
       </ul>
-
 
       {hiddenCount > 0 && (
         <button

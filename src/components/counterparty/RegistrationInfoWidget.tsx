@@ -50,9 +50,7 @@ export function RegistrationInfoWidget({
             <div className="text-[11px] uppercase tracking-wide text-muted-foreground">
               {r.label}
             </div>
-            <div className="mt-0.5 text-xs leading-snug text-foreground break-words">
-              {r.value}
-            </div>
+            <div className="mt-0.5 text-xs leading-snug text-foreground break-words">{r.value}</div>
           </li>
         ))}
       </ul>

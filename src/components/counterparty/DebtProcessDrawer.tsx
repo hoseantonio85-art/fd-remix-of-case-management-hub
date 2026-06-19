@@ -1,5 +1,14 @@
 import { useMemo, useState } from "react";
-import { ArrowRight, ArrowLeft, AlertTriangle, Check, Paperclip, FileText, Clock, History as HistoryIcon } from "lucide-react";
+import {
+  ArrowRight,
+  ArrowLeft,
+  AlertTriangle,
+  Check,
+  Paperclip,
+  FileText,
+  Clock,
+  History as HistoryIcon,
+} from "lucide-react";
 import type { CollectionSubStep } from "@/lib/mock-data";
 import { InModalDrawer } from "./InModalDrawer";
 import type { StepAnim } from "./DebtSummaryCard";
@@ -80,9 +89,7 @@ export function DebtProcessDrawer({
 
   const items: TimelineItem[] = [];
   for (const stage of stageOrder) {
-    const stageSteps = steps
-      .map((s, i) => ({ s, i }))
-      .filter(({ s }) => s.stage === stage);
+    const stageSteps = steps.map((s, i) => ({ s, i })).filter(({ s }) => s.stage === stage);
     if (stageSteps.length === 0) continue;
     const active = stageSteps.some(({ s }) => s.status === "current");
     const done = stageSteps.every(({ s }) => s.status === "done");
@@ -116,10 +123,7 @@ export function DebtProcessDrawer({
         {/* Timeline */}
         <section className="relative">
           {/* vertical line */}
-          <div
-            className="absolute left-[11px] top-2 bottom-2 w-px bg-border"
-            aria-hidden="true"
-          />
+          <div className="absolute left-[11px] top-2 bottom-2 w-px bg-border" aria-hidden="true" />
           <ul className="space-y-5">
             {items.map((item, idx) => {
               if (item.kind === "stage") {
@@ -175,9 +179,7 @@ export function DebtProcessDrawer({
                   {/* content */}
                   <div
                     className={`rounded-lg ${
-                      isCurrent
-                        ? "border border-border bg-slate-50/70 p-3"
-                        : "px-0 py-0.5"
+                      isCurrent ? "border border-border bg-slate-50/70 p-3" : "px-0 py-0.5"
                     }`}
                   >
                     <div className="flex items-start justify-between gap-3">
@@ -220,8 +222,7 @@ export function DebtProcessDrawer({
                         )}
                         {dueDate && (
                           <span>
-                            План:{" "}
-                            <b className="text-foreground">{formatDDMMYYYY(dueDate)}</b>
+                            План: <b className="text-foreground">{formatDDMMYYYY(dueDate)}</b>
                           </span>
                         )}
                         {remaining !== null && (
@@ -258,21 +259,23 @@ export function DebtProcessDrawer({
                     )}
 
                     {/* Required fields inline under current step */}
-                    {isCurrent && currentMeta?.requiredFields && currentMeta.requiredFields.length > 0 && (
-                      <div className="mt-3 space-y-2 border-t border-border/70 pt-3">
-                        <div className="text-[11px] font-medium text-foreground">
-                          Данные для перехода
+                    {isCurrent &&
+                      currentMeta?.requiredFields &&
+                      currentMeta.requiredFields.length > 0 && (
+                        <div className="mt-3 space-y-2 border-t border-border/70 pt-3">
+                          <div className="text-[11px] font-medium text-foreground">
+                            Данные для перехода
+                          </div>
+                          {currentMeta.requiredFields.map((f) => (
+                            <FieldInput
+                              key={f.key}
+                              field={f}
+                              value={completedFields[step.id]?.[f.key] ?? ""}
+                              onChange={(v) => onFieldChange(step.id, f.key, v)}
+                            />
+                          ))}
                         </div>
-                        {currentMeta.requiredFields.map((f) => (
-                          <FieldInput
-                            key={f.key}
-                            field={f}
-                            value={completedFields[step.id]?.[f.key] ?? ""}
-                            onChange={(v) => onFieldChange(step.id, f.key, v)}
-                          />
-                        ))}
-                      </div>
-                    )}
+                      )}
 
                     {/* Inline actions under current step */}
                     {isCurrent && (
@@ -429,9 +432,7 @@ function FieldInput({
     const attached = !!value;
     return (
       <div>
-        <label className="mb-1 block text-[11px] font-medium text-foreground">
-          {field.label}
-        </label>
+        <label className="mb-1 block text-[11px] font-medium text-foreground">{field.label}</label>
         {attached ? (
           <div className="flex items-center justify-between rounded-md border border-emerald-200 bg-emerald-50/60 px-2.5 py-1.5 text-xs">
             <span className="inline-flex items-center gap-1.5 text-emerald-900">
@@ -457,9 +458,7 @@ function FieldInput({
   }
   return (
     <div>
-      <label className="mb-1 block text-[11px] font-medium text-foreground">
-        {field.label}
-      </label>
+      <label className="mb-1 block text-[11px] font-medium text-foreground">{field.label}</label>
       <input
         type={field.type === "date" ? "date" : field.type === "number" ? "number" : "text"}
         value={value}

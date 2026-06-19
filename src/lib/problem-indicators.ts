@@ -31,10 +31,7 @@ function safeMeta(key: RiskType, fallbackIcon: LucideIcon): RiskMetaItem {
   return { ...FALLBACK_META, icon: fallbackIcon };
 }
 
-export const problemIndicatorMeta: Record<
-  ProblemIndicatorKey,
-  RiskMetaItem & { label: string }
-> = {
+export const problemIndicatorMeta: Record<ProblemIndicatorKey, RiskMetaItem & { label: string }> = {
   bankruptcy_liquidation: {
     ...safeMeta("Банкротство / ликвидация", Scale),
     label: "Банкротство / ликвидация",
@@ -52,9 +49,7 @@ export const problemIndicatorMeta: Record<
   },
 };
 
-export function getCounterpartyProblemIndicators(
-  c?: Counterparty | null,
-): ProblemIndicatorKey[] {
+export function getCounterpartyProblemIndicators(c?: Counterparty | null): ProblemIndicatorKey[] {
   if (!c || !Array.isArray(c.risks)) return [];
   // «Нет риска» counterparties never display problem indicators, regardless
   // of any residual risk entries in mock data.

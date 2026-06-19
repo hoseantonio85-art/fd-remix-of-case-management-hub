@@ -34,10 +34,7 @@ import { CounterpartyHeaderMeta } from "./CounterpartyHeaderMeta";
 
 export type AssessmentStatus = "pending" | "confirmed" | "disagreed" | "updated" | "review";
 
-const statusMeta: Record<
-  AssessmentStatus,
-  { label: string; chip: string; headerBg: string }
-> = {
+const statusMeta: Record<AssessmentStatus, { label: string; chip: string; headerBg: string }> = {
   pending: {
     label: "Не заключать сделки",
     chip: "bg-rose-100 text-rose-900",
@@ -126,13 +123,11 @@ export function AssessmentModal({
   onDeleteResult?: () => void;
   onAddToList?: () => void;
 }) {
-  
   const [groupDrawer, setGroupDrawer] = useState<AssessmentGroup | null>(null);
   const [registrationOpen, setRegistrationOpen] = useState(false);
 
   // Comment drawer (replaces old correction flow).
   const [commentOpen, setCommentOpen] = useState(false);
-
 
   // History blocks (persist per-counterparty within the session)
   const [commentHistoryOpen, setCommentHistoryOpen] = useState(false);
@@ -186,7 +181,6 @@ export function AssessmentModal({
     toast("Замечания сохранены");
   };
 
-
   if (!assessment) return null;
 
   const headerBg = positive
@@ -198,10 +192,6 @@ export function AssessmentModal({
     ? { label: "Сделки заключать можно", chip: "bg-emerald-100 text-emerald-900" }
     : { label: "Не заключать сделки", chip: "bg-rose-100 text-rose-900" };
 
-
-
-
-
   return (
     <DialogPrimitive.Root open={open} onOpenChange={onOpenChange}>
       <DialogPrimitive.Portal>
@@ -210,153 +200,154 @@ export function AssessmentModal({
             It must be h-[calc(100dvh-32px)] and w-[1320px].
             Keep the gradient header, but do not make the modal content-height, max-w-5xl, w-[96vw], or add backdrop blur. */}
         <DialogPrimitive.Content
-          className={cn(largeModalContentClass, "duration-200 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 sm:max-w-[calc(100vw-32px)] sm:rounded-3xl")}
+          className={cn(
+            largeModalContentClass,
+            "duration-200 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 sm:max-w-[calc(100vw-32px)] sm:rounded-3xl",
+          )}
         >
-        <div className="relative flex min-h-0 flex-1 flex-col">
-          {/* Header */}
-          <div className={cn("shrink-0 px-5 pt-6 pb-6 lg:px-10", headerBg)}>
-            <div className="absolute right-5 top-5 flex items-center gap-2">
-              {onBack && (
+          <div className="relative flex min-h-0 flex-1 flex-col">
+            {/* Header */}
+            <div className={cn("shrink-0 px-5 pt-6 pb-6 lg:px-10", headerBg)}>
+              <div className="absolute right-5 top-5 flex items-center gap-2">
+                {onBack && (
+                  <button
+                    onClick={onBack}
+                    className="rounded-full bg-white p-1.5 text-muted-foreground hover:bg-muted"
+                    aria-label="Вернуться назад"
+                  >
+                    <ArrowLeft className="h-4 w-4" />
+                  </button>
+                )}
                 <button
-                  onClick={onBack}
+                  onClick={() => (onCloseFlow ? onCloseFlow() : onOpenChange(false))}
                   className="rounded-full bg-white p-1.5 text-muted-foreground hover:bg-muted"
-                  aria-label="Вернуться назад"
+                  aria-label="Закрыть и вернуться на главный экран"
                 >
-                  <ArrowLeft className="h-4 w-4" />
+                  <X className="h-4 w-4" />
                 </button>
-              )}
-              <button
-                onClick={() => (onCloseFlow ? onCloseFlow() : onOpenChange(false))}
-                className="rounded-full bg-white p-1.5 text-muted-foreground hover:bg-muted"
-                aria-label="Закрыть и вернуться на главный экран"
-              >
-                <X className="h-4 w-4" />
-              </button>
+              </div>
+
+              <div className="flex flex-wrap items-center gap-1.5">
+                <span
+                  className={`inline-flex items-center rounded-full px-2.5 py-1 text-[11px] font-medium ${resolutionBadge.chip}`}
+                >
+                  {resolutionBadge.label}
+                </span>
+              </div>
+              <h2 className="mt-3 text-2xl font-semibold tracking-tight text-foreground min-w-0">
+                Оценка контрагента {assessment.counterpartyName}
+              </h2>
+              {inn && <CounterpartyHeaderMeta inn={inn} />}
             </div>
 
-            <div className="flex flex-wrap items-center gap-1.5">
-              <span className={`inline-flex items-center rounded-full px-2.5 py-1 text-[11px] font-medium ${resolutionBadge.chip}`}>
-                {resolutionBadge.label}
-              </span>
+            {/* Body */}
+            <div className="min-h-0 flex-1 space-y-5 overflow-y-auto bg-white px-5 py-6 lg:px-10">
+              <div className="grid gap-y-5 gap-x-5 lg:grid-cols-[minmax(0,1fr)_320px] lg:gap-x-12">
+                {/* What changed — right column */}
+                <aside className="order-2 lg:col-start-2 lg:row-start-1">
+                  <div className="space-y-3 lg:sticky lg:top-0">
+                    <AssessmentInfoWidget inn={assessment.inn} />
+                  </div>
+                </aside>
+
+                {/* Groups — left, row 2 */}
+                <section className="order-3 lg:col-start-1 lg:row-start-1 space-y-5">
+                  <div>
+                    <div className="grid grid-cols-1 gap-2.5">
+                      {MAIN_GROUP_IDS.map((id) => {
+                        const g = assessment.groups.find((x) => x.id === id);
+                        if (!g) return null;
+                        return (
+                          <GroupCard
+                            key={g.id}
+                            group={g}
+                            onOpen={setGroupDrawer}
+                            hasComment={!!groupComments[g.id]}
+                          />
+                        );
+                      })}
+                      {(() => {
+                        const otherGroups = OTHER_GROUP_IDS.map((id) =>
+                          assessment.groups.find((x) => x.id === id),
+                        ).filter((g): g is AssessmentGroup => !!g);
+                        return otherGroups.length > 0 ? (
+                          <OtherGroupsAccordion
+                            groups={otherGroups}
+                            onOpen={setGroupDrawer}
+                            groupComments={groupComments}
+                          />
+                        ) : null;
+                      })()}
+                    </div>
+                  </div>
+                </section>
+              </div>
             </div>
-            <h2 className="mt-3 text-2xl font-semibold tracking-tight text-foreground min-w-0">
-              Оценка контрагента {assessment.counterpartyName}
-            </h2>
-            {inn && <CounterpartyHeaderMeta inn={inn} />}
-          </div>
 
-
-          {/* Body */}
-          <div className="min-h-0 flex-1 space-y-5 overflow-y-auto bg-white px-5 py-6 lg:px-10">
-
-            <div className="grid gap-y-5 gap-x-5 lg:grid-cols-[minmax(0,1fr)_320px] lg:gap-x-12">
-              {/* What changed — right column */}
-              <aside className="order-2 lg:col-start-2 lg:row-start-1">
-                <div className="space-y-3 lg:sticky lg:top-0">
-                  <AssessmentInfoWidget inn={assessment.inn} />
+            {/* Footer actions */}
+            <div className="shrink-0 border-t border-border bg-white px-5 py-4 lg:px-10">
+              {completionMode ? (
+                <div className="flex gap-3">
+                  <Button
+                    variant="outline"
+                    onClick={onDeleteResult}
+                    className="h-12 flex-1 rounded-full text-sm font-medium"
+                  >
+                    Удалить
+                  </Button>
+                  <Button
+                    onClick={onAddToList}
+                    className="h-12 flex-1 rounded-full text-sm font-medium"
+                  >
+                    Добавить в список дебиторов
+                  </Button>
                 </div>
-              </aside>
-
-
-              {/* Groups — left, row 2 */}
-              <section className="order-3 lg:col-start-1 lg:row-start-1 space-y-5">
-                <div>
-                <div className="grid grid-cols-1 gap-2.5">
-                  {MAIN_GROUP_IDS.map((id) => {
-                    const g = assessment.groups.find((x) => x.id === id);
-                    if (!g) return null;
-                    return (
-                      <GroupCard
-                        key={g.id}
-                        group={g}
-                        onOpen={setGroupDrawer}
-                        hasComment={!!groupComments[g.id]}
-                      />
-                    );
-                  })}
-                  {(() => {
-                    const otherGroups = OTHER_GROUP_IDS
-                      .map((id) => assessment.groups.find((x) => x.id === id))
-                      .filter((g): g is AssessmentGroup => !!g);
-                    return otherGroups.length > 0 ? (
-                      <OtherGroupsAccordion groups={otherGroups} onOpen={setGroupDrawer} groupComments={groupComments} />
-                    ) : null;
-                  })()}
-                </div>
-                </div>
-              </section>
-            </div>
-          </div>
-
-
-          {/* Footer actions */}
-          <div className="shrink-0 border-t border-border bg-white px-5 py-4 lg:px-10">
-            {completionMode ? (
-              <div className="flex gap-3">
+              ) : (
                 <Button
                   variant="outline"
-                  onClick={onDeleteResult}
-                  className="h-12 flex-1 rounded-full text-sm font-medium"
+                  onClick={() => setCommentOpen(true)}
+                  className="h-12 w-full rounded-full text-sm font-medium"
                 >
-                  Удалить
+                  Оставить комментарий
                 </Button>
-                <Button
-                  onClick={onAddToList}
-                  className="h-12 flex-1 rounded-full text-sm font-medium"
-                >
-                  Добавить в список дебиторов
-                </Button>
-              </div>
-            ) : (
-              <Button
-                variant="outline"
-                onClick={() => setCommentOpen(true)}
-                className="h-12 w-full rounded-full text-sm font-medium"
-              >
-                Оставить комментарий
-              </Button>
-            )}
+              )}
+            </div>
+
+            <AssessmentGroupDrawer
+              group={groupDrawer}
+              open={!!groupDrawer}
+              onOpenChange={(o) => !o && setGroupDrawer(null)}
+              comment={groupDrawer ? groupComments[groupDrawer.id] : undefined}
+            />
+
+            <RegistrationInfoDrawer
+              open={registrationOpen}
+              onOpenChange={setRegistrationOpen}
+              counterpartyName={assessment.counterpartyName}
+              inn={assessment.inn}
+              ogrn={defaultOgrn}
+            />
+
+            <CommentHistoryDrawer
+              open={commentHistoryOpen}
+              onOpenChange={setCommentHistoryOpen}
+              records={commentHistory}
+            />
+
+            <AssessmentCommentDrawer
+              open={commentOpen}
+              onOpenChange={setCommentOpen}
+              groups={MAIN_GROUP_IDS.map((id) => assessment.groups.find((x) => x.id === id)).filter(
+                (g): g is AssessmentGroup => !!g,
+              )}
+              onSubmit={handleCommentSubmit}
+            />
           </div>
-
-
-
-
-          <AssessmentGroupDrawer
-            group={groupDrawer}
-            open={!!groupDrawer}
-            onOpenChange={(o) => !o && setGroupDrawer(null)}
-            comment={groupDrawer ? groupComments[groupDrawer.id] : undefined}
-          />
-
-
-          <RegistrationInfoDrawer
-            open={registrationOpen}
-            onOpenChange={setRegistrationOpen}
-            counterpartyName={assessment.counterpartyName}
-            inn={assessment.inn}
-            ogrn={defaultOgrn}
-          />
-
-          <CommentHistoryDrawer
-            open={commentHistoryOpen}
-            onOpenChange={setCommentHistoryOpen}
-            records={commentHistory}
-          />
-
-          <AssessmentCommentDrawer
-            open={commentOpen}
-            onOpenChange={setCommentOpen}
-            groups={MAIN_GROUP_IDS.map((id) => assessment.groups.find((x) => x.id === id)).filter((g): g is AssessmentGroup => !!g)}
-            onSubmit={handleCommentSubmit}
-          />
-        </div>
         </DialogPrimitive.Content>
       </DialogPrimitive.Portal>
     </DialogPrimitive.Root>
   );
 }
-
-
 
 import { assessmentCountMeta, type AssessmentCountKind } from "./assessment-count-meta";
 
@@ -372,13 +363,13 @@ function CountPill({ kind, count }: { kind: AssessmentCountKind; count: number }
         ? "без нарушений"
         : "нет данных";
   const isActiveRisk = kind === "risk" && count > 0;
-  const bg = isActiveRisk
-    ? "bg-rose-50 border-rose-100"
-    : "bg-slate-100/80 border-slate-200/70";
+  const bg = isActiveRisk ? "bg-rose-50 border-rose-100" : "bg-slate-100/80 border-slate-200/70";
   const iconColor = isActiveRisk ? "text-rose-500" : "text-slate-400";
   const textColor = isActiveRisk ? "text-rose-700" : "text-slate-600";
   return (
-    <span className={`inline-flex h-6 items-center gap-1 rounded-full border px-2.5 text-xs font-medium ${bg}`}>
+    <span
+      className={`inline-flex h-6 items-center gap-1 rounded-full border px-2.5 text-xs font-medium ${bg}`}
+    >
       <Ico className={`h-3.5 w-3.5 ${iconColor}`} />
       <span className={`leading-none ${textColor}`}>
         <span className="font-semibold">{count}</span> {label}
@@ -386,7 +377,6 @@ function CountPill({ kind, count }: { kind: AssessmentCountKind; count: number }
     </span>
   );
 }
-
 
 export function GroupCard({
   group,
@@ -459,9 +449,13 @@ export function GroupCard({
                 <AlertTriangle className="mt-0.5 h-3 w-3 shrink-0 text-rose-500" />
                 <div className="min-w-0 flex-1">
                   <div className="text-xs font-medium text-rose-800">{c.title}</div>
-                  {c.reason && c.reason !== "Нарушений не выявлено" && c.reason !== "Нет данных для проверки" && (
-                    <div className="mt-0.5 text-[11px] leading-snug text-muted-foreground line-clamp-2">{c.reason}</div>
-                  )}
+                  {c.reason &&
+                    c.reason !== "Нарушений не выявлено" &&
+                    c.reason !== "Нет данных для проверки" && (
+                      <div className="mt-0.5 text-[11px] leading-snug text-muted-foreground line-clamp-2">
+                        {c.reason}
+                      </div>
+                    )}
                 </div>
               </div>
             ))}
@@ -524,16 +518,19 @@ export function OtherGroupsAccordion({
           </div>
         </div>
         <ChevronDown
-          className={cn(
-            "h-4 w-4 shrink-0 text-muted-foreground transition",
-            open && "rotate-180",
-          )}
+          className={cn("h-4 w-4 shrink-0 text-muted-foreground transition", open && "rotate-180")}
         />
       </button>
       {open && (
         <div className="border-t border-slate-100 bg-slate-50/40 p-2 space-y-2">
           {groups.map((g) => (
-            <GroupCard key={g.id} group={g} onOpen={onOpen} compact hasComment={!!groupComments[g.id]} />
+            <GroupCard
+              key={g.id}
+              group={g}
+              onOpen={onOpen}
+              compact
+              hasComment={!!groupComments[g.id]}
+            />
           ))}
         </div>
       )}

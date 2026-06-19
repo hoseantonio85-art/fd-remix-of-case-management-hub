@@ -3,10 +3,7 @@ export type CriterionStatus = "risk" | "clear" | "no_data";
 export const statusFromPassed = (p: boolean | null): CriterionStatus =>
   p === false ? "risk" : p === true ? "clear" : "no_data";
 
-export const criterionStatusMeta: Record<
-  CriterionStatus,
-  { label: string; chip: string }
-> = {
+export const criterionStatusMeta: Record<CriterionStatus, { label: string; chip: string }> = {
   risk: { label: "Выявлен риск", chip: "bg-rose-50 text-rose-700" },
   clear: { label: "Нарушений нет", chip: "bg-emerald-50 text-emerald-700" },
   no_data: { label: "Нет данных", chip: "bg-slate-100 text-slate-600" },
@@ -20,11 +17,7 @@ export type AssessmentCriterion = {
   source?: string;
 };
 
-export type AssessmentGroupId =
-  | "legal_status"
-  | "management"
-  | "finance"
-  | "legal_reputation";
+export type AssessmentGroupId = "legal_status" | "management" | "finance" | "legal_reputation";
 
 export type AssessmentGroup = {
   id: AssessmentGroupId;
@@ -105,9 +98,7 @@ const finance: AssessmentGroup = {
   id: "finance",
   title: "Финансы и налоги",
   description: "Проверка финансов и налогов",
-  criteria: [
-    ok(1, "Не сдаёт налоговую отчётность >1 года"),
-  ],
+  criteria: [ok(1, "Не сдаёт налоговую отчётность >1 года")],
 };
 
 const legalReputation: AssessmentGroup = {
@@ -121,12 +112,7 @@ const legalReputation: AssessmentGroup = {
   ],
 };
 
-export const defaultGroups: AssessmentGroup[] = [
-  legalStatus,
-  management,
-  finance,
-  legalReputation,
-];
+export const defaultGroups: AssessmentGroup[] = [legalStatus, management, finance, legalReputation];
 
 export const MAIN_GROUP_IDS: AssessmentGroupId[] = [
   "legal_status",
@@ -140,9 +126,7 @@ function toPositiveGroups(groups: AssessmentGroup[]): AssessmentGroup[] {
   return groups.map((g) => ({
     ...g,
     criteria: g.criteria.map((c) =>
-      c.passed === false
-        ? { ...c, passed: true as boolean | null, reason: OK_REASON }
-        : { ...c },
+      c.passed === false ? { ...c, passed: true as boolean | null, reason: OK_REASON } : { ...c },
     ),
   }));
 }
