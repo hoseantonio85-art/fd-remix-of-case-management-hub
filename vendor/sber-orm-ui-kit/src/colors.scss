@@ -1,0 +1,29 @@
+@use './styles/background.module.scss' as *;
+@use './styles/border.module.scss' as *;
+@use './styles/button.module.scss' as *;
+@use './styles/control.module.scss' as *;
+@use './styles/droplist.module.scss' as *;
+@use './styles/icon.module.scss' as *;
+@use './styles/scrollbar.module.scss' as *;
+@use './styles/surface.module.scss' as *;
+@use './styles/text.module.scss' as *;
+@use './styles/tooltip.module.scss' as *;
+@use './styles/unknown.module.scss' as *;
+
+:root {
+  @include background();
+  @include border();
+  @include button();
+  @include control();
+  @include droplist();
+  @include icon();
+  @include text();
+  @include tooltip();
+  @include scrollbar();
+  @include surface();
+  @include unknown();
+}
+
+* {
+  letter-spacing: -0.3px;
+}

@@ -1,0 +1,434 @@
+.container {
+  display: flex;
+  align-items: start;
+  flex-direction: column;
+  position: relative;
+  width: 100%;
+
+  .topLabels {
+    order: 1;
+    max-width: 100%;
+    width: auto;
+    margin-bottom: 4px !important;
+    flex-direction: row !important;
+    gap: 6px;
+  }
+
+  &:not(.containerLabelInside) {
+    label span:not(.asterisk, .textViewOnly) {
+      color: var(--textBaseDefault) !important;
+      font-weight: 600 !important;
+    }
+
+    .description {
+      color: var(--iconBaseDefault) !important;
+      width: 16px;
+      height: 16px;
+    }
+  }
+
+  .required {
+    display: none !important;
+  }
+
+  .asterisk {
+    color: var(--textAccentDanger) !important;
+  }
+
+  textarea::placeholder {
+    color: var(--textBaseTertiary);
+  }
+
+  .suffix {
+    position: absolute;
+    right: 24px;
+    z-index: 2;
+    min-width: 24px;
+    top: 36px;
+  }
+
+  .counter {
+    font-size: 12px;
+    color: var(--textBaseTertiary);
+    position: absolute;
+    right: 20px;
+    bottom: 9px;
+  }
+
+  &:hover {
+    .textareaContainer {
+      background-color: var(--backgroundBasicHover) !important;
+
+      &::after {
+        border-width: 2px;
+      }
+    }
+  }
+
+  &.sizeS {
+    .textareaContainer {
+      padding: 10px 8px 8px 12px !important;
+    }
+
+    .counter {
+      right: 20px;
+      bottom: 5px;
+    }
+
+    .suffix {
+      top: 32px;
+    }
+  }
+
+  &.sizeM {
+    .textareaContainer {
+      padding: 14px 12px 12px 16px !important;
+    }
+    .counter {
+      right: 25px;
+    }
+  }
+
+  &.sizeL {
+    .textareaContainer {
+      padding: 18px 12px 12px 16px !important;
+    }
+    .counter {
+      right: 25px;
+    }
+  }
+
+  &.sizeXL {
+    .textareaContainer {
+      padding: 22px 16px 16px 20px !important;
+    }
+
+    .counter {
+      right: 24px;
+      bottom: 13px;
+    }
+
+    .suffix {
+      top: 42px;
+    }
+  }
+}
+
+.fullWidth {
+  width: 100%;
+  align-items: stretch;
+}
+
+.textareaContainer {
+  border-radius: 12px !important;
+  background-color: var(--backgroundBasicDefault) !important;
+  padding: 12px 8px 8px 16px !important;
+  width: 100%;
+
+  &ViewOnly {
+    padding: 0 !important;
+
+    background: none !important;
+    cursor: default !important;
+
+    .textarea,
+    &:not(.containerLabelInside) .textarea {
+      margin: 0 !important;
+
+      cursor: default !important;
+      font-size: 16px;
+      color: var(--textBaseDefault) !important;
+      overflow: hidden;
+      display: -webkit-box;
+      -webkit-box-orient: vertical;
+    }
+
+    &::after {
+      border: none !important;
+    }
+  }
+
+  &::after {
+    border-color: var(--borderDefault) !important;
+  }
+}
+
+.description,
+.clear {
+  color: var(--iconBaseTertiary) !important;
+  height: 20px;
+  width: 20px;
+  cursor: pointer;
+}
+
+.containerLabelInside {
+  position: relative;
+
+  &.sizeS {
+    .textareaContainer {
+      border-radius: 12px !important;
+    }
+
+    .suffix {
+      top: 12px;
+    }
+  }
+
+  &.sizeM {
+    .textareaContainer {
+      border-radius: 14px !important;
+    }
+
+    .suffix {
+      top: 16px;
+    }
+  }
+
+  &.sizeL {
+    .textareaContainer {
+      border-radius: 16px !important;
+      padding: 28px 12px 12px 16px !important;
+    }
+
+    .suffix {
+      top: 18px;
+    }
+  }
+
+  &.sizeXL {
+    .textareaContainer {
+      border-radius: 18px !important;
+      padding: 32px 16px 16px 20px !important;
+    }
+
+    .suffix {
+      top: 24px;
+    }
+  }
+
+  .topLabelsWrapper {
+    max-width: calc(100% - 60px);
+    width: auto;
+    padding: 0 4px;
+    position: absolute;
+    top: 0;
+    left: -4px;
+    z-index: 2;
+    transform-origin: top left;
+    transition: transform 200ms cubic-bezier(0, 0, 0.2, 1);
+    align-items: center;
+
+    &.sizeS {
+      transform: translate(10px, 12px) scale(1);
+    }
+
+    &.sizeM {
+      transform: translate(14px, 16px) scale(1);
+    }
+
+    &.sizeL {
+      transform: translate(18px, 16px) scale(1);
+    }
+
+    &.sizeXL {
+      transform: translate(22px, 20px) scale(1);
+    }
+  }
+
+  .topLabels {
+    margin-bottom: 0 !important;
+  }
+
+  &.disabled.filled,
+  &.focused:hover,
+  &.filled:hover {
+    .topLabelsWrapper {
+      &::before {
+        content: "";
+        position: absolute;
+        background-color: var(--backgroundBasicHover);
+        width: 100%;
+        height: calc(100% - 10px);
+        left: 0;
+        top: 10px;
+      }
+
+      &.sizeL,
+      &.sizeXL {
+        &::before {
+          display: none;
+        }
+      }
+    }
+  }
+
+  &.focused,
+  &.filled {
+    .topLabelsWrapper {
+      &.sizeS {
+        transform: translate(12px, -8px) scale(0.85);
+        background-color: var(--backgroundBasicDefault);
+      }
+
+      &.sizeM {
+        transform: translate(16px, -7px) scale(0.75);
+        background-color: var(--backgroundBasicDefault);
+      }
+
+      &.sizeL {
+        transform: translate(16px, 8px) scale(0.75);
+      }
+
+      &.sizeXL {
+        transform: translate(20px, 12px) scale(0.75);
+      }
+    }
+  }
+
+  .inputLabel {
+    span {
+      font-size: 16px;
+      line-height: 20px;
+      color: var(--textBaseTertiary);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    &.sizeS {
+      span {
+        font-size: 14px;
+      }
+    }
+
+    &Error {
+      color: var(--textTechDanger) !important;
+    }
+  }
+
+  .description,
+  .clear {
+    color: var(--iconBaseTertiary) !important;
+    max-height: 20px;
+    max-width: 20px;
+  }
+
+  .clear {
+    cursor: pointer;
+    height: 16px;
+
+    &:hover {
+      color: var(--iconBaseSecondary) !important;
+    }
+  }
+}
+
+.disabled {
+  .textarea {
+    cursor: not-allowed;
+  }
+
+  .textareaContainer {
+    background-color: var(--backgroundTechDisabled) !important;
+
+    &::after {
+      border-color: var(--borderDisabled) !important;
+    }
+  }
+
+  .inputLabel span {
+    color: var(--textBaseDisabled);
+  }
+}
+
+.focused:not(.error) {
+  .textareaContainer {
+    box-shadow: none !important;
+
+    &::after {
+      border-color: var(--borderFocus) !important;
+      border-width: 2px !important;
+    }
+  }
+}
+
+.textarea {
+  padding: 0px 60px 0px 0px !important;
+  color: var(--textBaseDefault) !important;
+
+  &:focus {
+    outline: none !important;
+  }
+
+  &::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: transparent;
+    border-radius: 4px;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: var(--scrollDefault);
+    border-radius: 4px;
+    transition: background 0.2s;
+  }
+
+  &::-webkit-scrollbar-thumb:hover {
+    background: var(--scrollHover);
+  }
+
+  &::-webkit-scrollbar-button {
+    display: none;
+  }
+}
+
+.error {
+  .textareaContainer {
+    box-shadow: none !important;
+
+    &::after {
+      border-width: 1px !important;
+      border-color: var(--borderError) !important;
+    }
+  }
+
+  .inputLabel span {
+    color: var(--textAccentDanger) !important;
+  }
+}
+
+.helperText {
+  font-size: 12px;
+  line-height: 16px;
+  margin-top: 4px;
+  color: var(--textBaseTertiary) !important;
+
+  &.error {
+    display: flex;
+    gap: 4px;
+    align-items: center;
+    color: var(--textAccentDanger) !important;
+  }
+}
+
+.textViewOnly {
+  font-size: 14px !important;
+  line-height: 20px !important;
+  color: var(--textBaseTertiary) !important;
+}
+
+.text {
+  color: var(--textBaseTertiary);
+}
+
+@for $i from 1 through 12 {
+  .rows-#{$i} {
+    .textarea {
+      line-clamp: $i;
+      -webkit-line-clamp: $i;
+    }
+  }
+}

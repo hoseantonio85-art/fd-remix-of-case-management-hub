@@ -32,19 +32,10 @@ export function ResolutionCard({
           <Icon className="h-4 w-4" />
         </div>
         <div className="min-w-0 flex-1">
-          <div className="text-base font-semibold leading-snug text-foreground">
-            {title}
-          </div>
-          <p className="mt-1.5 text-xs leading-snug text-muted-foreground">
-            {description}
-          </p>
+          <div className="text-base font-semibold leading-snug text-foreground">{title}</div>
+          <p className="mt-1.5 text-xs leading-snug text-muted-foreground">{description}</p>
           <div className="mt-3">
-            <Button
-              size="sm"
-              variant="outline"
-              className={buttonClass}
-              onClick={onDetailsClick}
-            >
+            <Button size="sm" variant="outline" className={buttonClass} onClick={onDetailsClick}>
               Подробнее
               <ChevronRight className="h-3.5 w-3.5" />
             </Button>

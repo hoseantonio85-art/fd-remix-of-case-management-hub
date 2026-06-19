@@ -1,0 +1,67 @@
+.scrollhost {
+  overflow: auto;
+  width: 100%;
+  height: 100%;
+  max-width: inherit;
+  max-height: inherit;
+  position: relative;
+  box-sizing: border-box;
+
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+  -webkit-overflow-scrolling: touch;
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+.scrollbarTrack {
+  padding: 2px;
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  transition: opacity 0.2s linear;
+  &X {
+    left: 0;
+    height: 12px;
+    z-index: 2;
+  }
+  &Y {
+    top: 0;
+    width: 12px;
+    z-index: 3;
+  }
+}
+
+.scrollbarThumb {
+  position: absolute;
+  cursor: pointer;
+  background-color: rgba(9, 32, 55, 0.13);
+  border-radius: 4px;
+  margin: 0;
+  opacity: 1;
+
+  &:hover {
+    background-color: rgba(3, 22, 41, 0.42);
+    transition: background-color 0.3s ease-in-out;
+  }
+  &:not(:hover) {
+    transition: background-color 0.3s ease-in-out;
+  }
+
+  &:active {
+    background-color: rgba(3, 22, 41, 0.42);
+    transition: background-color 0.3s ease-in-out;
+  }
+  &:not(:active) {
+    transition: background-color 0.3s ease-in-out;
+  }
+
+  &X {
+    height: 8px;
+  }
+  &Y {
+    width: 8px;
+  }
+}

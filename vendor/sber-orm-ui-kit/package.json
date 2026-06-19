@@ -1,0 +1,129 @@
+{
+	"name": "@sber-orm/ui-kit",
+	"version": "0.283.0",
+	"type": "module",
+	"description": "Библиотека компонентов на Platform V",
+	"sideEffects": false,
+	"main": "dist/index.js",
+	"types": "dist/index.d.ts",
+	"exports": {
+		".": {
+			"import": "./dist/index.js",
+			"types": "./dist/index.d.ts",
+			"default": "./dist/index.js"
+		},
+		"./index.css": {
+			"import": "./dist/index.css",
+			"default": "./dist/index.css"
+		}
+	},
+	"files": [
+		"dist/*",
+		"src/*"
+	],
+	"dependencies": {
+		"@v-uik/hooks": "1.18.0",
+		"@v-uik/utils": "1.18.0",
+		"dayjs": "^1.11.13",
+		"i18next": "^23.11.5",
+		"react": "18.3.1",
+		"react-dom": "18.3.1",
+		"react-i18next": "^11.8.15",
+		"react-imask": "7.6.1",
+		"simplebar-react": "3.3.2"
+	},
+	"devDependencies": {
+		"@biomejs/biome": "2.3.11",
+		"@sber-orm/biome-config": "*",
+		"@sber-orm/config-release-it": "*",
+		"@sber-orm/tsconfig-config": "*",
+		"@storybook/addon-controls": "^8.2.5",
+		"@storybook/react": "^8.2.5",
+		"@storybook/react-vite": "^8.2.4",
+		"@svgr/plugin-jsx": "^8.1.0",
+		"@svgr/plugin-svgo": "^8.1.0",
+		"@swc/cli": "^0.4.0",
+		"@swc/core": "^1.7.11",
+		"@testing-library/react": "16.2.0",
+		"@types/react": "^18.3.3",
+		"@types/react-dom": "^18.3.0",
+		"@types/throttle-debounce": "^5.0.2",
+		"@v-uik/accordion": "^1.13.0",
+		"@v-uik/button": "^1.13.0",
+		"@v-uik/button-group": "^1.13.0",
+		"@v-uik/checkbox": "^1.13.0",
+		"@v-uik/combo-box": "^1.13.0",
+		"@v-uik/date-picker": "^1.13.0",
+		"@v-uik/file-uploader": "^1.15.0",
+		"@v-uik/input": "1.18.0",
+		"@v-uik/input-number": "1.15.0",
+		"@v-uik/label-control": "^1.13.1",
+		"@v-uik/modal": "^1.16.0",
+		"@v-uik/notification": "^1.13.1",
+		"@v-uik/popup": "^1.13.1",
+		"@v-uik/progress": "^1.13.0",
+		"@v-uik/radio": "1.15.0",
+		"@v-uik/radio-group": "1.15.0",
+		"@v-uik/switch": "^1.13.0",
+		"@v-uik/tag": "^1.13.0",
+		"@v-uik/textarea": "^1.13.0",
+		"@v-uik/theme": "^1.13.0",
+		"@v-uik/tooltip": "^1.13.0",
+		"@v-uik/tree": "^1.13.0",
+		"@vitejs/plugin-react-swc": "^3.7.0",
+		"@vitest/coverage-istanbul": "3.0.5",
+		"classnames": "^2.3.1",
+		"cors": "2.8.5",
+		"esbuild-sass-plugin": "^3.2.0",
+		"express": "5.0.0-beta.1",
+		"happy-dom": "17.0.2",
+		"markdown-to-jsx": "7.7.10",
+		"pixelmatch": "^6.0.0",
+		"pngjs": "^7.0.0",
+		"puppeteer": "^23.2.1",
+		"sass-embedded": "1.93.3",
+		"storybook": "^8.2.6",
+		"throttle-debounce": "^5.0.2",
+		"tsup": "^8.0.2",
+		"typescript": "*",
+		"vite": "^6.0.0-alpha.18",
+		"vite-plugin-checker": "0.12.0",
+		"vite-plugin-svg-sprite": "0.7.0",
+		"vite-plugin-svgr": "^4.2.0",
+		"vitest": "3.0.5"
+	},
+	"scripts": {
+		"prepare": "npm run build",
+		"build": "vite build && tsup && npm run build:types",
+		"build:types": "mkdir -p types/dist && cp dist/index.d.ts types/dist",
+		"clean": "rm -rf .turbo && rm -rf node_modules",
+		"debug:release": "release-it --ci -VV --dry-run",
+		"format": "biome format --write .",
+		"release": "release-it --ci -VV && npm run release:types",
+		"release:types": "cd types && npm run release",
+		"lint": "biome check --fix --unsafe src",
+		"start": "storybook dev -p 6006",
+		"storybook": "storybook dev -p 6006",
+		"storybook:build": "storybook build",
+		"test": "npm run test:ui",
+		"test:ui": "npm run storybook:build && node utils/uiTest.js"
+	},
+	"repository": {
+		"type": "git",
+		"url": "https://stash.sigma.sbrf.ru/scm/sberorm/sberorm-front-lib-core.git",
+		"directory": "packages/ui-kit"
+	},
+	"publishConfig": {
+		"access": "public"
+	},
+	"keywords": [
+		"ui-kit",
+		"@v-uik"
+	],
+	"author": {
+		"name": "Dmitry Kozlov",
+		"email": "DmAleKozlov@sberbank.ru"
+	},
+	"license": "ISC",
+	"module": "dist/index.js"
+}

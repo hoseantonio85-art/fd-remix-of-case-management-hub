@@ -55,11 +55,7 @@ export function ChecksWidget({
   let subtitle = "Нет проверок";
   if (isRunning) {
     subtitle =
-      bucket === 0
-        ? "≈ 10 мин осталось"
-        : bucket === 1
-          ? "≈ 5 мин осталось"
-          : "Почти готово";
+      bucket === 0 ? "≈ 10 мин осталось" : bucket === 1 ? "≈ 5 мин осталось" : "Почти готово";
   } else if (isDoneOnly)
     subtitle = `${doneCount} ${
       doneCount === 1
@@ -94,30 +90,14 @@ export function ChecksWidget({
 
         {isRunning && (
           <span className="relative flex h-10 w-10 items-center justify-center rounded-full bg-primary/10">
-            <svg
-              className="absolute inset-0 h-10 w-10 animate-spin"
-              viewBox="0 0 40 40"
-            >
+            <svg className="absolute inset-0 h-10 w-10 animate-spin" viewBox="0 0 40 40">
               <defs>
-                <linearGradient
-                  id="checkGradient"
-                  x1="0%"
-                  y1="0%"
-                  x2="100%"
-                  y2="0%"
-                >
+                <linearGradient id="checkGradient" x1="0%" y1="0%" x2="100%" y2="0%">
                   <stop offset="0%" stopColor="hsl(var(--primary))" />
                   <stop offset="100%" stopColor="#8b5cf6" />
                 </linearGradient>
               </defs>
-              <circle
-                cx="20"
-                cy="20"
-                r="15"
-                fill="none"
-                stroke="#E5EDFF"
-                strokeWidth="3"
-              />
+              <circle cx="20" cy="20" r="15" fill="none" stroke="#E5EDFF" strokeWidth="3" />
               <circle
                 cx="20"
                 cy="20"
@@ -137,9 +117,7 @@ export function ChecksWidget({
       </span>
 
       <span className="flex flex-col items-start leading-tight">
-        <span className="text-[13px] font-semibold text-foreground">
-          Проверки
-        </span>
+        <span className="text-[13px] font-semibold text-foreground">Проверки</span>
         <span className="text-[11px] text-muted-foreground">{subtitle}</span>
       </span>
     </button>

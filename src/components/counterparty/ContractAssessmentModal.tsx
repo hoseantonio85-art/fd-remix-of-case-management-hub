@@ -1,13 +1,27 @@
 import { useState } from "react";
 import * as DialogPrimitive from "@radix-ui/react-dialog";
-import { X, ChevronDown, ArrowUp, Flame, Download, AlertTriangle, ChevronRight } from "lucide-react";
+import {
+  X,
+  ChevronDown,
+  ArrowUp,
+  Flame,
+  Download,
+  AlertTriangle,
+  ChevronRight,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { largeModalContentClass } from "@/lib/modal-styles";
 import { AssessmentInfoWidget } from "./AssessmentModal";
 import { InModalDrawer } from "./InModalDrawer";
 
-type ContractError = { id: string; title: string; summary: string; description: string; justification: string };
+type ContractError = {
+  id: string;
+  title: string;
+  summary: string;
+  description: string;
+  justification: string;
+};
 
 export const CONTRACT_ERRORS: ContractError[] = [
   {
@@ -48,8 +62,7 @@ export const CONTRACT_ERRORS: ContractError[] = [
     id: "e5",
     title: "Ошибка 5",
     summary: "Ошибка в нумерации этапов программы лояльности в п. 3.2.25.",
-    description:
-      "В пункте 3.2.25 допущена ошибка в нумерации этапов программы лояльности.",
+    description: "В пункте 3.2.25 допущена ошибка в нумерации этапов программы лояльности.",
     justification:
       "Пункт 3.2.25: «Программа лояльности реализуется в 2 этапа: 1ый этап ... 20й этап списание баллов ... Плановая дата реализации _ Зий, 4ый квартал 2022 года».",
   },
@@ -69,7 +82,10 @@ export function ErrorCard({ err }: { err: ContractError }) {
           <div className="mt-0.5 line-clamp-2 text-[12px] text-muted-foreground">{err.summary}</div>
         </div>
         <ChevronDown
-          className={cn("mt-1 h-4 w-4 shrink-0 text-muted-foreground transition", open && "rotate-180")}
+          className={cn(
+            "mt-1 h-4 w-4 shrink-0 text-muted-foreground transition",
+            open && "rotate-180",
+          )}
         />
       </button>
       {open && (
@@ -219,19 +235,14 @@ function RiskCard({ risk }: { risk: ContractRisk }) {
         className="flex w-full items-center gap-3 px-3 py-3 text-left"
       >
         <div
-          className={cn(
-            "flex h-9 w-9 shrink-0 items-center justify-center rounded-lg",
-            m.iconWrap,
-          )}
+          className={cn("flex h-9 w-9 shrink-0 items-center justify-center rounded-lg", m.iconWrap)}
         >
           <Flame className="h-4 w-4" />
         </div>
         <div className="min-w-0 flex-1">
           <div className="text-sm font-medium text-foreground">{risk.title}</div>
           <div className="mt-0.5 flex items-center gap-1.5 text-[12px] text-muted-foreground">
-            <ChevronDown
-              className={cn("h-3.5 w-3.5 transition", open && "rotate-180")}
-            />
+            <ChevronDown className={cn("h-3.5 w-3.5 transition", open && "rotate-180")} />
             <span>{risk.category}</span>
           </div>
         </div>
@@ -241,22 +252,14 @@ function RiskCard({ risk }: { risk: ContractRisk }) {
           <div className="text-[11px] font-medium uppercase tracking-wide text-muted-foreground">
             Описание
           </div>
-          <div className="mt-1 text-sm leading-relaxed text-foreground">
-            {risk.description}
-          </div>
+          <div className="mt-1 text-sm leading-relaxed text-foreground">{risk.description}</div>
         </div>
       )}
     </div>
   );
 }
 
-export function LevelAccordion({
-  level,
-  risks,
-}: {
-  level: Level;
-  risks: ContractRisk[];
-}) {
+export function LevelAccordion({ level, risks }: { level: Level; risks: ContractRisk[] }) {
   const [open, setOpen] = useState(level === "very_high" || level === "high");
   const m = levelMeta[level];
   const count = risks.length;
@@ -289,10 +292,7 @@ export function LevelAccordion({
           </span>
         </div>
         <ChevronDown
-          className={cn(
-            "h-4 w-4 text-muted-foreground transition",
-            open && "rotate-180",
-          )}
+          className={cn("h-4 w-4 text-muted-foreground transition", open && "rotate-180")}
         />
       </button>
       {open && (
@@ -310,7 +310,6 @@ export function LevelAccordion({
   );
 }
 
-
 export function ContractAssessmentModal({
   open,
   onOpenChange,
@@ -327,15 +326,12 @@ export function ContractAssessmentModal({
     medium: RISKS.filter((r) => r.level === "medium"),
     low: RISKS.filter((r) => r.level === "low"),
   };
-  const topLevel: Level =
-    LEVEL_ORDER.find((l) => grouped[l].length > 0) ?? "low";
+  const topLevel: Level = LEVEL_ORDER.find((l) => grouped[l].length > 0) ?? "low";
 
   const headerGradient: Record<Level, string> = {
-    very_high:
-      "bg-gradient-to-b from-rose-50 via-rose-50/40 to-transparent",
+    very_high: "bg-gradient-to-b from-rose-50 via-rose-50/40 to-transparent",
     high: "bg-gradient-to-b from-rose-50 via-rose-50/40 to-transparent",
-    medium:
-      "bg-gradient-to-b from-amber-50 via-amber-50/40 to-transparent",
+    medium: "bg-gradient-to-b from-amber-50 via-amber-50/40 to-transparent",
     low: "bg-gradient-to-b from-slate-50 via-slate-50/40 to-transparent",
   };
 
@@ -351,12 +347,7 @@ export function ContractAssessmentModal({
         >
           <div className="relative flex min-h-0 flex-1 flex-col">
             {/* Header */}
-            <div
-              className={cn(
-                "shrink-0 px-5 pt-6 pb-6 lg:px-10",
-                headerGradient[topLevel],
-              )}
-            >
+            <div className={cn("shrink-0 px-5 pt-6 pb-6 lg:px-10", headerGradient[topLevel])}>
               <div className="absolute right-5 top-5 flex items-center gap-2">
                 <button
                   onClick={() => onOpenChange(false)}
@@ -400,11 +391,7 @@ export function ContractAssessmentModal({
                     <RisksCounter count={RISKS.length} />
                   </div>
                   {LEVEL_ORDER.map((lvl) => (
-                    <LevelAccordion
-                      key={lvl}
-                      level={lvl}
-                      risks={grouped[lvl]}
-                    />
+                    <LevelAccordion key={lvl} level={lvl} risks={grouped[lvl]} />
                   ))}
                 </section>
                 <aside className="order-2 lg:col-start-2 lg:row-start-1">
@@ -419,7 +406,8 @@ export function ContractAssessmentModal({
               <div className="px-6 pt-6 pb-4">
                 <h3 className="text-lg font-semibold text-foreground">Ошибки документа</h3>
                 <p className="mt-1 text-[13px] text-muted-foreground">
-                  Найдено {CONTRACT_ERRORS.length} ошибок, которые могут повлиять на корректность договора.
+                  Найдено {CONTRACT_ERRORS.length} ошибок, которые могут повлиять на корректность
+                  договора.
                 </p>
               </div>
               <div className="space-y-2 px-6 pb-6">

@@ -1,0 +1,72 @@
+@use 'sass:math';
+.col {
+  width: auto;
+  max-width: auto;
+  flex-basis: auto;
+}
+
+@for $i from 1 through 12 {
+  .col-#{$i} {
+    $width: math.percentage(math.div($i, 12));
+    width: $width;
+    max-width: $width;
+    flex-basis: $width;
+  }
+}
+
+$i: 0;
+@while $i <= 40 {
+  .mb-#{$i} {
+    margin-bottom: #{$i}px;
+  }
+  .gap-#{$i} {
+    gap: #{$i}px;
+  }
+
+  $i: $i + 4;
+}
+
+.row {
+  display: flex;
+  flex-wrap: nowrap;
+  flex: 1;
+
+  &Wrap {
+    flex-wrap: wrap;
+  }
+
+  &Column {
+    flex-direction: column;
+  }
+
+  &NoFlex {
+    flex: 0 !important;
+  }
+}
+
+$alignMap:
+  baseline baseline,
+  bottom flex-end,
+  middle center,
+  stretch stretch,
+  top flex-start;
+
+@each $name, $align in $alignMap {
+  .row-align-#{$name} {
+    align-items: $align;
+  }
+}
+
+$justifyContentMap:
+  around space-around,
+  between space-between,
+  center center,
+  end flex-end,
+  start flex-start,
+  stretch stretch;
+
+@each $name, $align in $justifyContentMap {
+  .row-justify-#{$name} {
+    justify-content: $align;
+  }
+}

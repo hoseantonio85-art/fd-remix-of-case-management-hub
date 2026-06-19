@@ -41,9 +41,7 @@ export function DebtSummaryCard({
     : "border-border bg-white";
 
   return (
-    <div
-      className={`rounded-2xl border p-5 transition-all duration-700 ${flashClass}`}
-    >
+    <div className={`rounded-2xl border p-5 transition-all duration-700 ${flashClass}`}>
       <div className="mb-4 flex items-center gap-1.5">
         <h3 className="text-sm font-semibold">Работа с задолженностью</h3>
         <Info className="h-3.5 w-3.5 text-muted-foreground" />
@@ -72,7 +70,7 @@ export function DebtSummaryCard({
               </div>
               <div className={`flex-1 ${isLast ? "" : "pb-4"}`}>
                 <div
-                  key={`title-${it.step.id}-${isCurrent ? stepAnim?.tick ?? "static" : "static"}`}
+                  key={`title-${it.step.id}-${isCurrent ? (stepAnim?.tick ?? "static") : "static"}`}
                   className={`text-sm leading-tight ${
                     isCurrent
                       ? "font-semibold text-foreground"

@@ -1,0 +1,116 @@
+.control {
+  width: 48px !important;
+
+  input,
+  .switch {
+    width: 48px !important;
+  }
+
+  .thumb {
+    width: 16px !important;
+    height: 16px !important;
+    top: 3px !important;
+    left: 3px !important;
+    transform: unset !important;
+    background-color: var(--backgroundBasicDefault) !important;
+  }
+
+  .switch {
+    background-color: var(--backgroundTertiaryDefault) !important;
+    border-color: var(--borderDefault) !important;
+  }
+
+  &:hover:not(.error, .disabled) .switch {
+    background-color: var(--backgroundTertiaryHover) !important;
+  }
+
+  &:active:not(.error, .disabled) .switch {
+    background-color: var(--backgroundTertiaryActive) !important;
+  }
+}
+
+.small {
+  width: 32px !important;
+
+  input,
+  .switch {
+    width: 32px !important;
+  }
+
+  .thumb {
+    width: 12px !important;
+    height: 12px !important;
+    top: 1px !important;
+    left: 1px !important;
+  }
+}
+
+.checked {
+  .thumb {
+    left: 27px !important;
+  }
+
+  &.small .thumb {
+    left: 17px !important;
+  }
+
+  .switch {
+    background-color: var(--backgroundPrimaryDefault) !important;
+  }
+
+  &:hover:not(.error, .disabled) .switch {
+    background-color: var(--backgroundPrimaryHover) !important;
+  }
+
+  &:active:not(.error, .disabled) .switch {
+    background-color: var(--backgroundPrimaryActive) !important;
+  }
+}
+
+.error {
+  .switch {
+    background-color: var(--backgroundTechDanger) !important;
+  }
+}
+
+.disabled {
+  .switch {
+    background-color: var(--controlBackgroundDisabled) !important;
+    border-color: var(--backgroundSecondaryDefault) !important;
+  }
+
+  .thumb {
+    background-color: var(--iconBaseDisabled) !important;
+  }
+}
+
+.readonly {
+  pointer-events: none;
+}
+
+.helperText {
+  p {
+    color: var(--textBaseTertiary) !important;
+  }
+
+  &Error {
+
+    p,
+    svg {
+      color: var(--borderError) !important;
+    }
+  }
+}
+
+.label {
+  gap: 12px;
+
+  .labelContent {
+    margin: 0 !important;
+  }
+}
+
+.required {
+  color: var(--textTechDanger) !important;
+  font-weight: 400;
+}

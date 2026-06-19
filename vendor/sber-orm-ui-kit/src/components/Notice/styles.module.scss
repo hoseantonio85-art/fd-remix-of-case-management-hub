@@ -1,0 +1,18 @@
+.notice {
+  padding: 12px;
+
+  width: 100%;
+
+  background: var(--backgroundBasicDefault);
+  border-radius: 12px;
+  box-shadow: 0 0 1px 0 rgba(36, 41, 46, 0.32),0 4px 8px 0 rgba(36, 41, 46, 0.12);
+  cursor: pointer;
+
+  &:hover {
+    background: var(--surfaceBasicHover);
+  }
+}
+
+.content {
+  padding: 2px 0;
+}

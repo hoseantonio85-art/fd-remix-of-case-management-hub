@@ -19,18 +19,30 @@ import {
   X,
   ShieldCheck,
 } from "lucide-react";
-import { counterparties, type Counterparty, type RiskType, type ProcessStage } from "@/lib/mock-data";
+import {
+  counterparties,
+  type Counterparty,
+  type RiskType,
+  type ProcessStage,
+} from "@/lib/mock-data";
 import { CounterpartyModal } from "@/components/counterparty/CounterpartyModal";
 import { CounterpartyStatusBadge } from "@/components/counterparty/CounterpartyStatusBadge";
 import { riskMeta, allChipMeta } from "@/components/counterparty/risk-meta";
 import { getCounterpartyProblemIndicators, problemIndicatorMeta } from "@/lib/problem-indicators";
-import { AssessmentModal, type AssessmentStatus, type Disagreement } from "@/components/counterparty/AssessmentModal";
+import {
+  AssessmentModal,
+  type AssessmentStatus,
+  type Disagreement,
+} from "@/components/counterparty/AssessmentModal";
 import { buildAssessment, type Assessment } from "@/lib/assessment-data";
 import { Button } from "@/components/ui/button";
 import { ProcessFilterDrawer } from "@/components/counterparty/ProcessFilterDrawer";
 import { processMeta, processOrder } from "@/lib/process-meta";
 import { toast } from "sonner";
-import { DrpaDataUpdateDrawer, type DrpaCardData } from "@/components/counterparty/DrpaDataUpdateDrawer";
+import {
+  DrpaDataUpdateDrawer,
+  type DrpaCardData,
+} from "@/components/counterparty/DrpaDataUpdateDrawer";
 import { RunCheckDialog } from "@/components/counterparty/RunCheckDialog";
 import { PendingAssessmentModal } from "@/components/counterparty/PendingAssessmentModal";
 import { ChecksWidget } from "@/components/counterparty/CheckProcessPill";
@@ -64,7 +76,6 @@ function getContractWord(count: number): string {
   if (lastOne >= 2 && lastOne <= 4) return "договора";
   return "договоров";
 }
-
 
 type CategoryKey = "risk" | "overdue_risk" | "no_risk" | "overdue";
 
@@ -261,21 +272,40 @@ const NEGATIVE_RISK_TYPES: RiskType[] = [
   "Административные нарушения",
 ];
 
-const problemChips: { key: Exclude<RiskChipKey, "all">; meta: typeof riskMeta[RiskType]; matches: (c: Counterparty) => boolean }[] = [
+const problemChips: {
+  key: Exclude<RiskChipKey, "all">;
+  meta: (typeof riskMeta)[RiskType];
+  matches: (c: Counterparty) => boolean;
+}[] = [
   {
     key: "bankruptcy",
-    meta: { ...riskMeta["Банкротство / ликвидация"], label: "Банкротство / ликвидация", short: "Банкротство / ликвидация" },
-    matches: (c) => c.status !== "no_risk" && c.risks.some((r) => r.type === "Банкротство / ликвидация"),
+    meta: {
+      ...riskMeta["Банкротство / ликвидация"],
+      label: "Банкротство / ликвидация",
+      short: "Банкротство / ликвидация",
+    },
+    matches: (c) =>
+      c.status !== "no_risk" && c.risks.some((r) => r.type === "Банкротство / ликвидация"),
   },
   {
     key: "group",
-    meta: { ...riskMeta["Неисполнение контракта группы"], label: "Неисполнение контракта группы", short: "Неисполнение контракта группы" },
-    matches: (c) => c.status !== "no_risk" && c.risks.some((r) => r.type === "Неисполнение контракта группы"),
+    meta: {
+      ...riskMeta["Неисполнение контракта группы"],
+      label: "Неисполнение контракта группы",
+      short: "Неисполнение контракта группы",
+    },
+    matches: (c) =>
+      c.status !== "no_risk" && c.risks.some((r) => r.type === "Неисполнение контракта группы"),
   },
   {
     key: "negative",
-    meta: { ...riskMeta["Ухудшилось финансовое состояние"], label: "Наличие негативных факторов", short: "Наличие негативных факторов" },
-    matches: (c) => c.status !== "no_risk" && c.risks.some((r) => NEGATIVE_RISK_TYPES.includes(r.type)),
+    meta: {
+      ...riskMeta["Ухудшилось финансовое состояние"],
+      label: "Наличие негативных факторов",
+      short: "Наличие негативных факторов",
+    },
+    matches: (c) =>
+      c.status !== "no_risk" && c.risks.some((r) => NEGATIVE_RISK_TYPES.includes(r.type)),
   },
 ];
 
@@ -310,7 +340,9 @@ export default function Index() {
   const [manualFlowIsNew, setManualFlowIsNew] = useState(false);
   const [manualFlowCpOpen, setManualFlowCpOpen] = useState(false);
 
-  const [statusOverrides, setStatusOverrides] = useState<Record<string, Counterparty["status"]>>({});
+  const [statusOverrides, setStatusOverrides] = useState<Record<string, Counterparty["status"]>>(
+    {},
+  );
   const [statusChanges, setStatusChanges] = useState<
     Record<string, { from: Counterparty["status"]; to: Counterparty["status"] }>
   >({
@@ -326,9 +358,7 @@ export default function Index() {
     counterparties
       .filter(
         (c) =>
-          c.status === "overdue" ||
-          c.status === "overdue_risk" ||
-          (c.overdueAmountNum ?? 0) > 0,
+          c.status === "overdue" || c.status === "overdue_risk" || (c.overdueAmountNum ?? 0) > 0,
       )
       .map((c) => ({
         counterparty: c,
@@ -375,9 +405,6 @@ export default function Index() {
     }
     return map;
   }, [statusChanges]);
-
-
-
 
   // ESC/overlay close on AssessmentModal in manual flow → behave like Back:
   // close assessment, open CounterpartyModal of the just-evaluated counterparty.
@@ -438,7 +465,10 @@ export default function Index() {
   };
 
   const processCounts = useMemo(() => {
-    const map = { monitoring: 0, risk_confirmation: 0, settlement: 0, writeoff: 0 } as Record<ProcessStage, number>;
+    const map = { monitoring: 0, risk_confirmation: 0, settlement: 0, writeoff: 0 } as Record<
+      ProcessStage,
+      number
+    >;
     for (const c of allCounterparties) map[c.processStage]++;
     return map;
   }, [allCounterparties]);
@@ -552,8 +582,6 @@ export default function Index() {
     setRiskFilter("all");
   };
 
-
-
   return (
     <div className="min-h-screen bg-white">
       <div className="flex">
@@ -591,7 +619,9 @@ export default function Index() {
 
           <div className="mt-auto space-y-3">
             <div className="flex items-center gap-3 rounded-xl border border-border bg-card px-3 py-2.5">
-              <div className="flex h-9 w-9 items-center justify-center rounded-full bg-muted text-xs font-semibold">МЕ</div>
+              <div className="flex h-9 w-9 items-center justify-center rounded-full bg-muted text-xs font-semibold">
+                МЕ
+              </div>
               <div className="min-w-0">
                 <div className="truncate text-sm font-medium">Михайлова Екатерина</div>
                 <div className="truncate text-[11px] text-muted-foreground">Риск-менеджер (ЦА)</div>
@@ -626,12 +656,17 @@ export default function Index() {
                   <Sparkles className="h-4 w-4" />
                 </div>
                 <div className="min-w-0 flex-1 text-sm">
-                  <div className="font-medium">Я проанализировал дебиторскую задолженность: в зоне внимания 5 дебиторов и 3,9 млн рублей</div>
-                  <div className="mt-0.5 text-muted-foreground">Оценивается задолженность ЮЛ и ИП, зарегистрированных на территории РФ, с задолженностью свыше 10 млн</div>
+                  <div className="font-medium">
+                    Я проанализировал дебиторскую задолженность: в зоне внимания 5 дебиторов и 3,9
+                    млн рублей
+                  </div>
+                  <div className="mt-0.5 text-muted-foreground">
+                    Оценивается задолженность ЮЛ и ИП, зарегистрированных на территории РФ, с
+                    задолженностью свыше 10 млн
+                  </div>
                 </div>
               </div>
             </div>
-
 
             {/* Дебиторская задолженность */}
             <div className="mb-3 flex flex-wrap items-center justify-between gap-3">
@@ -676,7 +711,9 @@ export default function Index() {
                       >
                         <div className="flex items-start justify-between gap-2">
                           <div className="text-sm text-foreground/80">{t.title}</div>
-                          <span className={`rounded-full px-2 py-0.5 text-[11px] font-medium ${t.pctBg}`}>
+                          <span
+                            className={`rounded-full px-2 py-0.5 text-[11px] font-medium ${t.pctBg}`}
+                          >
                             {t.pct}
                           </span>
                         </div>
@@ -696,7 +733,6 @@ export default function Index() {
                   })}
                 </div>
 
-
                 <div className="flex items-center gap-6">
                   <ul className="space-y-2 text-sm">
                     {donutData.segments.map((s) => (
@@ -711,7 +747,6 @@ export default function Index() {
                   </ul>
                   <Donut amount={donutData.amount} segments={donutData.segments} />
                 </div>
-
               </div>
             </div>
 
@@ -738,7 +773,8 @@ export default function Index() {
 
             <div className="mb-5 flex flex-wrap items-center gap-2">
               {(["all", ...problemChips.map((c) => c.key)] as RiskChipKey[]).map((key) => {
-                const meta = key === "all" ? allChipMeta : problemChips.find((c) => c.key === key)!.meta;
+                const meta =
+                  key === "all" ? allChipMeta : problemChips.find((c) => c.key === key)!.meta;
                 const Icon = meta.icon;
                 const count = riskCounts[key] ?? 0;
                 const isActive = riskFilter === key;
@@ -747,9 +783,7 @@ export default function Index() {
                   <button
                     key={key}
                     disabled={disabled}
-                    onClick={() =>
-                      setRiskFilter(isActive && key !== "all" ? "all" : key)
-                    }
+                    onClick={() => setRiskFilter(isActive && key !== "all" ? "all" : key)}
                     className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-medium transition ${
                       isActive
                         ? `${meta.activeBg} ${meta.activeBorder} ${meta.activeText} shadow-sm`
@@ -757,9 +791,7 @@ export default function Index() {
                     } ${disabled ? "opacity-40 cursor-not-allowed" : ""}`}
                   >
                     <Icon
-                      className={`h-3.5 w-3.5 ${
-                        isActive ? meta.iconColor : meta.idleIconColor
-                      }`}
+                      className={`h-3.5 w-3.5 ${isActive ? meta.iconColor : meta.idleIconColor}`}
                     />
                     {meta.label}
                     <span
@@ -806,7 +838,6 @@ export default function Index() {
               </div>
             </div>
 
-
             <div className="space-y-2.5">
               {filtered.length === 0 && (
                 <div className="rounded-2xl border border-border bg-white p-8 text-center text-sm text-muted-foreground">
@@ -839,14 +870,16 @@ export default function Index() {
                         ) : (
                           <CounterpartyStatusBadge tag={categoryLabel[c.status]} />
                         )}
-                        {!isPending && statusChanges[c.inn] && statusChanges[c.inn].from !== statusChanges[c.inn].to && (
-                          <span
-                            title={`${categoryLabel[statusChanges[c.inn].from as CategoryKey]} → ${categoryLabel[statusChanges[c.inn].to as CategoryKey]}`}
-                            className="inline-flex items-center rounded-full border border-violet-100 bg-violet-50 px-2 py-0.5 text-[11px] font-medium text-violet-700"
-                          >
-                            Статус изменён
-                          </span>
-                        )}
+                        {!isPending &&
+                          statusChanges[c.inn] &&
+                          statusChanges[c.inn].from !== statusChanges[c.inn].to && (
+                            <span
+                              title={`${categoryLabel[statusChanges[c.inn].from as CategoryKey]} → ${categoryLabel[statusChanges[c.inn].to as CategoryKey]}`}
+                              className="inline-flex items-center rounded-full border border-violet-100 bg-violet-50 px-2 py-0.5 text-[11px] font-medium text-violet-700"
+                            >
+                              Статус изменён
+                            </span>
+                          )}
                         {indicators
                           .map((k) => ({ k, m: problemIndicatorMeta[k] }))
                           .filter((x) => Boolean(x.m))
@@ -887,9 +920,7 @@ export default function Index() {
                           >
                             {c.overdueAmountNum > 0 ? c.overdueDebt : "—"}
                           </div>
-                          <div className="mt-1 text-[11px] text-muted-foreground">
-                            Просроченная
-                          </div>
+                          <div className="mt-1 text-[11px] text-muted-foreground">Просроченная</div>
                         </div>
                       </div>
                     )}
@@ -914,7 +945,6 @@ export default function Index() {
           Запустить проверку
         </Button>
       </div>
-
 
       <CounterpartyModal
         counterparty={active}
@@ -943,9 +973,7 @@ export default function Index() {
           };
           setChecks((prev) => [rec, ...prev]);
           window.setTimeout(() => {
-            setChecks((prev) =>
-              prev.map((c) => (c.id === id ? { ...c, status: "done" } : c)),
-            );
+            setChecks((prev) => prev.map((c) => (c.id === id ? { ...c, status: "done" } : c)));
           }, 5000);
         }}
       />
@@ -969,11 +997,7 @@ export default function Index() {
           const recordType =
             c.type ?? (hasInn && hasFiles ? "complex" : hasInn ? "counterparty" : "contract");
           if (recordType === "complex") {
-            const a = buildAssessment(
-              `ООО „Альтаир Логистик“`,
-              c.inn ?? "",
-              "auto",
-            );
+            const a = buildAssessment(`ООО „Альтаир Логистик“`, c.inn ?? "", "auto");
             setActiveComplexCheckId(c.id);
             setComplexAssessment(a);
             setCheckDrawerOpen(false);
@@ -986,11 +1010,7 @@ export default function Index() {
             setContractModalOpen(true);
             return;
           }
-          const a = buildAssessment(
-            `ООО „Альтаир Логистик“`,
-            c.inn ?? "",
-            "auto",
-          );
+          const a = buildAssessment(`ООО „Альтаир Логистик“`, c.inn ?? "", "auto");
           setActiveCheckId(c.id);
           setCheckAssessment(a);
           setCheckDrawerOpen(false);
@@ -1058,7 +1078,6 @@ export default function Index() {
         }}
       />
 
-
       <AssessmentModal
         assessment={checkAssessment}
         open={checkAssessmentOpen}
@@ -1105,8 +1124,6 @@ export default function Index() {
           toast.success("Контрагент добавлен в список дебиторов");
         }}
       />
-
-
 
       <AssessmentModal
         assessment={manualAssessment}
@@ -1156,4 +1173,3 @@ export default function Index() {
     </div>
   );
 }
-

@@ -1,0 +1,52 @@
+.badge {
+  width: fit-content;
+
+  position: static;
+  font-weight: 400;
+  border-radius: 99px;
+  white-space: nowrap;
+
+  &.thin {
+    font-weight: 400;
+  }
+
+  $variantMap: 'gray' var(--backgroundTertiaryDefault) var(--textBaseDefault),
+    'green' var(--backgroundLightBrand) var(--textBaseDefault),
+    'brand' var(--backgroundLightSuccess) var(--textBaseDefault),
+    'blue' var(--backgroundLightInfo) var(--textBaseDefault),
+    'yellow' var(--backgroundLightWarning) var(--textBaseDefault),
+    'red' var(--backgroundLightDanger) var(--textBaseDefault),
+    'violet' var(--backgroundLightQuest) var(--textBaseDefault),
+    'outlined' var(--backgroundBasicDefault) var(--textBaseDefault);
+
+  @each $name, $bgColor, $color in $variantMap {
+    &.variant-#{$name} {
+      background-color: $bgColor;
+      color: $color;
+    }
+  }
+
+  &.variant-outlined {
+    box-shadow: inset 0 0 0 1px var(--borderDefault);
+  }
+
+  &.size-sm,
+  &.size-xxxs {
+    padding: 2px 8px;
+    font-size: 12px;
+    line-height: 16px;
+  }
+
+  &.size-md,
+  &.size-xxs {
+    padding: 2px 8px;
+    font-size: 14px;
+    line-height: 20px;
+  }
+}
+
+@for $i from 0 through 32 {
+  .mb-#{$i} {
+    margin-bottom: #{$i}px;
+  }
+}

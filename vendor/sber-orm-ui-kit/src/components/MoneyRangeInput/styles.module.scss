@@ -1,0 +1,334 @@
+.root {
+  display: flex;
+  flex: 1;
+}
+
+.labelAfter {
+  content: "";
+  height: 8px;
+  width: 100%;
+
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  background: var(--controlBackgroundHover);
+}
+
+.prefixContainer {
+  box-sizing: border-box;
+  border-radius: 8px;
+  background-color: var(--backgroundSecondaryDefault);
+}
+
+.sizeS {
+  width: 100% !important;
+
+  &.containerLabelInside {
+    .label {
+      font-size: 14px !important;
+      line-height: 16px !important;
+    }
+
+    &.filled:not(.disabled):not(.error):has(.inputContainer:hover) .topLabelsWrapper::after {
+      @extend .labelAfter;
+    }
+
+    &.disabled.filled .topLabelsWrapper::after {
+      @extend .labelAfter;
+
+      background: var(--backgroundTechDisabled);
+    }
+  }
+
+  .inputContainer {
+    padding: 0 12px !important;
+
+    height: 40px !important;
+
+    border-radius: 12px;
+  }
+
+  .input {
+    font-size: 14px !important;
+  }
+
+  &WithPrefix .inputContainer {
+    padding: 0 8px !important;
+  }
+
+  &WithPrefix .prefix {
+    @extend .prefixContainer;
+
+    background: none !important;
+  }
+}
+
+.sizeM {
+  width: 100% !important;
+
+  .inputContainer {
+    padding: 0 14px !important;
+
+    height: 48px !important;
+
+    border-radius: 14px;
+  }
+
+  &WithPrefix .inputContainer {
+    padding: 0 8px !important;
+  }
+
+  &WithPrefix .prefix {
+    @extend .prefixContainer;
+
+    padding: 4px;
+
+    width: 32px;
+    height: 32px;
+  }
+}
+
+.sizeL {
+  width: 100% !important;
+
+  .inputContainer {
+    padding: 0 16px !important;
+
+    height: 56px !important;
+
+    border-radius: 16px;
+  }
+
+  &WithPrefix .inputContainer {
+    padding: 0 8px !important;
+  }
+
+  &WithPrefix .prefix {
+    @extend .prefixContainer;
+
+    padding: 8px;
+
+    width: 40px;
+    height: 40px;
+  }
+}
+
+.sizeXL {
+  width: 100% !important;
+
+  .inputContainer {
+    padding: 0 20px !important;
+
+    height: 64px !important;
+
+    border-radius: 18px;
+  }
+
+  &WithPrefix .inputContainer {
+    padding: 0 12px !important;
+  }
+
+  &WithPrefix .prefix {
+    @extend .prefixContainer;
+
+    padding: 8px;
+
+    width: 40px;
+    height: 40px;
+  }
+}
+
+.input,
+.inputSecond {
+  color: var(--textBaseDefault) !important;
+  min-height: 20px !important;
+  flex: 1;
+
+  &::placeholder {
+    color: var(--textBaseDisabled) !important;
+  }
+}
+
+.disabled,
+.disabled:hover {
+  .input {
+    color: var(--textBaseDisabled) !important;
+  }
+
+  .inputContainer {
+    background-color: var(--backgroundTechDisabled) !important;
+
+    &:after {
+      border-color: var(--borderDefault) !important;
+    }
+  }
+
+  .suffix {
+    border-left-color: var(--borderDefault) !important;
+  }
+}
+
+.disabledSecond {
+  .inputSecond {
+    color: var(--textBaseDisabled) !important;
+  }
+
+  .inputContainerSecond {
+    background-color: transparent !important;
+  }
+}
+
+.focused {
+  .inputContainer {
+    box-shadow: none !important;
+  }
+
+  .suffix {
+    border-left: 1px solid var(--borderFocus);
+    box-shadow: inset 1px 0 0 0 var(--borderFocus);
+  }
+}
+
+.prefix,
+.suffix {
+  svg * {
+    fill: var(--iconBaseDefault);
+  }
+}
+
+.prefix {
+  margin-right: 16px !important;
+}
+
+.suffix {
+  padding-left: 8px;
+
+  width: calc(50% - 8px);
+  height: 100%;
+
+  border-left: 1px solid var(--borderDefault);
+}
+
+.inputClear svg * {
+  fill: var(--iconBaseTertiary);
+}
+
+.inputContainer {
+  background-color: var(--controlBackgroundDefault) !important;
+  padding: 0 8px !important;
+  border-radius: var(--controlBorderRadius) !important;
+
+  &::after {
+    border-color: var(--borderDefault) !important;
+    border-radius: var(--controlBorderRadius) !important;
+    border-width: 1px !important;
+  }
+
+  &:hover {
+    background-color: var(--controlBackgroundHover) !important;
+  }
+}
+
+.inputContainerSecond {
+  background-color: transparent !important;
+  padding: 0 8px !important;
+  border-radius: var(--controlBorderRadius) !important;
+  width: 100% !important;
+
+  &::after {
+    border: none !important;
+  }
+
+  &:hover {
+    background-color: transparent !important;
+  }
+
+  & *,
+  & {
+    box-shadow: none !important;
+  }
+}
+
+.focused .inputContainer:after {
+  border-color: var(--borderFocus) !important;
+  border-width: 2px !important;
+}
+
+.inputContainer:hover {
+  &:after {
+    border-color: var(--borderFocus) !important;
+  }
+
+  .suffix {
+    border-color: var(--borderFocus);
+  }
+}
+
+.error {
+  .prefix {
+    background: var(--backgroundLightDanger);
+  }
+
+  .inputContainer:not(.focused)::after,
+  .suffix {
+    border-color: var(--borderError) !important;
+  }
+  &.focused .suffix {
+    box-shadow: inset 1px 0 0 0  var(--borderError) !important;
+  }
+}
+
+.inputLabel {
+  position: relative;
+  color: var(--textBaseTertiary) !important;
+
+  &Bold>span {
+    color: var(--textBaseDefault) !important;
+    font-weight: 600 !important;
+    font-size: 12px;
+    line-height: 16px;
+  }
+
+  &>span {
+    text-overflow: ellipsis;
+    overflow: hidden;
+    text-wrap: nowrap;
+  }
+
+  &Error {
+    color: var(--textTechDanger) !important;
+  }
+}
+
+.large {
+  .input {
+    margin: 18px 0 !important;
+  }
+}
+
+.clearButton {
+  color: var(--iconBaseTertiary);
+}
+
+.helperText {
+  color: var(--textBaseSecondary) !important;
+}
+
+.error {
+  color: var(--borderError) !important;
+}
+
+.topLabels {
+  margin-bottom: 4px !important;
+  order: -1;
+
+  &Inside {
+    margin-bottom: 0 !important;
+    position: absolute;
+    z-index: 1;
+    top: 12px;
+    left: 72px;
+    right: 40px;
+    width: auto !important;
+  }
+}

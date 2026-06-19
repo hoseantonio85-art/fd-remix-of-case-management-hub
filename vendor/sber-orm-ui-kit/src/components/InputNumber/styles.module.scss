@@ -1,0 +1,513 @@
+.containerLabelInside {
+  position: relative;
+
+  .topLabelsWrapper {
+    width: auto;
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 2;
+    overflow: hidden;
+    max-width: calc(100% - 100px) !important;
+
+    transform-origin: top left;
+    transition: all 200ms cubic-bezier(0, 0, 0.2, 1);
+
+    span {
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+  }
+
+  &.noArrows {
+    .topLabelsWrapper {
+      max-width: calc(100% - 64px) !important;
+    }
+
+    .tooltipIconWrapper {
+      margin-right: 8px;
+    }
+  }
+
+  .topLabels {
+    padding: 0 4px !important;
+    margin: 0 !important;
+    overflow: hidden;
+  }
+
+  .label {
+    font-size: 16px;
+    line-height: 20px;
+    font-weight: 400;
+    color: var(--textBaseTertiary) !important;
+    white-space: nowrap;
+  }
+
+  .labelError .label {
+    color: var(--textAccentDanger) !important;
+  }
+
+  &.disabled .label {
+    color: var(--textBaseDisabled) !important;
+  }
+
+  &.focused .topLabelsWrapper,
+  &.filled .topLabelsWrapper {
+    background: var(--controlBackgroundDefault);
+    max-width: 100% !important;
+  }
+
+  &.sizeL .topLabelsWrapper,
+  &.sizeXL .topLabelsWrapper {
+    background: none;
+  }
+
+  $sizeMap: "S" translate(8px, 13px) translate(9px, -7px) translate(36px, 13px) translate(37px, -7px) scale(0.86),
+    "M" translate(10px, 14px) translate(11px, -8px) translate(43px, 14px) translate(44px, -8px) scale(0.75),
+    "L" translate(12px, 18px) translate(13px, 8px) translate(52px, 18px) translate(53px, 8px) scale(0.75),
+    "XL" translate(16px, 22px) translate(17px, 12px) translate(56px, 22px) translate(57px, 12px) scale(0.75);
+
+  @each $size, $basePosition, $focusedPosition, $basePositionWithIcon,
+  $focusedPositionWithIcon, $scale in $sizeMap {
+    &.size#{$size} {
+      .topLabelsWrapper {
+        transform: $basePosition !important;
+      }
+
+      &.focused,
+      &.filled {
+        .topLabelsWrapper {
+          transform: $focusedPosition $scale !important;
+        }
+      }
+
+      &WithPrefix {
+        .topLabelsWrapper {
+          transform: $basePositionWithIcon !important;
+        }
+
+        &.focused,
+        &.filled {
+          .topLabelsWrapper {
+            transform: $focusedPositionWithIcon $scale !important;
+          }
+        }
+      }
+    }
+  }
+}
+
+.label {
+  font-size: 12px;
+  line-height: 16px;
+  font-weight: 600;
+  color: var(--textBaseDefault) !important;
+}
+
+.labelRequired .label::after {
+  content: "*";
+  color: var(--textAccentDanger);
+}
+
+.prefix {
+  box-sizing: border-box;
+  border-radius: 8px;
+  color: var(--iconBaseDefault) !important;
+  background: var(--backgroundSecondaryDefault);
+}
+
+.error .prefix {
+  background: var(--backgroundLightDanger);
+}
+
+.disabled:not(.viewOnly) .prefix {
+  background: var(--backgroundTechDisabled);
+  color: var(--iconBaseDisabled) !important;
+}
+
+.suffix {
+  margin-left: 10px !important;
+  color: var(--iconBaseTertiary) !important;
+  cursor: pointer !important;
+}
+
+.clearButton {
+  visibility: hidden !important;
+  opacity: 0 !important;
+  color: var(--iconBaseTertiary) !important;
+
+  transition:
+    visibility 0.3s ease-in-out,
+    opacity 0.3s ease-in-out;
+}
+
+.filled:not(.disabled) .inputContainer:hover .clearButton {
+  visibility: visible !important;
+  opacity: 1 !important;
+
+  transition:
+    visibility 0.3s ease-in-out,
+    opacity 0.3s ease-in-out;
+}
+
+.labelAfter {
+  content: "";
+  height: 8px;
+  width: 100%;
+
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  background: var(--controlBackgroundHover);
+}
+
+.sizeS {
+  &.containerLabelInside {
+    .label {
+      font-size: 14px;
+      line-height: 16px;
+    }
+
+    &.filled:not(.disabled):not(.error):has(.inputContainer:hover) .topLabelsWrapper::after {
+      @extend .labelAfter;
+    }
+
+    &.disabled.filled .topLabelsWrapper::after {
+      @extend .labelAfter;
+
+      background: var(--backgroundTechDisabled);
+    }
+  }
+
+  .inputContainer {
+    padding: 0 12px !important;
+
+    height: 40px !important;
+
+    border-radius: 12px !important;
+  }
+
+  .input {
+    font-size: 14px !important;
+  }
+
+  &WithPrefix .inputContainer {
+    padding: 0 8px !important;
+  }
+
+  &WithPrefix .prefix {
+    background: none !important;
+  }
+
+  &PaddingRight .inputContainer {
+    padding-right: 10px !important;
+  }
+
+  .suffix {
+    margin-right: -2px;
+  }
+}
+
+.sizeM {
+  &.containerLabelInside.filled:not(.disabled):not(.error):has(.inputContainer:hover) .topLabelsWrapper::after {
+    @extend .labelAfter;
+
+    height: 9px;
+  }
+
+  &.disabled.filled .topLabelsWrapper::after {
+    @extend .labelAfter;
+
+    height: 9px;
+    background: var(--backgroundTechDisabled);
+  }
+
+  .inputContainer {
+    padding: 0 14px !important;
+
+    height: 48px !important;
+
+    border-radius: 14px !important;
+  }
+
+  &WithPrefix .inputContainer {
+    padding: 0 8px !important;
+  }
+
+  &WithPrefix .prefix {
+    padding: 4px;
+
+    width: 32px;
+    height: 32px;
+  }
+
+  &PaddingRight .inputContainer {
+    padding-right: 14px !important;
+  }
+
+  .suffix {
+    margin-right: -3px;
+  }
+}
+
+.sizeL {
+  &.containerLabelInside:has(.inputContainer:hover) .topLabelsWrapper {
+    background: none;
+  }
+
+  .inputContainer {
+    padding: 0 16px !important;
+
+    height: 56px !important;
+
+    border-radius: 16px !important;
+  }
+
+  &.containerLabelInside .input {
+    margin: 28px 0 8px !important;
+  }
+
+  &WithPrefix .inputContainer {
+    padding: 0 8px !important;
+  }
+
+  &WithPrefix .prefix {
+    padding: 8px;
+
+    width: 40px;
+    height: 40px;
+  }
+
+  &PaddingRight .inputContainer {
+    padding-right: 18px !important;
+  }
+
+  .suffix {
+    margin-right: -5px;
+  }
+}
+
+.sizeXL {
+  &.containerLabelInside:has(.inputContainer:hover) .topLabelsWrapper {
+    background: none;
+  }
+
+  .inputContainer {
+    padding: 0 20px !important;
+
+    height: 64px !important;
+
+    border-radius: 18px !important;
+  }
+
+  &.containerLabelInside .input {
+    margin: 32px 0 12px !important;
+  }
+
+  &WithPrefix .inputContainer {
+    padding: 0 12px !important;
+  }
+
+  &WithPrefix .prefix {
+    padding: 8px;
+
+    width: 40px;
+    height: 40px;
+  }
+
+  &PaddingRight .inputContainer {
+    padding-right: 22px !important;
+  }
+
+  .suffix {
+    margin-right: -5px;
+  }
+}
+
+.focused .topLabelsWrapper::after {
+  background: none !important;
+}
+
+.focused .inputContainer:hover::after {
+  background: var(--controlBackgroundDefault);
+}
+
+.inputContainer {
+  background: var(--controlBackgroundDefault) !important;
+
+  &::after {
+    border-color: var(--borderDefault) !important;
+  }
+
+  &:hover {
+    &::after {
+      background: var(--controlBackgroundHover);
+      border-width: 2px !important;
+    }
+  }
+}
+
+.input {
+  font-size: 16px !important;
+
+  &::placeholder {
+    color: var(--textBaseTertiary) !important;
+  }
+}
+
+.focused .inputContainer {
+  box-shadow: none !important;
+
+  &::after {
+    border-color: var(--borderFocus) !important;
+    border-width: 2px !important;
+  }
+
+  .clearButton {
+    visibility: visible !important;
+    opacity: 1 !important;
+
+    transition:
+      visibility 0.3s ease-in-out,
+      opacity 0.3s ease-in-out;
+  }
+}
+
+.disabled {
+  .input {
+    color: var(--textBaseDefault) !important;
+  }
+
+  .inputContainer:after {
+    background: var(--backgroundTechDisabled) !important;
+    border-width: 1px !important;
+    border-color: var(--borderDisabled) !important;
+  }
+}
+
+.error:not(.disabled) .inputContainer {
+  &::after {
+    border-color: var(--borderError) !important;
+    border-width: 1px !important;
+  }
+
+  &:hover {
+    &::after {
+      background: none !important;
+      border-color: var(--borderError) !important;
+      border-width: 1px !important;
+    }
+  }
+}
+
+.clearButton {
+  color: var(--iconBaseTertiary);
+}
+
+.helperText {
+  color: var(--textBaseTertiary) !important;
+}
+
+.error {
+  color: var(--textAccentDanger) !important;
+}
+
+.topLabels {
+  width: auto !important;
+  margin-right: 4px !important;
+  margin-bottom: 4px !important;
+  order: -1;
+}
+
+.textViewOnly {
+  font-size: 14px !important;
+  line-height: 20px !important;
+}
+
+.required {
+  margin-right: 0 !important;
+}
+
+.inputContainerViewOnly {
+  padding: 0 !important;
+
+  background: none !important;
+  cursor: default !important;
+
+  .input,
+  &:not(.containerLabelInside) .input {
+    margin: 0 !important;
+
+    cursor: default !important;
+    font-size: 16px;
+    text-overflow: ellipsis;
+    color: var(--textBaseDefault) !important;
+  }
+
+  &::after {
+    border: none !important;
+  }
+}
+
+.tooltipIcon {
+  color: var(--iconBaseDefault) !important;
+}
+
+.arrowButton {
+  border: none;
+  border-radius: 4px;
+  background-color: transparent;
+
+  &:hover {
+    background-color: var(--backgroundBasicHover);
+  }
+
+  &:active {
+    background-color: var(--backgroundBasicActive);
+  }
+}
+
+.arrowControl {
+  padding: 4px;
+  border-radius: 8px;
+  border: 1px solid var(--borderDefault);
+  background-color: var(--backgroundBasicDefault);
+
+  &Disabled {
+    opacity: 0.3;
+    cursor: not-allowed !important;
+
+    .arrowButton {
+      cursor: not-allowed !important;
+
+      &:hover,
+      &:active {
+        background-color: transparent;
+      }
+    }
+  }
+
+  &.sizeS {
+    border: none;
+
+    .arrowButton {
+      padding: 0 6px;
+      height: 12px;
+    }
+  }
+
+  &.sizeM .arrowButton {
+    padding: 0 6px;
+    height: 12px;
+  }
+
+  &.sizeL .arrowButton {
+    padding: 2px 10px;
+    height: 16px;
+  }
+
+  &.sizeXL .arrowButton {
+    padding: 2px 10px;
+    height: 16px;
+  }
+}

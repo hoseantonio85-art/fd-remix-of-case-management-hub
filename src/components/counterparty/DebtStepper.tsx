@@ -48,7 +48,9 @@ export function DebtStepper({
         </div>
       )}
 
-      <div className={`rounded-xl border bg-white p-5 transition-all duration-700 ${containerFlash}`}>
+      <div
+        className={`rounded-xl border bg-white p-5 transition-all duration-700 ${containerFlash}`}
+      >
         <div className="space-y-5">
           {stages.map((stage) => {
             const stageSteps = steps.filter((s) => s.stage === stage);
@@ -77,58 +79,70 @@ export function DebtStepper({
                     const globalIdx = steps.findIndex((x) => x.id === s.id);
                     const num = globalIdx + 1;
                     return (
-                    <div key={s.id} className="relative">
-                      <div className="absolute -left-[34px] top-0.5">
-                        {isCurrent ? (
-                          <div
-                            key={`cur-${stepAnim?.tick ?? "static"}-${s.id}`}
-                            className={`flex h-6 w-6 items-center justify-center rounded-full border-2 border-emerald-500 bg-emerald-50 text-[10px] font-semibold text-emerald-700 transition-transform duration-500 ${animateThis ? "scale-125" : "scale-100"}`}
-                          >
-                            {num}
-                          </div>
-                        ) : (
-                          <div className="flex h-6 w-6 items-center justify-center rounded-full border-2 border-border bg-white text-[10px] font-semibold text-muted-foreground">
-                            {num}
-                          </div>
-                        )}
-                      </div>
-                      <div
-                        className={`rounded-md px-2.5 py-1.5 ${
-                          isCurrent
-                            ? s.overdue
-                              ? "border border-amber-300 bg-amber-50/50"
-                              : "border border-primary/20 bg-primary/5"
-                            : ""
-                        }`}
-                      >
-                        <div
-                          key={`t-${s.id}-${isCurrent ? stepAnim?.tick ?? "static" : "static"}`}
-                          className={`text-sm ${
-                            s.status === "upcoming"
-                              ? "text-muted-foreground"
-                              : "font-medium text-foreground"
-                          } ${animateThis ? "animate-fade-in" : ""}`}
-                        >
-                          {s.title}
+                      <div key={s.id} className="relative">
+                        <div className="absolute -left-[34px] top-0.5">
+                          {isCurrent ? (
+                            <div
+                              key={`cur-${stepAnim?.tick ?? "static"}-${s.id}`}
+                              className={`flex h-6 w-6 items-center justify-center rounded-full border-2 border-emerald-500 bg-emerald-50 text-[10px] font-semibold text-emerald-700 transition-transform duration-500 ${animateThis ? "scale-125" : "scale-100"}`}
+                            >
+                              {num}
+                            </div>
+                          ) : (
+                            <div className="flex h-6 w-6 items-center justify-center rounded-full border-2 border-border bg-white text-[10px] font-semibold text-muted-foreground">
+                              {num}
+                            </div>
+                          )}
                         </div>
-                        {isCurrent && (
-                          <div className="mt-1.5 flex flex-wrap gap-x-4 gap-y-1 text-[11px] text-muted-foreground">
-                            {s.startDate && <span>Старт: <b className="text-foreground">{s.startDate}</b></span>}
-                            {s.sla && <span>SLA: <b className="text-foreground">{s.sla}</b></span>}
-                            {s.plannedDate && <span>План: <b className="text-foreground">{s.plannedDate}</b></span>}
-                            {s.overdue ? (
-                              <span className="inline-flex items-center gap-1 rounded-full bg-amber-100 px-2 py-0.5 font-medium text-amber-900">
-                                <AlertTriangle className="h-3 w-3" /> Срок истёк
-                              </span>
-                            ) : (
-                              <span className="rounded-full bg-primary/10 px-2 py-0.5 font-medium text-primary">
-                                В работе
-                              </span>
-                            )}
+                        <div
+                          className={`rounded-md px-2.5 py-1.5 ${
+                            isCurrent
+                              ? s.overdue
+                                ? "border border-amber-300 bg-amber-50/50"
+                                : "border border-primary/20 bg-primary/5"
+                              : ""
+                          }`}
+                        >
+                          <div
+                            key={`t-${s.id}-${isCurrent ? (stepAnim?.tick ?? "static") : "static"}`}
+                            className={`text-sm ${
+                              s.status === "upcoming"
+                                ? "text-muted-foreground"
+                                : "font-medium text-foreground"
+                            } ${animateThis ? "animate-fade-in" : ""}`}
+                          >
+                            {s.title}
                           </div>
-                        )}
+                          {isCurrent && (
+                            <div className="mt-1.5 flex flex-wrap gap-x-4 gap-y-1 text-[11px] text-muted-foreground">
+                              {s.startDate && (
+                                <span>
+                                  Старт: <b className="text-foreground">{s.startDate}</b>
+                                </span>
+                              )}
+                              {s.sla && (
+                                <span>
+                                  SLA: <b className="text-foreground">{s.sla}</b>
+                                </span>
+                              )}
+                              {s.plannedDate && (
+                                <span>
+                                  План: <b className="text-foreground">{s.plannedDate}</b>
+                                </span>
+                              )}
+                              {s.overdue ? (
+                                <span className="inline-flex items-center gap-1 rounded-full bg-amber-100 px-2 py-0.5 font-medium text-amber-900">
+                                  <AlertTriangle className="h-3 w-3" /> Срок истёк
+                                </span>
+                              ) : (
+                                <span className="rounded-full bg-primary/10 px-2 py-0.5 font-medium text-primary">
+                                  В работе
+                                </span>
+                              )}
+                            </div>
+                          )}
+                        </div>
                       </div>
-                    </div>
                     );
                   })}
                 </div>

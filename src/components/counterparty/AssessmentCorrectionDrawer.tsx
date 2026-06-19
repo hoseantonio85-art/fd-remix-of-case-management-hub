@@ -22,7 +22,7 @@ export type CorrectionTag = (typeof CORRECTION_TAGS)[number];
 export const correctionTagToStatus: Record<CorrectionTag, CounterpartyStatus> = {
   "Нет риска": "no_risk",
   "Риск дефолта": "risk",
-  "Просрочено": "overdue",
+  Просрочено: "overdue",
   "Просрочено с риском дефолта": "overdue_risk",
 };
 
@@ -74,8 +74,8 @@ export function AssessmentCorrectionDrawer({
         <div className="flex-1 p-6 pb-4">
           <h2 className="text-lg font-semibold">Корректировка оценки</h2>
           <p className="mt-1 text-sm text-muted-foreground">
-            Укажите, почему результат оценки нужно изменить, выберите новый статус
-            контрагента и дату возврата на мониторинг.
+            Укажите, почему результат оценки нужно изменить, выберите новый статус контрагента и
+            дату возврата на мониторинг.
           </p>
 
           <div className="mt-6 space-y-6">
@@ -144,8 +144,7 @@ export function AssessmentCorrectionDrawer({
               <div className="mt-1.5 flex items-start gap-1.5 text-xs text-muted-foreground">
                 <Info className="mt-0.5 h-3 w-3 shrink-0" />
                 <span>
-                  С этой даты агент возобновит мониторинг и будет обновлять оценку по новым
-                  данным.
+                  С этой даты агент возобновит мониторинг и будет обновлять оценку по новым данным.
                 </span>
               </div>
               {submitted && errors.date && (

@@ -1,0 +1,16 @@
+<svg width="24.000000" height="24.000000" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+	<defs>
+		<clipPath id="clip995_1592">
+			<rect id="Frame 7552" width="10.000000" height="10.000000" transform="translate(7.000000 7.000000)" fill="white" fill-opacity="0"/>
+		</clipPath>
+		<linearGradient x1="20.999998" y1="2.999999" x2="3.000002" y2="21.000000" id="paint_linear_995_1588_0" gradientUnits="userSpaceOnUse">
+			<stop stop-color="#EE46BC"/>
+			<stop offset="1.000000" stop-color="#FDB022"/>
+		</linearGradient>
+	</defs>
+	<path id="vector" d="M12 21C7.02 21 3 16.97 3 12C3 7.02 7.02 3 12 3C16.97 3 21 7.02 21 12C21 16.97 16.97 21 12 21Z" fill="url(#paint_linear_995_1588_0)" fill-opacity="1.000000" fill-rule="evenodd"/>
+	<g clip-path="url(#clip995_1592)">
+		<path id="Rectangle 2313" d="M8.06 8.06L9.56 9.56C9.79 9.79 10.16 9.75 10.33 9.49L11.58 7.62C11.78 7.32 12.21 7.32 12.41 7.62L13.66 9.49C13.83 9.75 14.2 9.79 14.43 9.56L15.93 8.06C16.27 7.72 16.85 8 16.78 8.48L16.06 13.57C16.02 13.81 15.81 14 15.56 14L8.43 14C8.18 14 7.97 13.81 7.93 13.57L7.21 8.48C7.14 8 7.72 7.72 8.06 8.06Z" fill="#FFFFFF" fill-opacity="1.000000" fill-rule="evenodd"/>
+		<rect id="Rectangle 2314" x="8.000000" y="15.000000" rx="0.500000" width="8.000000" height="1.000000" fill="#FFFFFF" fill-opacity="1.000000"/>
+	</g>
+</svg>

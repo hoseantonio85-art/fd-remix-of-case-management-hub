@@ -82,9 +82,7 @@ export function AddContractDrawer({
       measures: "",
       collectionStage: stage,
       overdueHistory:
-        overdueAmount > 0
-          ? [{ date: dueDateRu, amount: overdueAmount, days: 0 }]
-          : [],
+        overdueAmount > 0 ? [{ date: dueDateRu, amount: overdueAmount, days: 0 }] : [],
     };
     onAdd(contract);
     onOpenChange(false);
@@ -94,9 +92,7 @@ export function AddContractDrawer({
     <InModalDrawer open={open} onOpenChange={onOpenChange}>
       <div className="flex h-full flex-col">
         <div className="flex-1 overflow-y-auto p-6 pb-4">
-          <h2 className="text-lg font-semibold tracking-tight text-foreground">
-            Добавить договор
-          </h2>
+          <h2 className="text-lg font-semibold tracking-tight text-foreground">Добавить договор</h2>
 
           <div className="mt-5 space-y-4">
             <Field
@@ -138,11 +134,7 @@ export function AddContractDrawer({
                 label="Срок исполнения / дата оплаты"
                 error={showErrors && errors.dueDate ? "Обязательное поле" : null}
               >
-                <Input
-                  type="date"
-                  value={dueDate}
-                  onChange={(e) => setDueDate(e.target.value)}
-                />
+                <Input type="date" value={dueDate} onChange={(e) => setDueDate(e.target.value)} />
               </Field>
             </div>
 

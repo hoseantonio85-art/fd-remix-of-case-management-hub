@@ -16,10 +16,8 @@ export function NormAssistantIcon({
   tone?: "rose" | "emerald";
   className?: string;
 }) {
-  const dim =
-    size === "lg" ? "h-10 w-10" : size === "sm" ? "h-8 w-8" : "h-9 w-9";
-  const icon =
-    size === "lg" ? "h-5 w-5" : size === "sm" ? "h-4 w-4" : "h-[18px] w-[18px]";
+  const dim = size === "lg" ? "h-10 w-10" : size === "sm" ? "h-8 w-8" : "h-9 w-9";
+  const icon = size === "lg" ? "h-5 w-5" : size === "sm" ? "h-4 w-4" : "h-[18px] w-[18px]";
   const toneClasses =
     tone === "emerald"
       ? "border-emerald-100/80 bg-white/70 text-emerald-600 shadow-[0_1px_2px_rgba(16,185,129,0.08)]"

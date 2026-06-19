@@ -1,0 +1,296 @@
+.root {
+  position: relative;
+  width: unset !important;
+  height: unset !important;
+
+  & div[role='tooltip'] {
+    width: 296px !important;
+
+    .root {
+      width: 280px !important;
+
+      &>:last-child {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        flex-wrap: wrap;
+        column-gap: 4px;
+      }
+
+      .row {
+        &:first-child {
+          margin: 8px 0 16px;
+        }
+        :nth-child(6):not(.notCurrentMonth:not([aria-disabled="true"])):not(.selected),
+        :nth-child(7):not(.notCurrentMonth:not([aria-disabled="true"])):not(.selected) {
+          .dayText {
+            color: var(--textBaseTertiary) !important;
+          }
+        }
+      }
+    }
+
+    &>div {
+      width: 296px !important;
+      border-radius: 16px !important;
+      border: none;
+    }
+  }
+}
+
+.iconContainer {
+  grid-area: icon;
+  padding: 8px;
+  border-radius: 8px;
+  align-self: center;
+  justify-self: center;
+  background-color: var(--backgroundSecondaryDefault);
+}
+
+.label {
+  grid-area: label;
+  overflow: hidden;
+  text-overflow: ellipsis;
+
+  &ViewOnlyWithoutValue {
+    transform: translate(0, 1px);
+  }
+}
+
+.input {
+  width: 400px !important;
+}
+
+.fullWidth {
+  width: 100% !important;
+  align-items: stretch !important;
+
+  .input, dateInput {
+    width: 100% !important;
+    min-width: 256px !important;
+  }
+}
+
+.dateInput {
+  height: 40px;
+  padding: 11px 0;
+  box-sizing: content-box;
+  width: 400px;
+  background-color: var(--backgroundBasicDefault);
+  border-radius: var(--controlBorderRadius);
+  border: 1px solid var(--borderDefault);
+  display: grid;
+  grid-template-areas:
+    'icon label clear'
+    'icon startDate clear';
+  grid-template-columns: 70px minmax(auto, max-content) auto;
+  grid-template-rows: 20px 20px;
+  font-size: 16px;
+  line-height: 20px;
+
+  .inputDate {
+    width: 100px;
+    font-size: 16px;
+    line-height: 20px;
+    border: none;
+    outline: none;
+    background-color: unset;
+    height: 20px;
+    padding: 0;
+    font-family: SBSansText;
+    border-radius: 0;
+  }
+}
+
+.opened {
+  .dateInput {
+    border-color: var(--borderFocus);
+  }
+}
+
+.yearButton, .monthButton {
+  border-radius: 8px !important;
+  width: 83px !important;
+
+  &:hover {
+    background-color: var(--surfaceBasicHover) !important;
+    color: var(--textBaseDefault) !important;
+  }
+}
+.monthText, .yearText {
+  font-size: 16px !important;
+  font-weight: 600 !important;
+}
+
+.yearButton.selected,
+.monthButton.selected {
+  background-color: var(--surfacePrimaryDefault) !important;
+
+  &:hover {
+    background-color: var(--surfacePrimaryDefault) !important;
+    color: var(--textBaseInverse) !important;
+  }
+}
+
+.calendarBar {
+  padding-bottom: 8px;
+  margin-bottom: 8px !important;
+
+  border-bottom: 1px solid var(--borderDefault);
+
+  :first-child {
+    order: 0;
+  }
+  .month {
+    height: 32px;
+
+    order: 1;
+    border-radius: 10px !important;
+    color: var(--textBaseSecondary) !important;
+    transition: color var(--transitionDuration) ease-in-out;
+
+    &:active {
+      background: transparent !important;
+      color: var(--textBaseDefault) !important;
+    }
+    &:hover {
+      background: transparent !important;
+      color: var(--textBaseDefault) !important;
+    }
+  }
+  .year {
+    height: 32px;
+
+    order: 1;
+    border-radius: 10px !important;
+    color: var(--textBaseSecondary) !important;
+    transition: color var(--transitionDuration) ease-in-out;
+
+    &:active {
+      background: transparent !important;
+      color: var(--textBaseDefault) !important;
+    }
+    &:hover {
+      background: transparent !important;
+      color: var(--textBaseDefault) !important;
+    }
+  }
+  :nth-child(3) {
+    order: 2;
+  }
+}
+
+.month.selected,
+.year.selected {
+  background-color: transparent !important;
+}
+
+.startDate {
+  display: flex;
+  grid-area: startDate;
+}
+
+.chevron {
+  padding: 4px !important;
+
+  width: 32px;
+  height: 32px;
+
+  color: var(--textBaseSecondary) !important;
+  background-color: transparent !important;
+  transition: color var(--transitionDuration) ease-in-out;
+  border-radius: 10px !important;
+
+  &:hover {
+    background: transparent !important;
+    color: var(--textBaseDefault) !important;
+  }
+  &:active {
+    background: transparent !important;
+    color: var(--textBaseDefault) !important;
+  }
+}
+
+.dayButton {
+  width: 40px !important;
+  height: 40px !important;
+
+  border-radius: 8px !important;
+
+  & .dayText {
+    font-size: 16px !important;
+    line-height: 20px !important;
+  }
+
+  &:hover:not(.selected-start):not(.selected-end):not(.selected) {
+    background-color: var(--surfaceBasicHover) !important;
+  }
+
+  &.selected:not(.selected-start):not(.selected-end) {
+    background-color: var(--surfacePrimaryDefault) !important;
+  }
+
+  &.notCurrentMonth:not([aria-disabled="true"]) {
+    color: var(--textBaseDisabled) !important;
+  }
+
+  &.notInMonth {
+    color: var(--textBaseDisabled) !important;
+  }
+}
+
+.today {
+  box-shadow: inset 0 0 0 1px var(--borderFocus) !important;
+  color: var(--textBaseDefault) !important;
+
+  &.selected {
+    color: var(--textBaseInverse) !important;
+  }
+  &>span {
+    box-shadow: none !important;
+  }
+}
+
+.weekDay {
+  height: 20px !important;
+
+  color: var(--textBaseTertiary) !important;
+  font-size: 14px !important;
+}
+
+.row {
+  margin-bottom: 0 !important;
+}
+
+.viewOnly {
+  .dateInput {
+    border: none !important;
+    padding: 0;
+    grid-template-columns: 56px minmax(auto, max-content) auto;
+    background-color: var(--backgroundBasicDefault) !important;
+    cursor: default;
+  }
+
+  .inputDate {
+    color: var(--textBaseDefault) !important;
+    cursor: text;
+  }
+
+  .label {
+    cursor: text;
+  }
+
+  .iconContainer {
+    justify-self: start;
+  }
+}
+
+.calendarPickerDropdown {
+  margin-top: 2px !important;
+
+  border-radius: 16px !important;
+}
+
+.calendarPickerDropdownReadonly {
+  display: none !important;
+}

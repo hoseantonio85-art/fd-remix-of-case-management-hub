@@ -1,0 +1,509 @@
+@keyframes iconPulse {
+  0% {
+    transform: scale(1);
+  }
+
+  50% {
+    transform: scale(1.2);
+  }
+
+  100% {
+    transform: scale(1.15);
+  }
+}
+
+@keyframes spin {
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+.base {
+  position: relative;
+  overflow: hidden;
+  padding: 8px;
+
+  min-width: unset;
+
+  box-shadow: inset 0 0 0 1px var(--buttonUtilityBorder);
+  border: none;
+
+  cursor: pointer;
+
+  transition: color var(--transitionDuration) ease-in-out, background-color var(--transitionDuration) ease-in-out;
+
+  // For gradients
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    transition: opacity var(--transitionDuration) ease-in-out;
+    z-index: 0;
+    opacity: 0;
+  }
+
+  &:disabled {
+    color: var(--textBaseDisabled);
+    background: var(--buttonDisabled);
+  }
+
+  &:hover {
+    .icon svg {
+      animation: iconPulse var(--longTransitionDuration) ease-out forwards;
+    }
+  }
+}
+
+.fullWidth {
+  width: 100%;
+}
+
+.icon {
+  z-index: 1;
+}
+
+.primary {
+  @extend .base;
+
+  background: var(--buttonPrimaryDefault);
+  color: var(--textBaseInverse);
+
+  &::before {
+    background: var(--buttonPrimaryHover);
+  }
+
+  &:hover::before {
+    opacity: 1;
+  }
+
+  &:active {
+    background: var(--buttonPrimaryActive);
+  }
+}
+
+.secondary {
+  @extend .base;
+
+  background: var(--buttonSecondaryDefault);
+  color: var(--textBaseSecondary);
+
+  &:hover {
+    background: var(--buttonSecondaryHover);
+    color: var(--textBaseDefault);
+  }
+
+  &:active {
+    background: var(--buttonSecondaryActive);
+    color: var(--textBaseDefault);
+  }
+}
+
+.tertiary {
+  @extend .base;
+
+  background: var(--buttonTertiaryDefault);
+  color: var(--textBaseSecondary);
+
+  &:hover {
+    background: var(--buttonTertiaryHover);
+    color: var(--textBaseDefault);
+  }
+
+  &:active {
+    background: var(--buttonTertiaryActive);
+    color: var(--textBaseDefault);
+  }
+}
+
+.ghost {
+  @extend .base;
+
+  background: var(--buttonGhostDefault);
+  color: var(--textBaseSecondary);
+  box-shadow: none;
+
+  &:disabled {
+    box-shadow: inset 0 0 0 1px var(--buttonUtilityBorder);
+  }
+
+  &:hover {
+    background: var(--buttonGhostHover);
+    color: var(--textBaseDefault);
+  }
+
+  &:active {
+    background: var(--buttonGhostActive);
+    color: var(--textBaseDefault);
+  }
+}
+
+.ai {
+  @extend .base;
+
+  border: none;
+  flex-shrink: 0;
+  color: var(--textBaseInverse);
+
+  &:hover {
+    box-shadow: 0 8px 25px rgba(137, 72, 249, 0.4);
+  }
+
+  &:before {
+    right: auto;
+    transition: left var(--longTransitionDuration) ease;
+    opacity: 1;
+    left: -100%;
+    width: 200%;
+    background: linear-gradient(225.00deg, #8948F9, #1BD0EE, #8948F9);
+  }
+
+  &:hover::before,
+  &:active::before {
+    left: 0%;
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    background: linear-gradient(225.00deg, rgb(137, 72, 249), rgb(27, 208, 238) 100%);
+    color: var(--textBaseInverse);
+  }
+}
+
+.ellipse {
+  @extend .base;
+
+  background: none;
+  box-shadow: none;
+  color: var(--textBaseSecondary);
+  padding: 0;
+
+  .icon {
+    background: var(--buttonTertiaryDefault);
+    border-radius: 999px;
+    transition: background-color var(--transitionDuration) ease-in-out;
+  }
+
+  &:disabled .icon {
+    background: var(--buttonDisabled);
+  }
+
+  &:hover {
+    color: var(--textBaseDefault);
+
+    .icon {
+      background: var(--buttonTertiaryHover);
+    }
+  }
+
+  &:active {
+    color: var(--textBaseDefault);
+
+    .icon {
+      background: var(--buttonTertiaryActive);
+    }
+  }
+
+  &:disabled {
+    background: none;
+  }
+}
+
+.warning {
+  @extend .base;
+
+  background: var(--buttonWarningDefault);
+  color: var(--textBaseInverse);
+
+  &:hover {
+    background: var(--buttonWarningHover);
+  }
+
+  &:active {
+    background: var(--buttonWarningActive);
+  }
+}
+
+.danger {
+  @extend .base;
+
+  background: var(--buttonDangerDefault);
+  color: var(--textBaseInverse);
+
+  &:hover {
+    background: var(--buttonDangerHover);
+  }
+
+  &:active {
+    background: var(--buttonDangerActive);
+  }
+}
+
+.function {
+  @extend .base;
+
+  background: none;
+  box-shadow: none;
+  color: var(--textBaseSecondary);
+  padding: 0;
+
+  &.blue {
+    color: var(--textAccentInfo);
+  }
+
+  &:hover {
+    color: var(--textBaseDefault);
+  }
+
+  &:active {
+    color: var(--textBaseDefault);
+  }
+
+  &:disabled {
+    background: none;
+  }
+}
+
+.content {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  font-size: 16px;
+  line-height: 20px;
+  font-weight: 600;
+
+  .children {
+    z-index: 1;
+    padding: 0 4px;
+  }
+
+  &.contentEllipse .children {
+    padding: 0 8px;
+  }
+
+  .iconOnly & {
+    .children {
+      padding: 0;
+    }
+  }
+}
+
+.sizeXXS {
+  padding: 2px 6px;
+
+  height: 24px;
+
+  border-radius: 8px;
+  font-size: 14px;
+
+  .content {
+    font-size: 14px;
+  }
+
+  &.iconOnly {
+    padding: 2px;
+  }
+
+  &.loading::after {
+    mask-size: 14px;
+  }
+
+  &.ellipse {
+    padding: 0;
+
+    .icon {
+      padding: 2px;
+    }
+  }
+
+  &.function {
+    padding: 2px 0;
+  }
+}
+
+.sizeXS {
+  padding: 6px 8px;
+
+  height: 32px;
+
+  border-radius: 10px;
+
+  .content {
+    font-size: 14px;
+  }
+
+  &.iconOnly {
+    padding: 6px;
+  }
+
+  &.loading::after {
+    mask-size: 14px;
+  }
+
+  &.ellipse {
+    padding: 0;
+
+    .icon {
+      padding: 6px;
+    }
+  }
+
+  &.function {
+    padding: 6px 0;
+  }
+}
+
+.sizeS {
+  padding: 8px;
+
+  height: 40px;
+
+  border-radius: 12px;
+
+  .content {
+    font-size: 14px;
+  }
+
+  &.ellipse {
+    padding: 0;
+
+    .icon {
+      padding: 8px;
+    }
+  }
+
+  &.function {
+    padding: 8px 0;
+  }
+}
+
+.sizeM {
+  padding: 12px;
+
+  height: 48px;
+
+  border-radius: 14px;
+
+  &.ellipse {
+    padding: 0;
+
+    .icon {
+      padding: 12px;
+    }
+  }
+
+  &.function {
+    padding: 12px 0;
+  }
+}
+
+.sizeL {
+  padding: 16px;
+
+  height: 56px;
+
+  border-radius: 16px;
+
+  &.ellipse {
+    padding: 0;
+
+    .icon {
+      padding: 16px;
+    }
+  }
+
+  &.function {
+    padding: 16px 0;
+  }
+}
+
+.sizeXL {
+  padding: 20px;
+
+  height: 64px;
+
+  border-radius: 18px;
+
+  &.ellipse {
+    padding: 0;
+
+    .icon {
+      padding: 20px;
+    }
+  }
+
+  &.function {
+    padding: 20px 0;
+  }
+}
+
+.loading {
+  pointer-events: none;
+}
+
+.loading::after {
+  content: '';
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 1;
+  position: absolute;
+  mask-repeat: no-repeat;
+  mask-position: center;
+  mask-size: 18px;
+  animation: spin 2s linear infinite;
+  -webkit-mask-image: url('../../icons/loader/track.svg');
+  mask-image: url('../../icons/loader/track.svg');
+  background: var(--iconBaseInverse);
+}
+
+.primary.loading::after,
+.warning.loading::after,
+.danger.loading::after {
+  background: var(--iconBaseInverse);
+}
+
+.secondary.loading::after,
+.tertiary.loading::after,
+.ghost.loading::after,
+.disabled.loading::after,
+.function.loading::after,
+.ellipse.loading::after {
+  background: var(--buttonPrimaryDefault);
+}
+
+.ellipse.loading.iconOnly {
+  background: var(--buttonTertiaryDefault);
+  border-radius: 999px;
+}
+
+.loading::after {
+  mask-repeat: no-repeat;
+  mask-position: center;
+  mask-size: 18px;
+  animation: spin 2s linear infinite;
+  -webkit-mask-image: url('../../icons/loader/track.svg');
+  mask-image: url('../../icons/loader/track.svg');
+  background: var(--iconBaseInverse);
+}
+
+.secondary.loading::after,
+.tertiary.loading::after,
+.ghost.loading::after,
+.function.loading::after,
+.ellipse.loading::after {
+  background: var(--buttonPrimaryDefault);
+}
+
+.ellipse.loading.iconOnly {
+  background: var(--buttonTertiaryDefault);
+  border-radius: 999px;
+}
+
+.loadingText {
+  visibility: hidden;
+}

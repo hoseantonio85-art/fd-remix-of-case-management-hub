@@ -1,0 +1,473 @@
+@mixin fieldBase() {
+  .containerLabelInside {
+    position: relative;
+
+    .topLabelsWrapper {
+      width: auto;
+
+      position: absolute;
+      top: 0;
+      left: 0;
+      z-index: 2;
+
+      transform-origin: top left;
+      transition: transform 200ms cubic-bezier(0, 0, 0.2, 1);
+    }
+
+    .topLabels {
+      padding: 0 4px !important;
+      margin: 0 !important;
+    }
+
+    .label {
+      font-size: 16px !important;
+      line-height: 20px !important;
+      font-weight: 400 !important;
+      color: var(--textBaseTertiary) !important;
+    }
+
+    .labelError .label {
+      color: var(--textAccentDanger) !important;
+    }
+
+    &.disabled .label {
+      color: var(--textBaseDisabled) !important;
+    }
+
+    &.focused .topLabelsWrapper,
+    &.rootFocused .topLabelsWrapper,
+    &.filled .topLabelsWrapper {
+      background: var(--controlBackgroundDefault);
+    }
+
+    &.sizeL .topLabelsWrapper,
+    &.sizeXL .topLabelsWrapper {
+      background: none;
+    }
+
+    $sizeMap: "S" translate(8px, 13px) translate(9px, -7px) translate(36px, 13px) translate(37px, -7px) scale(0.86),
+      "M" translate(10px, 14px) translate(11px, -8px) translate(43px, 14px) translate(44px, -8px) scale(0.75),
+      "L" translate(12px, 18px) translate(13px, 8px) translate(52px, 18px) translate(53px, 8px) scale(0.75),
+      "XL" translate(16px, 22px) translate(17px, 12px) translate(56px, 22px) translate(57px, 12px) scale(0.75);
+
+    @each $size, $basePosition, $focusedPosition, $basePositionWithIcon,
+    $focusedPositionWithIcon, $scale in $sizeMap {
+      &.size#{$size} {
+        .topLabelsWrapper {
+          transform: $basePosition !important;
+        }
+
+        &.focused,
+        &.rootFocused,
+        &.filled {
+          .topLabelsWrapper {
+            transform: $focusedPosition $scale !important;
+          }
+        }
+
+        &WithPrefix {
+          .topLabelsWrapper {
+            transform: $basePositionWithIcon !important;
+          }
+
+          &.focused,
+          &.rootFocused,
+          &.filled {
+            .topLabelsWrapper {
+              transform: $focusedPositionWithIcon $scale !important;
+            }
+          }
+        }
+      }
+    }
+  }
+
+  .input {
+    min-height: 20px !important;
+  }
+
+  .label {
+    font-size: 12px !important;
+    line-height: 16px !important;
+    font-weight: 600 !important;
+    color: var(--textBaseDefault) !important;
+  }
+
+  .labelRequired .label::after {
+    content: "*";
+    color: var(--textAccentDanger);
+  }
+
+  .prefix {
+    box-sizing: border-box;
+    border-radius: 8px;
+    color: var(--iconBaseDefault) !important;
+    background: var(--backgroundSecondaryDefault);
+
+    &.grayColor {
+      color: var(--iconBaseTertiary) !important;
+    }
+  }
+
+  .error .prefix {
+    background: var(--backgroundLightDanger);
+  }
+
+  .disabled:not(.viewOnly) .prefix {
+    background: var(--backgroundTechDisabled);
+    color: var(--iconBaseDisabled) !important;
+  }
+
+  .suffix {
+    margin-left: 10px !important;
+    color: var(--iconBaseTertiary) !important;
+    cursor: pointer !important;
+  }
+
+  .clearButton {
+    visibility: hidden !important;
+    opacity: 0 !important;
+    color: var(--iconBaseTertiary) !important;
+
+    transition:
+      visibility 0.3s ease-in-out,
+      opacity 0.3s ease-in-out;
+  }
+
+  .filled:not(.disabled) .inputContainer:hover .clearButton {
+    visibility: visible !important;
+    opacity: 1 !important;
+
+    transition:
+      visibility 0.3s ease-in-out,
+      opacity 0.3s ease-in-out;
+  }
+
+  .labelAfter {
+    content: "";
+    height: 8px;
+    width: 100%;
+
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    background: var(--controlBackgroundHover);
+  }
+
+  .sizeS {
+    width: 100% !important;
+
+    &.containerLabelInside {
+      .label {
+        font-size: 14px !important;
+        line-height: 16px !important;
+      }
+
+      &.filled:not(.disabled):not(.error):has(.inputContainer:hover) .topLabelsWrapper::after {
+        @extend .labelAfter;
+      }
+
+      &.disabled.filled .topLabelsWrapper::after {
+        @extend .labelAfter;
+
+        background: var(--backgroundTechDisabled);
+      }
+    }
+
+    .inputContainer {
+      padding: 0 12px !important;
+
+      height: 40px !important;
+
+      border-radius: 12px;
+    }
+
+    .input {
+      font-size: 14px !important;
+    }
+
+    &WithPrefix .inputContainer {
+      padding: 0 8px !important;
+    }
+
+    &WithPrefix .prefix {
+      background: none !important;
+    }
+
+    &PaddingRight .inputContainer {
+      padding-right: 10px !important;
+    }
+  }
+
+  .sizeM {
+    width: 100% !important;
+
+    &.containerLabelInside.filled:not(.disabled):not(.error):has(.inputContainer:hover) .topLabelsWrapper::after {
+      @extend .labelAfter;
+
+      height: 9px;
+    }
+
+    &.disabled.filled .topLabelsWrapper::after {
+      @extend .labelAfter;
+
+      height: 9px;
+      background: var(--backgroundTechDisabled);
+    }
+
+    .inputContainer {
+      padding: 0 14px !important;
+
+      height: 48px !important;
+
+      border-radius: 14px;
+    }
+
+    &WithPrefix .inputContainer {
+      padding: 0 8px !important;
+    }
+
+    &WithPrefix .prefix {
+      padding: 4px;
+
+      width: 32px;
+      height: 32px;
+    }
+
+    &PaddingRight .inputContainer {
+      padding-right: 14px !important;
+    }
+  }
+
+  .sizeL {
+    width: 100% !important;
+
+    &.containerLabelInside:has(.inputContainer:hover) .topLabelsWrapper {
+      background: none;
+    }
+
+    .inputContainer {
+      padding: 0 16px !important;
+
+      height: 56px !important;
+
+      border-radius: 16px;
+    }
+
+    &.containerLabelInside .input {
+      margin: 28px 0 8px !important;
+    }
+
+    &WithPrefix .inputContainer {
+      padding: 0 8px !important;
+    }
+
+    &WithPrefix .prefix {
+      padding: 8px;
+
+      width: 40px;
+      height: 40px;
+    }
+
+    &PaddingRight .inputContainer {
+      padding-right: 18px !important;
+    }
+  }
+
+  .sizeXL {
+    width: 100% !important;
+
+    &.containerLabelInside:has(.inputContainer:hover) .topLabelsWrapper {
+      background: none;
+    }
+
+    .inputContainer {
+      padding: 0 20px !important;
+
+      height: 64px !important;
+
+      border-radius: 18px;
+    }
+
+    &.containerLabelInside .input {
+      margin: 32px 0 12px !important;
+    }
+
+    &WithPrefix .inputContainer {
+      padding: 0 12px !important;
+    }
+
+    &WithPrefix .prefix {
+      padding: 8px;
+
+      width: 40px;
+      height: 40px;
+    }
+
+    &PaddingRight .inputContainer {
+      padding-right: 22px !important;
+    }
+  }
+
+  .focused .topLabelsWrapper::after {
+    background: none !important;
+  }
+
+  .focused .inputContainer:hover::after {
+    background: var(--controlBackgroundDefault);
+  }
+
+  .inputContainer {
+    width: 100% !important;
+    background: var(--controlBackgroundDefault) !important;
+
+    &::after {
+      border-color: var(--borderDefault) !important;
+    }
+
+    &.noBorder::after {
+      border-color: transparent !important;
+    }
+
+    &:hover,
+    &.noBorder:hover {
+      &::after {
+        border-color: var(--borderDefault) !important;
+        background: var(--controlBackgroundHover);
+        border-width: 2px !important;
+      }
+    }
+  }
+
+  .input {
+    font-size: 16px !important;
+
+    &::placeholder {
+      color: var(--textBaseTertiary) !important;
+    }
+  }
+
+  .error:not(.disabled) .inputContainer {
+    &::after {
+      border-color: var(--borderError) !important;
+      border-width: 1px !important;
+    }
+
+    &:hover,
+    .noBorder:hover {
+      &::after {
+        background: none !important;
+        border-color: var(--borderError) !important;
+        border-width: 2px !important;
+      }
+    }
+  }
+
+  .focused .inputContainer,
+  .focused.inputContainer {
+    box-shadow: none !important;
+
+    &::after,
+    &.noBorder::after {
+      border-color: var(--borderFocus) !important;
+      border-width: 2px !important;
+    }
+
+    .clearButton {
+      visibility: visible !important;
+      opacity: 1 !important;
+
+      transition:
+        visibility 0.3s ease-in-out,
+        opacity 0.3s ease-in-out;
+    }
+  }
+
+  .disabled {
+    .input {
+      color: var(--textBaseDefault) !important;
+    }
+
+    .inputContainer:after {
+      background: var(--backgroundTechDisabled) !important;
+      border-width: 1px !important;
+      border-color: var(--borderDisabled) !important;
+    }
+  }
+
+  .clearButton {
+    color: var(--iconBaseTertiary);
+  }
+
+  .helperText {
+    color: var(--textBaseTertiary) !important;
+    font-size: 12px !important;
+    line-height: 16px !important;
+  }
+
+  .helperTextError {
+    color: var(--textAccentDanger) !important;
+  }
+
+  .error {
+    color: var(--textAccentDanger) !important;
+  }
+
+  .topLabels {
+    width: auto !important;
+    margin-right: 4px !important;
+    margin-bottom: 4px !important;
+    order: -1;
+  }
+
+  .textViewOnly {
+    font-size: 14px !important;
+    line-height: 20px !important;
+  }
+
+  .required {
+    margin-right: 0 !important;
+  }
+
+  .inputContainerViewOnly {
+    padding: 0 !important;
+
+    background: none !important;
+    cursor: default !important;
+
+    .input,
+    &:not(.containerLabelInside) .input {
+      margin: 0 !important;
+
+      cursor: default !important;
+      font-size: 16px;
+      text-overflow: ellipsis;
+      color: var(--textBaseDefault) !important;
+    }
+
+    &::after {
+      border: none !important;
+    }
+  }
+
+  .tooltipIcon {
+    color: var(--iconBaseDefault) !important;
+  }
+
+  .containerComplex {
+    position: relative;
+
+    .inputContainer {
+      border-top-right-radius: 0 !important;
+      border-bottom-right-radius: 0 !important;
+    }
+
+    &:not(.containerLabelInside) .helperText {
+      position: absolute;
+      bottom: -20px;
+      left: 0;
+    }
+  }
+}
+
+;

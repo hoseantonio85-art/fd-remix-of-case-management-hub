@@ -1,0 +1,103 @@
+$paragraphMargin: 16px;
+
+.MDwrapper {
+  width: 100%;
+}
+
+.p {
+  display: block;
+  margin: $paragraphMargin 0;
+}
+
+.p:first-of-type {
+  margin-top: 0 !important;
+  margin-bottom: $paragraphMargin;
+}
+
+.p:last-of-type {
+  margin-top: $paragraphMargin;
+  margin-bottom: 0 !important;
+}
+
+.li .p {
+  display: block;
+}
+
+.ol {
+  margin: 0 !important;
+  white-space: normal !important;
+  word-break: break-word;
+  padding-left: 32px;
+
+  .li {
+    list-style-type: decimal !important;
+  }
+}
+
+.ul {
+  margin: 0 !important;
+  white-space: normal !important;
+  word-break: break-word;
+  padding-left: 32px;
+
+  .li {
+    list-style-type: disc !important;
+  }
+}
+
+.a {
+  color: var(--textLinkDefault);
+
+  &:active {
+    color: var(--textLinkActive);
+  }
+
+  &:visited {
+    color: var(--textLinkVisited);
+  }
+}
+
+.table {
+  border-spacing: 0;
+  border-collapse: collapse;
+  display: block;
+  margin-top: 0;
+  margin-bottom: 16px;
+  width: max-content;
+  max-width: 100%;
+  overflow: auto;
+
+  tr:first-child td:first-child {
+    border-top-left-radius: 8px;
+  }
+
+  tr:first-child td:last-child {
+    border-top-right-radius: 8px;
+  }
+
+  tr:last-child td:first-child {
+    border-bottom-left-radius: 8px;
+  }
+
+  tr:last-child td:last-child {
+    border-bottom-right-radius: 8px;
+  }
+
+  tr {
+    border-top: 1px solid var(--borderDefault);
+  }
+
+  tr:nth-child(2n) {
+    background-color: var(--surfaceTertiaryDefault);
+  }
+
+  td,
+  th {
+    padding: 6px 12px;
+    border: 1px solid var(--borderDefault);
+  }
+
+  th {
+    font-weight: 600;
+  }
+}

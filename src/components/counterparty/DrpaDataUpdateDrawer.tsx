@@ -25,7 +25,11 @@ const todayLabel = () => {
 };
 
 const parseNum = (v: string) => {
-  const n = Number(String(v).replace(/[^\d.,-]/g, "").replace(",", "."));
+  const n = Number(
+    String(v)
+      .replace(/[^\d.,-]/g, "")
+      .replace(",", "."),
+  );
   return Number.isFinite(n) ? n : 0;
 };
 
@@ -83,9 +87,7 @@ export function DrpaDataUpdateDrawer({
 
   const markActual = (inn: string) => {
     setCards((prev) =>
-      prev.map((card) =>
-        card.counterparty.inn === inn ? { ...card, updated: true } : card,
-      ),
+      prev.map((card) => (card.counterparty.inn === inn ? { ...card, updated: true } : card)),
     );
   };
 
@@ -100,8 +102,8 @@ export function DrpaDataUpdateDrawer({
           <div className="pr-10">
             <h2 className="text-xl font-semibold tracking-tight">Обновление данных для ДРПА</h2>
             <p className="mt-1 text-sm text-muted-foreground">
-              Актуализируйте договоры контрагентов с просрочкой более 30 дней на 01.07.2026.
-              После подтверждения данные будут зафиксированы.
+              Актуализируйте договоры контрагентов с просрочкой более 30 дней на 01.07.2026. После
+              подтверждения данные будут зафиксированы.
             </p>
           </div>
           <div className="mt-4">
@@ -314,7 +316,9 @@ function ContractRow({
         <Cell label="Задолженность" value={`${Number(contract.debt).toFixed(1)} млн ₽`} />
         <Cell
           label="Просрочка"
-          value={Number(contract.overdue) > 0 ? `${Number(contract.overdue).toFixed(1)} млн ₽` : "нет"}
+          value={
+            Number(contract.overdue) > 0 ? `${Number(contract.overdue).toFixed(1)} млн ₽` : "нет"
+          }
           sub={Number(contract.overdue) > 0 ? `${contract.overdueDays} дн.` : undefined}
           accent={Number(contract.overdue) > 0}
         />
@@ -351,7 +355,9 @@ function Cell({
   return (
     <div className="min-w-0">
       <div className="text-[10px] uppercase tracking-wide text-muted-foreground">{label}</div>
-      <div className={`truncate text-sm font-medium ${accent ? "text-amber-700" : ""}`}>{value}</div>
+      <div className={`truncate text-sm font-medium ${accent ? "text-amber-700" : ""}`}>
+        {value}
+      </div>
       {sub && <div className="text-[11px] text-muted-foreground">{sub}</div>}
     </div>
   );

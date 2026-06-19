@@ -1,0 +1,146 @@
+.uppercase {
+  text-transform: uppercase;
+}
+
+.title {
+  font-family: SBSansText;
+  color: var(--textBaseDefault);
+  font-weight: 600;
+  $sizeMap: 'H100' 10px 16px,
+    'H200' 12px 16px,
+    'H300' 14px 20px,
+    'H400' 16px 20px,
+    'H500' 18px 22px,
+    'H600' 20px 24px,
+    'H700' 24px 28px,
+    'H800' 28px 32px,
+    'H900' 32px 40px;
+
+  @each $name, $fontSize, $lineHeight in $sizeMap {
+    &.size-#{$name} {
+      font-size: $fontSize;
+      line-height: $lineHeight;
+    }
+  }
+
+  &.thin {
+    font-weight: 400;
+  }
+
+  &.nowrap {
+    white-space: nowrap;
+  }
+
+  &.white {
+    color: var(--textBaseInverse);
+  }
+}
+
+@for $i from 0 through 32 {
+  .mb-#{$i} {
+    margin-bottom: #{$i}px;
+  }
+}
+
+.link {
+  font-family: SBSansText;
+  color: var(--textLinkDefault);
+  cursor: pointer;
+  font-weight: 400;
+
+  &:hover {
+    text-decoration: underline;
+  }
+
+  &:active {
+    color: var(--textLinkActive);
+  }
+
+  &:visited {
+    color: var(--textLinkVisited);
+  }
+
+  $sizeMap: 'lg' 16px,
+    'md' 14px,
+    'sm' 12px;
+
+  @each $name, $fontSize in $sizeMap {
+    &.size-#{$name} {
+      font-size: $fontSize;
+      line-height: $fontSize * 1.43;
+    }
+  }
+
+  &.bold {
+    font-weight: 600;
+  }
+}
+
+.text {
+  font-family: SBSansText;
+  color: var(--textBaseDefault);
+  font-weight: 400;
+  margin-top: 0;
+
+  &.medium {
+    font-weight: 500;
+  }
+
+  &.bold {
+    font-weight: 600;
+  }
+
+  &.code {
+    color: var(--textBaseSecondary);
+  }
+
+  &.disabled {
+    color: var(--textBaseDisabled);
+  }
+
+  &.tooltip {
+    color: var(--textBaseTertiary);
+  }
+
+  &.nowrap {
+    white-space: nowrap;
+  }
+
+  &.wrap {
+    white-space: pre-line;
+    word-break: break-word;
+  }
+
+  &.white {
+    color: var(--textBaseInverse);
+  }
+
+  &.link {
+    color: var(--textLinkDefault);
+
+    &:hover {
+      text-decoration: underline;
+    }
+
+    &:active {
+      color: var(--textLinkActive);
+    }
+
+    &:visited {
+      color: var(--textLinkVisited);
+    }
+  }
+
+  $sizeMap: 'xxlg' 20px 24px,
+    'xlg' 18px 22px,
+    'lg' 16px 20px,
+    'md' 14px 20px,
+    'sm' 12px 16px;
+
+  @each $name, $fontSize, $lineHeight in $sizeMap {
+    &.size-#{$name} {
+      font-size: $fontSize;
+      line-height: $lineHeight;
+    }
+  }
+}
