@@ -30,9 +30,9 @@ export function AssessmentGroupDrawer({
   onOpenChange: (o: boolean) => void;
   comment?: GroupComment;
 }) {
+  const [activeFilter, setActiveFilter] = useState<AssessmentCountKind | null>(null);
   if (!group) return null;
   const counts = groupCounts(group);
-  const [activeFilter, setActiveFilter] = useState<AssessmentCountKind | null>(null);
 
   const toggleFilter = (kind: AssessmentCountKind) => {
     setActiveFilter((prev) => (prev === kind ? null : kind));
