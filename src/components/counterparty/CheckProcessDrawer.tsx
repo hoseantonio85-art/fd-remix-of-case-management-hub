@@ -135,7 +135,7 @@ export function ChecksDrawer({
                 const clickable = isDone;
                 const title = isContract ? "Договор № 24/06-У" : "ООО „Альтаир Логистик“";
                 const meta = isComplex
-                  ? `ИНН ${c.inn} · ${formatDateOnly(c.createdAt)} · Измайлова Л.Д.`
+                  ? `ИНН ${c.inn} · Договор об оказании услуг · ${formatDateOnly(c.createdAt)} · Измайлова Л.Д.`
                   : isContract
                     ? `Договор об оказании услуг · ${formatDateOnly(c.createdAt)} · Измайлова Л.Д.`
                     : `ИНН ${c.inn} · ${formatDateOnly(c.createdAt)} · Измайлова Л.Д.`;
