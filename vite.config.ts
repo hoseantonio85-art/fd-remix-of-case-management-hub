@@ -7,7 +7,7 @@ import path from "node:path";
 // https://vitejs.dev/config/
 export default defineConfig({
   // base используется как basename для BrowserRouter в src/App.tsx — для GitHub Pages
-  base: "/case-management-hub-v3/",
+  base: "/fd-remix-of-case-management-hub/",
   plugins: [react(), tailwindcss(), tsconfigPaths()],
   resolve: {
     alias: {
