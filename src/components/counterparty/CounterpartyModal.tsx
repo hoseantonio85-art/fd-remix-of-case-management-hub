@@ -243,6 +243,13 @@ export function CounterpartyModal({
       }),
     );
 
+    // Персистентная мутация решения по риску.
+    if (prevRisk) {
+      void persistRisk({ ...prevRisk });
+    }
+
+
+
     if (payload.kind === "verify") {
       setNotification({
         tone: "info",
