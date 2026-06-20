@@ -293,3 +293,61 @@ UX, визуал и сценарии не менялись.
 - Для batched-mutations (rollback нескольких шагов) пишется один общий
   snapshot — этого достаточно для mock-репозитория с фиксированной
   задержкой; при появлении конкурентных операций потребуется версионирование.
+
+## Итерация 2.3 — финальные критичные исправления
+
+### Что исправлено
+
+1. **Risk → связанные изменения этапа.** В `CounterpartyModal.handleSave`
+   при confirm/dismiss, который сдвигает текущий этап, теперь действительно
+   персистируются изменённые `CollectionSubStep` через
+   `persistCollectionStep`. Введён хелпер `shiftCurrentStep(delta)`,
+   возвращающий список изменённых шагов; результат отправляется в repo
+   с обработкой ошибки (toast.error, без повторного rollback —
+   локальный state остаётся согласованным с попыткой пользователя).
+2. **Contract stage — compute → persist → setContracts.**
+   `advanceContractStage`, `addOverdue` и `onUpdateContract` теперь
+   вычисляют новый `Contract` снаружи setState-апдейтера,
+   синхронно обновляют state и drawer, затем вызывают `persistContract`
+   с rollback’ом локального state при ошибке. Дублирующая логика
+   в `ContractDrawer onAdvanceStage` использует единый `stageOrder`.
+3. **AddContractDrawer.** `toast.success` теперь показывается только
+   после успешного `persistContract`; при ошибке — rollback + toast.error.
+4. **Assessment retry без пустого ИНН.** Для проверок (`AssessmentModal`
+   в Index) `onRetry` использует `assessment.inn ?? check.inn`; если
+   ИНН недоступен — `toast.error("Не указан ИНН для повторной оценки")`,
+   запрос не отправляется.
+5. **Checks flow.** `useChecks.run/remove` теперь пробрасывают ошибки
+   вызывающему коду (`throw e` после `setError`). В Index `runCheck`/
+   `removeCheck` тоже пробрасывают. Сообщение «Результат проверки удалён»
+   показывается только после успешного `removeCheck`. Неиспользуемый
+   `void retryChecks` удалён.
+6. **`addCounterparty` / `updateStatus`.** `handleStatusChange` и
+   manual-flow `handleManualFlowCpOpenChange` больше не показывают
+   success-toast до завершения repository-операции — оптимистично
+   обновляют UI, await’ят repo, откатывают state и показывают error
+   при сбое. Аналогично для check/complex `onAddToList`.
+
+### Проверки
+
+| Команда / сценарий | Результат |
+| --- | --- |
+| `bun run build` | ✓ 4.58s, 580 kB JS / 294 kB CSS |
+| `bun run lint` | 0 errors, 14 warnings (pre-existing) |
+| Risk confirm/dismiss со сдвигом этапа | persist всех изменённых шагов |
+| Contract advance / overdue / update | compute → setState → persist с откатом |
+| Add contract | toast только после persist |
+| Assessment retry с пустым ИНН | блокируется toast’ом, запрос не уходит |
+| Run/remove check | ошибки доходят до вызывающего кода, success post-await |
+| Status change / addCounterparty | success-toast только после repo |
+
+### Остаточный долг
+
+- Для batched-операций (несколько шагов / отката статуса) rollback
+  делается покомпонентно из snapshot; конкурентные мутации одного
+  контрагента всё ещё не сериализуются — добавится вместе с HTTP-слоем.
+- `useAssessment` пока не сохраняет последний использованный ИНН,
+  поэтому retry в check-флоу опирается на `check.inn`; при переходе
+  на HTTP-репозиторий разумно передавать context внутрь хука.
+- Глобальный mutation-layer (toast/progress политика, in-flight reg)
+  всё ещё откладывается до подключения backend.
