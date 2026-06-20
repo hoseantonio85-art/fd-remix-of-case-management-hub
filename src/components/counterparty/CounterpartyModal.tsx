@@ -85,6 +85,7 @@ export function CounterpartyModal({
   const {
     assessment,
     loading: assessmentRunning,
+    error: assessmentError,
     run: runAssessment,
     reset: resetAssessment,
   } = useAssessment();
