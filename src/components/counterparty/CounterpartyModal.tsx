@@ -427,11 +427,12 @@ export function CounterpartyModal({
       tone: "info",
       text: "Этап возвращен. Комментарий сохранен в истории.",
     });
-    Promise.all([persistCollectionStep(updatedCurrent), persistCollectionStep(updatedPrev)])
-      .catch(() => {
+    Promise.all([persistCollectionStep(updatedCurrent), persistCollectionStep(updatedPrev)]).catch(
+      () => {
         setSteps((_p) => steps);
         toast.error("Не удалось сохранить откат этапа");
-      });
+      },
+    );
   };
 
   const advanceContractStage = (id: string) => {

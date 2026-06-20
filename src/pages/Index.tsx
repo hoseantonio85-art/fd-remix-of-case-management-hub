@@ -338,7 +338,11 @@ export default function Index() {
     if (checksError) toast.error(`Ошибка проверок: ${checksError.message}`);
   }, [checksError]);
   const [checkActionId, setCheckActionId] = useState<string | null>(null);
-  const runCheck = async (input: { inn?: string; fileNames: string[]; type?: "counterparty" | "contract" | "complex" }) => {
+  const runCheck = async (input: {
+    inn?: string;
+    fileNames: string[];
+    type?: "counterparty" | "contract" | "complex";
+  }) => {
     try {
       setCheckActionId("__run__");
       await runCheckRaw(input);
@@ -1162,10 +1166,14 @@ export default function Index() {
         running={assessmentForChecks.loading}
         error={assessmentForChecks.error}
         onRetry={() =>
-          void assessmentForChecks.run(`ООО „Альтаир Логистик“`, assessmentForChecks.assessment?.inn ?? "", {
-            source: "auto",
-            variant: "positive",
-          })
+          void assessmentForChecks.run(
+            `ООО „Альтаир Логистик“`,
+            assessmentForChecks.assessment?.inn ?? "",
+            {
+              source: "auto",
+              variant: "positive",
+            },
+          )
         }
         onConfirm={() => {}}
         onDisagree={() => {}}
