@@ -446,7 +446,9 @@ export default function Index() {
         setStatusChanges((prev) => ({ ...prev, [inn]: { from: current, to: status } }));
       }
     } catch (e) {
-      setActive((prev) => (prev && prev.inn === inn && current ? { ...prev, status: current } : prev));
+      setActive((prev) =>
+        prev && prev.inn === inn && current ? { ...prev, status: current } : prev,
+      );
       setManualFlowTarget((prev) =>
         prev && prev.inn === inn && current ? { ...prev, status: current } : prev,
       );
@@ -507,9 +509,7 @@ export default function Index() {
                 description: `Оценка сохранена по ИНН ${inn}`,
               }),
             )
-            .catch((e) =>
-              toast.error(`Не удалось добавить контрагента: ${(e as Error).message}`),
-            );
+            .catch((e) => toast.error(`Не удалось добавить контрагента: ${(e as Error).message}`));
         } else {
           toast("Контрагент уже есть в списке", {
             description: `ИНН ${inn} найден в рабочем списке`,
@@ -1165,9 +1165,7 @@ export default function Index() {
           assessmentForComplex.reset();
           Promise.all([addCounterparty(cp), removeCheck(check.id)])
             .then(() => toast.success("Контрагент добавлен в список дебиторов"))
-            .catch((e) =>
-              toast.error(`Не удалось добавить контрагента: ${(e as Error).message}`),
-            );
+            .catch((e) => toast.error(`Не удалось добавить контрагента: ${(e as Error).message}`));
         }}
       />
 
@@ -1184,8 +1182,7 @@ export default function Index() {
         status="updated"
         disagreement={null}
         defaultInn={
-          assessmentForChecks.assessment?.inn ??
-          checks.find((c) => c.id === activeCheckId)?.inn
+          assessmentForChecks.assessment?.inn ?? checks.find((c) => c.id === activeCheckId)?.inn
         }
         running={assessmentForChecks.loading}
         error={assessmentForChecks.error}
@@ -1233,9 +1230,7 @@ export default function Index() {
           setActiveCheckId(null);
           Promise.all([addCounterparty(cp), removeCheck(check.id)])
             .then(() => toast.success("Контрагент добавлен в список дебиторов"))
-            .catch((e) =>
-              toast.error(`Не удалось добавить контрагента: ${(e as Error).message}`),
-            );
+            .catch((e) => toast.error(`Не удалось добавить контрагента: ${(e as Error).message}`));
         }}
       />
 
