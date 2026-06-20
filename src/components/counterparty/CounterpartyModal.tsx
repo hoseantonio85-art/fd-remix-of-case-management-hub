@@ -446,17 +446,19 @@ export function CounterpartyModal({
   };
 
   const addOverdue = (id: string, record: OverdueRecord) => {
+    let nextContract: Contract | null = null;
     setContracts((prev) =>
-      prev.map((c) =>
-        c.id === id
-          ? {
-              ...c,
-              overdue: toFiniteNumber(c.overdue) + toFiniteNumber(record.amount),
-              overdueDays: Math.max(toFiniteNumber(c.overdueDays), toFiniteNumber(record.days)),
-              overdueHistory: [record, ...(c.overdueHistory ?? [])],
-            }
-          : c,
-      ),
+      prev.map((c) => {
+        if (c.id !== id) return c;
+        const updated: Contract = {
+          ...c,
+          overdue: toFiniteNumber(c.overdue) + toFiniteNumber(record.amount),
+          overdueDays: Math.max(toFiniteNumber(c.overdueDays), toFiniteNumber(record.days)),
+          overdueHistory: [record, ...(c.overdueHistory ?? [])],
+        };
+        nextContract = updated;
+        return updated;
+      }),
     );
     setContractDrawer((prev) =>
       prev && prev.id === id
@@ -468,7 +470,9 @@ export function CounterpartyModal({
           }
         : prev,
     );
+    if (nextContract) void persistContract(nextContract);
   };
+
 
   const problemIndicators = getCounterpartyProblemIndicators(counterparty)
     .map((key) => {
