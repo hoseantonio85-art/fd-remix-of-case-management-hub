@@ -862,11 +862,36 @@ export default function Index() {
             </div>
 
             <div className="space-y-2.5">
-              {filtered.length === 0 && (
-                <div className="rounded-2xl border border-border bg-white p-8 text-center text-sm text-muted-foreground">
-                  Нет дебиторов в этой категории
+              {dataStatus === "loading" && (
+                <div className="flex items-center justify-center gap-2 rounded-2xl border border-border bg-white p-8 text-sm text-muted-foreground">
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                  Загружаем список контрагентов…
                 </div>
               )}
+              {dataStatus === "error" && (
+                <div className="flex flex-col items-center gap-3 rounded-2xl border border-rose-200 bg-rose-50/40 p-8 text-center">
+                  <AlertTriangle className="h-6 w-6 text-rose-600" />
+                  <div className="text-sm font-medium text-rose-900">
+                    Не удалось загрузить контрагентов
+                  </div>
+                  <div className="max-w-md text-xs text-muted-foreground">
+                    {dataError?.message ?? "Неизвестная ошибка"}
+                  </div>
+                  <Button size="sm" variant="outline" onClick={() => void refetch()}>
+                    Повторить
+                  </Button>
+                </div>
+              )}
+              {dataStatus !== "loading" &&
+                dataStatus !== "error" &&
+                filtered.length === 0 && (
+                  <div className="rounded-2xl border border-border bg-white p-8 text-center text-sm text-muted-foreground">
+                    {dataStatus === "empty"
+                      ? "Список контрагентов пуст"
+                      : "Нет дебиторов в этой категории"}
+                  </div>
+                )}
+
               {filtered.map((c) => {
                 const isPending = c.tag === "На оценке";
                 const indicators = isPending ? [] : getCounterpartyProblemIndicators(c);
