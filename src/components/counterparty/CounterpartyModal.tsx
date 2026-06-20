@@ -213,7 +213,6 @@ export function CounterpartyModal({
     setSteps(next);
     return changed;
   };
-  
 
   const handleSave = (riskId: string, payload: RiskSavePayload) => {
     const prevRisk = risks.find((r) => r.id === riskId);
@@ -689,7 +688,6 @@ export function CounterpartyModal({
                       });
                   }}
                 />
-
               </section>
             </div>
 
