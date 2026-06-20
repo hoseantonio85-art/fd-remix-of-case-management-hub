@@ -241,3 +241,55 @@ UX, визуал и сценарии не менялись.
 2. Stepper-логика в `CounterpartyModal` (advanceStage / rollbackStage с правилами «нельзя в суд без сверки» и т.п.) — кандидат на `useDebtStepper`. Не делалось, чтобы не задеть многочисленные UI-привязки (notifications + history + stepAnim).
 3. `manualAssessment` flow (правка статуса контрагента из AssessmentModal) пока работает через локальный state в `Index.tsx` без отдельного hook — это переходный сценарий, который уйдёт после унификации флоу проверок.
 4. `src/lib/*` shim'ы по-прежнему остаются для внешней совместимости.
+
+---
+
+## Итерация 2.2 — исправления mutations и состояний (20.06.2026)
+
+### Что починено
+
+1. **Сохранение решения по риску.** В `CounterpartyModal.handleSave` вычисляется
+   обновлённый `RiskSignal` и именно он передаётся в `persistRisk`
+   (раньше уходил `prevRisk`). При ошибке persist делаем rollback локального
+   state и показываем `toast.error`; toast.success — только после успешного
+   завершения repository-операции.
+2. **Persistence этапов взыскания.** `advanceStage` и `rollbackStage` теперь
+   вызывают `persistCollectionStep` для двух изменённых шагов (done+current
+   или current→upcoming + prev→current). Ошибка → rollback к снимку `steps`
+   и toast.error.
+3. **Persistence этапа договора.** `advanceContractStage` вычисляет
+   обновлённый `Contract` и сохраняет через `persistContract`.
+4. **Assessment loading/error UI.** `AssessmentModal` больше не возвращает
+   `null` при `assessment === null` — показывает спиннер «Готовим оценку…»,
+   либо блок ошибки с кнопкой «Повторить» (`onRetry`). Новые props
+   `error`, `onRetry` пробрасываются из `useAssessment.error` в
+   `CounterpartyModal` и в Index-флоу проверок.
+5. **Checks flow.** В `Index.tsx` подключены `useChecks.error` (toast.error
+   через useEffect) и обёртки `runCheck`/`removeCheck`, которые блокируют
+   повторный вызов через `checkActionId` и показывают ошибку запуска/удаления.
+6. **Поиск по списку.** `searchValue` теперь реально фильтрует список
+   через `searchCounterparties(list, searchValue)` в `filtered`-мемоизации.
+
+### Проверки
+
+| Команда / сценарий | Результат |
+| --- | --- |
+| `bun run build` | ✓ 4.76s, 579 kB JS / 294 kB CSS |
+| `bun run lint` | 0 errors, 14 warnings (pre-existing) |
+| Playwright smoke `/` + поиск «Сигма» | 0 runtime / console errors |
+| Поиск по названию и ИНН | работает |
+| Изменение статуса | через `updateCounterparties.updateStatus` |
+| Решение по риску | persist в repo, toast после успеха |
+| Advance/rollback этапа | persist обоих изменённых шагов |
+| Запуск/удаление проверки | блокируются повторно, ошибки → toast |
+| Loading/error/retry оценки | спиннер и блок ошибки в `AssessmentModal` |
+
+### Остаточный долг
+
+- Глобального loading-индикатора для inflight-mutations пока нет
+  (используется локальный disabled на конкретных кнопках там, где это
+  критично). Полноценный `useMutation`-слой откладывается до интеграции
+  с реальным HTTP-репозиторием.
+- Для batched-mutations (rollback нескольких шагов) пишется один общий
+  snapshot — этого достаточно для mock-репозитория с фиксированной
+  задержкой; при появлении конкурентных операций потребуется версионирование.
