@@ -331,7 +331,6 @@ export default function Index() {
     error: checksError,
     run: runCheckRaw,
     remove: removeCheckRaw,
-    retry: retryChecks,
   } = useChecks();
   const checks: CheckRecord[] = checksDto;
   useEffect(() => {
@@ -348,6 +347,7 @@ export default function Index() {
       await runCheckRaw(input);
     } catch (e) {
       toast.error(`Не удалось запустить проверку: ${(e as Error).message}`);
+      throw e;
     } finally {
       setCheckActionId(null);
     }
@@ -359,11 +359,11 @@ export default function Index() {
       await removeCheckRaw(id);
     } catch (e) {
       toast.error(`Не удалось удалить проверку: ${(e as Error).message}`);
+      throw e;
     } finally {
       setCheckActionId(null);
     }
   };
-  void retryChecks;
 
   // Оценка контрагента строится через assessmentRepository.
   const assessmentForChecks = useAssessment();
@@ -436,14 +436,24 @@ export default function Index() {
   const drpaUpdated = drpaCards.filter((c) => c.updated).length;
   const drpaInProgress = drpaUpdated > 0 && !drpaConfirmed;
 
-  const handleStatusChange = (inn: string, status: Counterparty["status"]) => {
+  const handleStatusChange = async (inn: string, status: Counterparty["status"]) => {
     const current = allCounterparties.find((c) => c.inn === inn)?.status;
-    if (current && current !== status) {
-      setStatusChanges((prev) => ({ ...prev, [inn]: { from: current, to: status } }));
-    }
-    void updateStatus(inn, status);
     setActive((prev) => (prev && prev.inn === inn ? { ...prev, status } : prev));
     setManualFlowTarget((prev) => (prev && prev.inn === inn ? { ...prev, status } : prev));
+    try {
+      await updateStatus(inn, status);
+      if (current && current !== status) {
+        setStatusChanges((prev) => ({ ...prev, [inn]: { from: current, to: status } }));
+      }
+    } catch (e) {
+      setActive((prev) =>
+        prev && prev.inn === inn && current ? { ...prev, status: current } : prev,
+      );
+      setManualFlowTarget((prev) =>
+        prev && prev.inn === inn && current ? { ...prev, status: current } : prev,
+      );
+      toast.error(`Не удалось изменить статус: ${(e as Error).message}`);
+    }
   };
 
   const categoryLabel: Record<CategoryKey, string> = {
@@ -488,13 +498,18 @@ export default function Index() {
   const handleManualFlowCpOpenChange = (o: boolean) => {
     setManualFlowCpOpen(o);
     if (!o) {
-      if (manualFlowTarget) {
-        const inn = manualFlowTarget.inn;
-        if (manualFlowIsNew) {
-          void addCounterparty(manualFlowTarget);
-          toast.success("Контрагент добавлен в список", {
-            description: `Оценка сохранена по ИНН ${inn}`,
-          });
+      const target = manualFlowTarget;
+      const isNew = manualFlowIsNew;
+      if (target) {
+        const inn = target.inn;
+        if (isNew) {
+          addCounterparty(target)
+            .then(() =>
+              toast.success("Контрагент добавлен в список", {
+                description: `Оценка сохранена по ИНН ${inn}`,
+              }),
+            )
+            .catch((e) => toast.error(`Не удалось добавить контрагента: ${(e as Error).message}`));
         } else {
           toast("Контрагент уже есть в списке", {
             description: `ИНН ${inn} найден в рабочем списке`,
@@ -1099,12 +1114,14 @@ export default function Index() {
           if (!o) setActiveContractCheckId(null);
         }}
         onDelete={() => {
-          if (activeContractCheckId) {
-            void removeCheck(activeContractCheckId);
-          }
+          const id = activeContractCheckId;
           setContractModalOpen(false);
           setActiveContractCheckId(null);
-          toast("Результат проверки удалён");
+          if (id) {
+            removeCheck(id)
+              .then(() => toast("Результат проверки удалён"))
+              .catch(() => {});
+          }
         }}
       />
 
@@ -1120,13 +1137,15 @@ export default function Index() {
         }}
         positive
         onDelete={() => {
-          if (activeComplexCheckId) {
-            void removeCheck(activeComplexCheckId);
-          }
+          const id = activeComplexCheckId;
           setComplexModalOpen(false);
           setActiveComplexCheckId(null);
           assessmentForComplex.reset();
-          toast("Результат проверки удалён");
+          if (id) {
+            removeCheck(id)
+              .then(() => toast("Результат проверки удалён"))
+              .catch(() => {});
+          }
         }}
         onAddToList={() => {
           const check = checks.find((c) => c.id === activeComplexCheckId);
@@ -1141,12 +1160,12 @@ export default function Index() {
             tag: "Нет риска",
             status: "no_risk",
           };
-          void addCounterparty(cp);
-          void removeCheck(check.id);
           setComplexModalOpen(false);
           setActiveComplexCheckId(null);
           assessmentForComplex.reset();
-          toast.success("Контрагент добавлен в список дебиторов");
+          Promise.all([addCounterparty(cp), removeCheck(check.id)])
+            .then(() => toast.success("Контрагент добавлен в список дебиторов"))
+            .catch((e) => toast.error(`Не удалось добавить контрагента: ${(e as Error).message}`));
         }}
       />
 
@@ -1162,31 +1181,39 @@ export default function Index() {
         }}
         status="updated"
         disagreement={null}
-        defaultInn={assessmentForChecks.assessment?.inn}
+        defaultInn={
+          assessmentForChecks.assessment?.inn ?? checks.find((c) => c.id === activeCheckId)?.inn
+        }
         running={assessmentForChecks.loading}
         error={assessmentForChecks.error}
-        onRetry={() =>
-          void assessmentForChecks.run(
-            `ООО „Альтаир Логистик“`,
-            assessmentForChecks.assessment?.inn ?? "",
-            {
-              source: "auto",
-              variant: "positive",
-            },
-          )
-        }
+        onRetry={() => {
+          const innForRetry =
+            assessmentForChecks.assessment?.inn ??
+            checks.find((c) => c.id === activeCheckId)?.inn ??
+            "";
+          if (!innForRetry) {
+            toast.error("Не указан ИНН для повторной оценки");
+            return;
+          }
+          void assessmentForChecks.run(`ООО „Альтаир Логистик“`, innForRetry, {
+            source: "auto",
+            variant: "positive",
+          });
+        }}
         onConfirm={() => {}}
         onDisagree={() => {}}
         completionMode
         positive
         onDeleteResult={() => {
-          if (activeCheckId) {
-            void removeCheck(activeCheckId);
-          }
+          const id = activeCheckId;
           setCheckAssessmentOpen(false);
           assessmentForChecks.reset();
           setActiveCheckId(null);
-          toast("Результат проверки удалён");
+          if (id) {
+            removeCheck(id)
+              .then(() => toast("Результат проверки удалён"))
+              .catch(() => {});
+          }
         }}
         onAddToList={() => {
           const check = checks.find((c) => c.id === activeCheckId);
@@ -1198,12 +1225,12 @@ export default function Index() {
             tag: "Нет риска",
             status: "no_risk",
           };
-          void addCounterparty(cp);
-          void removeCheck(check.id);
           setCheckAssessmentOpen(false);
           assessmentForChecks.reset();
           setActiveCheckId(null);
-          toast.success("Контрагент добавлен в список дебиторов");
+          Promise.all([addCounterparty(cp), removeCheck(check.id)])
+            .then(() => toast.success("Контрагент добавлен в список дебиторов"))
+            .catch((e) => toast.error(`Не удалось добавить контрагента: ${(e as Error).message}`));
         }}
       />
 
