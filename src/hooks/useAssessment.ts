@@ -27,6 +27,8 @@ export function useAssessment(): UseAssessmentResult {
     ) => {
       setLoading(true);
       setError(null);
+      // Сбрасываем предыдущий результат, чтобы старая оценка не воспринималась как актуальная.
+      setAssessment(null);
       try {
         const a = await assessmentRepository.buildFor(
           name,
@@ -38,6 +40,7 @@ export function useAssessment(): UseAssessmentResult {
         return a;
       } catch (e) {
         setError(e as Error);
+        setAssessment(null);
         return null;
       } finally {
         setLoading(false);

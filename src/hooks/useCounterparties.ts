@@ -95,14 +95,42 @@ export function useCounterparties(): UseCounterpartiesResult {
   }, [data, filters]);
 
   const updateStatus = useCallback(async (inn: string, st: Counterparty["status"]) => {
-    setData((prev) => prev.map((c) => (c.inn === inn ? { ...c, status: st } : c)));
-    await counterpartyRepository.updateStatus(inn, st);
+    let prev: Counterparty["status"] | undefined;
+    setData((list) => {
+      prev = list.find((c) => c.inn === inn)?.status;
+      return list.map((c) => (c.inn === inn ? { ...c, status: st } : c));
+    });
+    try {
+      await counterpartyRepository.updateStatus(inn, st);
+    } catch (e) {
+      if (prev !== undefined) {
+        setData((list) => list.map((c) => (c.inn === inn ? { ...c, status: prev! } : c)));
+      }
+      throw e;
+    }
   }, []);
 
   const add = useCallback(async (cp: Counterparty) => {
-    setData((prev) => (prev.some((c) => c.inn === cp.inn) ? prev : [cp, ...prev]));
-    setStatus((s) => (s === "empty" ? "success" : s));
-    await counterpartyRepository.add(cp);
+    let inserted = false;
+    let prevStatus: LoadStatus | null = null;
+    setData((list) => {
+      if (list.some((c) => c.inn === cp.inn)) return list;
+      inserted = true;
+      return [cp, ...list];
+    });
+    setStatus((s) => {
+      prevStatus = s;
+      return s === "empty" ? "success" : s;
+    });
+    try {
+      await counterpartyRepository.add(cp);
+    } catch (e) {
+      if (inserted) {
+        setData((list) => list.filter((c) => c.inn !== cp.inn));
+        if (prevStatus) setStatus(prevStatus);
+      }
+      throw e;
+    }
   }, []);
 
   return {

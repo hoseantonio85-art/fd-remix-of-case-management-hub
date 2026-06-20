@@ -218,6 +218,7 @@ export function CounterpartyModal({
     const prevRisk = risks.find((r) => r.id === riskId);
     const prevStatus = prevRisk?.status;
     if (!prevRisk) return;
+    const prevSteps = steps;
 
     const updatedRisk: RiskSignal =
       payload.kind === "confirm"
@@ -260,11 +261,22 @@ export function CounterpartyModal({
 
     setRisks((prev) => prev.map((r) => (r.id === riskId ? updatedRisk : r)));
 
-    // Persist обновлённое решение по риску; откат при ошибке.
-    void persistRisk(updatedRisk)
+    // Шаги меняем синхронно (для анимации), persist — общим Promise.all с риском.
+    let changedSteps: CollectionSubStep[] = [];
+    if (payload.kind === "confirm" && prevStatus !== "confirmed") {
+      changedSteps = shiftCurrentStep(1);
+      setStepAnim({ direction: "forward", tick: Date.now() });
+    } else if (payload.kind === "dismiss" && prevStatus === "confirmed") {
+      changedSteps = shiftCurrentStep(-1);
+      setStepAnim({ direction: "backward", tick: Date.now() });
+    }
+
+    // Атомарный UI-flow: success только когда сохранены и риск, и связанные этапы.
+    Promise.all([persistRisk(updatedRisk), ...changedSteps.map((s) => persistCollectionStep(s))])
       .then(() => toast.success("Решение по риску сохранено"))
       .catch(() => {
         setRisks((prev) => prev.map((r) => (r.id === riskId ? prevRisk : r)));
+        if (changedSteps.length > 0) setSteps(prevSteps);
         toast.error("Не удалось сохранить решение по риску");
       });
 
@@ -278,8 +290,6 @@ export function CounterpartyModal({
 
     if (payload.kind === "dismiss") {
       if (prevStatus === "confirmed") {
-        const changedSteps = shiftCurrentStep(-1);
-        setStepAnim({ direction: "backward", tick: Date.now() });
         setTimeout(() => {
           setSteps((cur) => {
             const c = cur.find((s) => s.status === "current");
@@ -292,11 +302,6 @@ export function CounterpartyModal({
             return cur;
           });
         }, 0);
-        if (changedSteps.length > 0) {
-          Promise.all(changedSteps.map((s) => persistCollectionStep(s))).catch(() =>
-            toast.error("Не удалось сохранить откат этапа"),
-          );
-        }
       } else {
         setNotification({
           tone: "info",
@@ -320,8 +325,6 @@ export function CounterpartyModal({
       });
       return;
     }
-    const changedConfirm = shiftCurrentStep(1);
-    setStepAnim({ direction: "forward", tick: Date.now() });
     setTimeout(() => {
       setSteps((cur) => {
         const c = cur.find((s) => s.status === "current");
@@ -334,11 +337,6 @@ export function CounterpartyModal({
         return cur;
       });
     }, 0);
-    if (changedConfirm.length > 0) {
-      Promise.all(changedConfirm.map((s) => persistCollectionStep(s))).catch(() =>
-        toast.error("Не удалось сохранить переход этапа"),
-      );
-    }
   };
 
   const pushHistory = (entry: DebtHistoryEntry) => setHistory((prev) => [entry, ...prev]);
@@ -476,8 +474,11 @@ export function CounterpartyModal({
     const nextStage = stageOrder[Math.min(i + 1, stageOrder.length - 1)] || stageOrder[0];
     const updated: Contract = { ...cur, collectionStage: nextStage };
     setContracts((prev) => prev.map((c) => (c.id === id ? updated : c)));
+    setContractDrawer((prev) => (prev && prev.id === id ? updated : prev));
     void persistContract(updated).catch(() => {
+      // Откат и списка договоров, и открытого drawer одновременно.
       setContracts((prev) => prev.map((c) => (c.id === id ? cur : c)));
+      setContractDrawer((prev) => (prev && prev.id === id ? cur : prev));
       toast.error("Не удалось сохранить этап договора");
     });
   };
@@ -737,18 +738,7 @@ export function CounterpartyModal({
           open={!!contractDrawer}
           onOpenChange={(o) => !o && setContractDrawer(null)}
           onAddOverdue={addOverdue}
-          onAdvanceStage={(id) => {
-            advanceContractStage(id);
-            setContractDrawer((prev) => {
-              if (!prev || prev.id !== id) return prev;
-              const i = stageOrder.indexOf(prev.collectionStage ?? "");
-              return {
-                ...prev,
-                collectionStage:
-                  stageOrder[Math.min(i + 1, stageOrder.length - 1)] || stageOrder[0],
-              };
-            });
-          }}
+          onAdvanceStage={(id) => advanceContractStage(id)}
           onUpdateContract={(id, patch) => {
             const cur = contracts.find((c) => c.id === id);
             if (!cur) return;

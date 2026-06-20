@@ -333,9 +333,9 @@ export default function Index() {
     remove: removeCheckRaw,
   } = useChecks();
   const checks: CheckRecord[] = checksDto;
-  useEffect(() => {
-    if (checksError) toast.error(`Ошибка проверок: ${checksError.message}`);
-  }, [checksError]);
+  // Ошибки checks показываем точечно в обработчиках вызовов (runCheck/removeCheck),
+  // чтобы не дублировать toast для одной и той же операции.
+  void checksError;
   const [checkActionId, setCheckActionId] = useState<string | null>(null);
   const runCheck = async (input: {
     inn?: string;
@@ -346,8 +346,8 @@ export default function Index() {
       setCheckActionId("__run__");
       await runCheckRaw(input);
     } catch (e) {
+      // Один toast на операцию; не пробрасываем дальше — вызов идёт через `void`.
       toast.error(`Не удалось запустить проверку: ${(e as Error).message}`);
-      throw e;
     } finally {
       setCheckActionId(null);
     }
