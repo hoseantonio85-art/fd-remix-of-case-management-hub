@@ -248,8 +248,6 @@ export function CounterpartyModal({
       void persistRisk({ ...prevRisk });
     }
 
-
-
     if (payload.kind === "verify") {
       setNotification({
         tone: "info",
@@ -472,7 +470,6 @@ export function CounterpartyModal({
     );
     if (nextContract) void persistContract(nextContract);
   };
-
 
   const problemIndicators = getCounterpartyProblemIndicators(counterparty)
     .map((key) => {

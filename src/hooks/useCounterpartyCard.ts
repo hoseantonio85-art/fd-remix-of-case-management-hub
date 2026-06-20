@@ -1,12 +1,7 @@
 // Состояние и действия карточки контрагента.
 // Лифт state из CounterpartyModal + персистентные мутации через counterpartyRepository.
 import { useEffect, useState } from "react";
-import type {
-  Contract,
-  CollectionSubStep,
-  Counterparty,
-  RiskSignal,
-} from "@/domain/counterparty";
+import type { Contract, CollectionSubStep, Counterparty, RiskSignal } from "@/domain/counterparty";
 import { counterpartyRepository } from "@/data/repositories";
 
 export interface UseCounterpartyCardResult {
