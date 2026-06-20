@@ -197,7 +197,8 @@ export function CounterpartyModal({
   };
 
   const handleSave = (riskId: string, payload: RiskSavePayload) => {
-    const prevStatus = risks.find((r) => r.id === riskId)?.status;
+    const prevRisk = risks.find((r) => r.id === riskId);
+    const prevStatus = prevRisk?.status;
 
     setRisks((prev) =>
       prev.map((r) => {
