@@ -73,12 +73,7 @@ const legalReputation: AssessmentGroup = {
   ],
 };
 
-export const defaultGroups: AssessmentGroup[] = [
-  legalStatus,
-  management,
-  finance,
-  legalReputation,
-];
+export const defaultGroups: AssessmentGroup[] = [legalStatus, management, finance, legalReputation];
 
 function toPositiveGroups(groups: AssessmentGroup[]): AssessmentGroup[] {
   return groups.map((g) => ({

@@ -1,9 +1,4 @@
-import type {
-  Counterparty,
-  RiskSignal,
-  Contract,
-  CollectionSubStep,
-} from "@/domain/counterparty";
+import type { Counterparty, RiskSignal, Contract, CollectionSubStep } from "@/domain/counterparty";
 import { counterpartiesMock } from "@/data/mock/counterparties";
 import type { CounterpartyRepository } from "../types";
 

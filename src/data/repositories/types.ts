@@ -1,10 +1,5 @@
 // Контракты репозиториев. Реализации (mock или http) подменяются в `@/data/repositories`.
-import type {
-  Counterparty,
-  RiskSignal,
-  Contract,
-  CollectionSubStep,
-} from "@/domain/counterparty";
+import type { Counterparty, RiskSignal, Contract, CollectionSubStep } from "@/domain/counterparty";
 import type { Assessment, AssessmentSource } from "@/domain/assessment";
 
 export type AsyncResult<T> = Promise<T>;

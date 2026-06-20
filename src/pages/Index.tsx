@@ -412,7 +412,6 @@ export default function Index() {
     setManualFlowTarget((prev) => (prev && prev.inn === inn ? { ...prev, status } : prev));
   };
 
-
   const categoryLabel: Record<CategoryKey, string> = {
     risk: "Риск дефолта",
     overdue_risk: "Просрочено с риском дефолта",
@@ -1160,7 +1159,6 @@ export default function Index() {
           toast.success("Контрагент добавлен в список дебиторов");
         }}
       />
-
 
       <AssessmentModal
         assessment={manualAssessment}
