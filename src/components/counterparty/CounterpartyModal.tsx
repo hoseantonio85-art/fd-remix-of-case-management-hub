@@ -654,6 +654,7 @@ export function CounterpartyModal({
                   onOpenChange={setAddContractOpen}
                   onAdd={(c) => {
                     setContracts((prev) => [...prev, c]);
+                    void persistContract(c);
                     toast.success("Договор добавлен");
                   }}
                 />
