@@ -49,6 +49,7 @@ export function useChecks(): UseChecksResult {
         });
       } catch (e) {
         setError(e as Error);
+        throw e;
       }
     },
     [],
@@ -59,6 +60,7 @@ export function useChecks(): UseChecksResult {
       await checkRepository.remove(id);
     } catch (e) {
       setError(e as Error);
+      throw e;
     }
   }, []);
 
