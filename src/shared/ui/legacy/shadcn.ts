@@ -30,6 +30,7 @@ export {
   DialogFooter,
   DialogTrigger,
 } from "@/components/ui/dialog";
+export * as DialogPrimitive from "@radix-ui/react-dialog";
 export {
   Sheet,
   SheetContent,
