@@ -94,6 +94,8 @@ export function AssessmentModal({
   disagreement,
   defaultInn,
   running,
+  error,
+  onRetry,
   onRun,
   onConfirm,
   onDisagree,
@@ -112,6 +114,8 @@ export function AssessmentModal({
   disagreement: Disagreement | null;
   defaultInn?: string;
   running?: boolean;
+  error?: Error | null;
+  onRetry?: () => void;
   onRun?: (inn: string) => void;
   onConfirm: () => void;
   onDisagree: (d: Disagreement) => void;
