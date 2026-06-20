@@ -409,17 +409,10 @@ export function CounterpartyModal({
     const idx = steps.findIndex((s) => s.status === "current");
     if (idx <= 0) return;
     const prevStep = steps[idx - 1];
+    const updatedCurrent: CollectionSubStep = { ...steps[idx], status: "upcoming" };
+    const updatedPrev: CollectionSubStep = { ...prevStep, status: "current", overdue: false };
     setSteps((prev) =>
-      prev.map((s, i) => {
-        if (i === idx) return { ...s, status: "upcoming" as const };
-        if (i === idx - 1)
-          return {
-            ...s,
-            status: "current" as const,
-            overdue: false,
-          };
-        return s;
-      }),
+      prev.map((s, i) => (i === idx ? updatedCurrent : i === idx - 1 ? updatedPrev : s)),
     );
     setStepAnim({ direction: "backward", tick: Date.now() });
     pushHistory({
@@ -433,6 +426,11 @@ export function CounterpartyModal({
       tone: "info",
       text: "Этап возвращен. Комментарий сохранен в истории.",
     });
+    Promise.all([persistCollectionStep(updatedCurrent), persistCollectionStep(updatedPrev)])
+      .catch(() => {
+        setSteps((_p) => steps);
+        toast.error("Не удалось сохранить откат этапа");
+      });
   };
 
   const advanceContractStage = (id: string) => {
@@ -442,16 +440,22 @@ export function CounterpartyModal({
       "Принудительное взыскание",
       "Завершение работы",
     ];
+    let updated: Contract | null = null;
     setContracts((prev) =>
       prev.map((c) => {
         if (c.id !== id) return c;
         const i = stageOrder.indexOf(c.collectionStage ?? "");
-        return {
+        const next: Contract = {
           ...c,
           collectionStage: stageOrder[Math.min(i + 1, stageOrder.length - 1)] || stageOrder[0],
         };
+        updated = next;
+        return next;
       }),
     );
+    if (updated) {
+      void persistContract(updated).catch(() => toast.error("Не удалось сохранить этап договора"));
+    }
   };
 
   const addOverdue = (id: string, record: OverdueRecord) => {
