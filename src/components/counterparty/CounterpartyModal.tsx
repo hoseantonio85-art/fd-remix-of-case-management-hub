@@ -101,20 +101,15 @@ export function CounterpartyModal({
       setNotification(null);
       setStepAnim(null);
       setCompletedFields({});
-      setAssessment(
-        buildAssessment(
-          counterparty.name,
-          counterparty.inn,
-          "auto",
-          undefined,
-          counterparty.status === "no_risk" ? "positive" : "negative",
-        ),
-      );
+      resetAssessment();
+      void runAssessment(counterparty.name, counterparty.inn, {
+        source: "auto",
+        variant: counterparty.status === "no_risk" ? "positive" : "negative",
+      });
       setAssessmentStatus("pending");
       setAssessmentConfirmedAt(undefined);
       setAssessmentDisagreement(null);
       setAssessmentOpen(false);
-      setAssessmentRunning(false);
       const curStep = nextCollection.find((s) => s.status === "current");
       setHistory(
         curStep
