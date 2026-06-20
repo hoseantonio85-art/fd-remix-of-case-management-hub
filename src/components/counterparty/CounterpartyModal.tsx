@@ -72,8 +72,12 @@ export function CounterpartyModal({
   const [completedFields, setCompletedFields] = useState<CompletedFields>({});
   const [history, setHistory] = useState<DebtHistoryEntry[]>([]);
   const [assessmentOpen, setAssessmentOpen] = useState(false);
-  const [assessment, setAssessment] = useState<Assessment | null>(null);
-  const [assessmentRunning, setAssessmentRunning] = useState(false);
+  const {
+    assessment,
+    loading: assessmentRunning,
+    run: runAssessment,
+    reset: resetAssessment,
+  } = useAssessment();
   const [assessmentStatus, setAssessmentStatus] = useState<AssessmentStatus>("pending");
   const [assessmentConfirmedAt, setAssessmentConfirmedAt] = useState<string | undefined>(undefined);
   const [assessmentDisagreement, setAssessmentDisagreement] = useState<Disagreement | null>(null);
