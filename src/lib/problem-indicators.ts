@@ -1,4 +1,4 @@
-import { AlertTriangle, Scale, FileX, TrendingDown, type LucideIcon } from "lucide-react";
+import { AlertTriangle, Scale, FileX, TrendingDown, type LucideIcon } from "@/shared/ui";
 import type { Counterparty, RiskType } from "@/lib/mock-data";
 import { riskMeta, type RiskMetaItem } from "@/components/counterparty/risk-meta";
 

@@ -8,8 +8,8 @@ import {
   Download,
   AlertTriangle,
   ChevronRight,
-} from "lucide-react";
-import { Button } from "@/components/ui/button";
+} from "@/shared/ui";
+import { Button } from "@/shared/ui";
 import { cn } from "@/lib/utils";
 import { largeModalContentClass } from "@/lib/modal-styles";
 import { AssessmentInfoWidget } from "./AssessmentModal";

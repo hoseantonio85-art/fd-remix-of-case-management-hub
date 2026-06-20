@@ -1,9 +1,9 @@
 import { useRef, useState } from "react";
 import { createPortal } from "react-dom";
-import { Dialog, DialogContent } from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Sparkles, Upload, X, Info, FileText } from "lucide-react";
+import { Dialog, DialogContent } from "@/shared/ui";
+import { Button } from "@/shared/ui";
+import { Input } from "@/shared/ui";
+import { Sparkles, Upload, X, Info, FileText } from "@/shared/ui";
 
 export function RunCheckDialog({
   open,

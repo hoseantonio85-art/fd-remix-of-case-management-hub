@@ -18,7 +18,7 @@ import {
   SlidersHorizontal,
   X,
   ShieldCheck,
-} from "lucide-react";
+} from "@/shared/ui";
 import {
   counterparties,
   type Counterparty,
@@ -35,7 +35,7 @@ import {
   type Disagreement,
 } from "@/components/counterparty/AssessmentModal";
 import { buildAssessment, type Assessment } from "@/lib/assessment-data";
-import { Button } from "@/components/ui/button";
+import { Button } from "@/shared/ui";
 import { ProcessFilterDrawer } from "@/components/counterparty/ProcessFilterDrawer";
 import { processMeta, processOrder } from "@/lib/process-meta";
 import { toast } from "sonner";

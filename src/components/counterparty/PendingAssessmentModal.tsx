@@ -1,8 +1,8 @@
-import { Dialog, DialogContent } from "@/components/ui/dialog";
+import { Dialog, DialogContent } from "@/shared/ui";
 import { largeModalContentClass } from "@/lib/modal-styles";
 import { CounterpartyStatusBadge } from "./CounterpartyStatusBadge";
-import { Clock, X } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { Clock, X } from "@/shared/ui";
+import { Button } from "@/shared/ui";
 import type { Counterparty } from "@/lib/mock-data";
 import { CounterpartyHeaderMeta } from "./CounterpartyHeaderMeta";
 

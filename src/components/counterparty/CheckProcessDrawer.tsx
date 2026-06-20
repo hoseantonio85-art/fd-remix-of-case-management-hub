@@ -1,6 +1,6 @@
 import { useState } from "react";
-import { Sheet, SheetContent } from "@/components/ui/sheet";
-import { CheckCircle2, Loader2, ClipboardList } from "lucide-react";
+import { Sheet, SheetContent } from "@/shared/ui";
+import { CheckCircle2, Loader2, ClipboardList } from "@/shared/ui";
 import { cn } from "@/lib/utils";
 
 export type CheckProcessStatus = "running" | "done";

@@ -1,4 +1,4 @@
-import { MessageSquareWarning } from "lucide-react";
+import { MessageSquareWarning } from "@/shared/ui";
 import { InModalDrawer } from "./InModalDrawer";
 
 export type CommentRecord = {

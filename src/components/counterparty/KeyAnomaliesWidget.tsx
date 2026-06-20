@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { ChevronDown, Info } from "lucide-react";
+import { ChevronDown, Info } from "@/shared/ui";
 import { cn } from "@/lib/utils";
 
 type AnomalySeverity = "block" | "amplify" | "context";

@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { CheckCircle2, ClipboardList, Sparkles } from "lucide-react";
+import { CheckCircle2, ClipboardList, Sparkles } from "@/shared/ui";
 
 export type CheckProcessStatus = "running" | "done";
 

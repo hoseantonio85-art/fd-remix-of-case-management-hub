@@ -8,7 +8,7 @@ import {
   UsersRound,
   LayoutGrid,
   type LucideIcon,
-} from "lucide-react";
+} from "@/shared/ui";
 import type { RiskType } from "@/lib/mock-data";
 
 export type RiskMetaItem = {
