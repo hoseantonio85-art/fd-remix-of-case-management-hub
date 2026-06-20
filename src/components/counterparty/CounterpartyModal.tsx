@@ -370,20 +370,22 @@ export function CounterpartyModal({
       return;
     }
 
+    const doneStep: CollectionSubStep = { ...steps[idx], status: "done", overdue: false };
+    const nextStep: CollectionSubStep = {
+      ...steps[idx + 1],
+      status: "current",
+      startDate: new Date().toLocaleDateString("ru-RU"),
+      sla: steps[idx + 1].sla ?? "7 дней",
+      plannedDate:
+        steps[idx + 1].plannedDate ??
+        new Date(Date.now() + 7 * 86400000).toLocaleDateString("ru-RU"),
+      overdue: false,
+      nextAction: steps[idx + 1].nextAction ?? "Запланировать следующее действие",
+    };
     setSteps((prev) => {
       const arr = [...prev];
-      arr[idx] = { ...arr[idx], status: "done", overdue: false };
-      arr[idx + 1] = {
-        ...arr[idx + 1],
-        status: "current",
-        startDate: new Date().toLocaleDateString("ru-RU"),
-        sla: arr[idx + 1].sla ?? "7 дней",
-        plannedDate:
-          arr[idx + 1].plannedDate ??
-          new Date(Date.now() + 7 * 86400000).toLocaleDateString("ru-RU"),
-        overdue: false,
-        nextAction: arr[idx + 1].nextAction ?? "Запланировать следующее действие",
-      };
+      arr[idx] = doneStep;
+      arr[idx + 1] = nextStep;
       return arr;
     });
     setStepAnim({ direction: "forward", tick: Date.now() });
@@ -393,6 +395,13 @@ export function CounterpartyModal({
       step: next.title,
       user: counterparty?.risks?.[0]?.decision?.responsible ?? "Михайлова Екатерина",
     });
+    // Persist обновлённые этапы; откат при ошибке.
+    Promise.all([persistCollectionStep(doneStep), persistCollectionStep(nextStep)])
+      .then(() => toast.success("Этап переведён"))
+      .catch(() => {
+        setSteps((_prev) => steps);
+        toast.error("Не удалось сохранить переход этапа");
+      });
   };
 
   const rollbackStage = (comment: string) => {
