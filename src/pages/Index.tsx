@@ -22,8 +22,10 @@ import {
 } from "@/shared/ui";
 import type { Counterparty, RiskType, ProcessStage } from "@/domain/counterparty";
 import { getCounterpartyProblemIndicators, type ProblemIndicatorKey } from "@/domain/counterparty";
-import { buildAssessment, type Assessment } from "@/domain/assessment";
+import type { Assessment } from "@/domain/assessment";
 import { useCounterparties } from "@/hooks/useCounterparties";
+import { useChecks } from "@/hooks/useChecks";
+import { useAssessment } from "@/hooks/useAssessment";
 import { CounterpartyModal } from "@/components/counterparty/CounterpartyModal";
 import { CounterpartyStatusBadge } from "@/components/counterparty/CounterpartyStatusBadge";
 import { riskMeta, allChipMeta } from "@/components/counterparty/risk-meta";
