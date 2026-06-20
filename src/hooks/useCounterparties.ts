@@ -36,8 +36,8 @@ export interface UseCounterpartiesResult {
   setSelectedStatuses: (s: Set<Counterparty["status"]>) => void;
   setProcessStage: (s: ProcessStage | null) => void;
   refetch: () => Promise<void>;
-  updateStatusLocally: (inn: string, status: Counterparty["status"]) => void;
-  prepend: (cp: Counterparty) => void;
+  updateStatus: (inn: string, status: Counterparty["status"]) => Promise<void>;
+  add: (cp: Counterparty) => Promise<void>;
 }
 
 export function useCounterparties(): UseCounterpartiesResult {
