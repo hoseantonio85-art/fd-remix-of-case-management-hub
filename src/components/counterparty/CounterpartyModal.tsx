@@ -474,8 +474,11 @@ export function CounterpartyModal({
     const nextStage = stageOrder[Math.min(i + 1, stageOrder.length - 1)] || stageOrder[0];
     const updated: Contract = { ...cur, collectionStage: nextStage };
     setContracts((prev) => prev.map((c) => (c.id === id ? updated : c)));
+    setContractDrawer((prev) => (prev && prev.id === id ? updated : prev));
     void persistContract(updated).catch(() => {
+      // Откат и списка договоров, и открытого drawer одновременно.
       setContracts((prev) => prev.map((c) => (c.id === id ? cur : c)));
+      setContractDrawer((prev) => (prev && prev.id === id ? cur : prev));
       toast.error("Не удалось сохранить этап договора");
     });
   };
