@@ -1,4 +1,4 @@
-import { GripVertical } from "@/shared/ui";
+import { GripVertical } from "lucide-react";
 import { Group, Panel, Separator } from "react-resizable-panels";
 
 import { cn } from "@/lib/utils";
