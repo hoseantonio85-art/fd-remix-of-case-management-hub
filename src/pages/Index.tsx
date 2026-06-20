@@ -346,8 +346,8 @@ export default function Index() {
       setCheckActionId("__run__");
       await runCheckRaw(input);
     } catch (e) {
+      // Один toast на операцию; не пробрасываем дальше — вызов идёт через `void`.
       toast.error(`Не удалось запустить проверку: ${(e as Error).message}`);
-      throw e;
     } finally {
       setCheckActionId(null);
     }
