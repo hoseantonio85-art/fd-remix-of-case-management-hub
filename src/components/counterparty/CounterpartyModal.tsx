@@ -51,9 +51,18 @@ export function CounterpartyModal({
   onOpenChange: (o: boolean) => void;
   onStatusChange?: (inn: string, status: Counterparty["status"]) => void;
 }) {
-  const [risks, setRisks] = useState<RiskSignal[]>([]);
-  const [contracts, setContracts] = useState<Contract[]>([]);
-  const [steps, setSteps] = useState<CollectionSubStep[]>([]);
+  // Состояние карточки (risks/contracts/steps) + персистентные мутации — в hook.
+  const {
+    risks,
+    setRisks,
+    contracts,
+    setContracts,
+    steps,
+    setSteps,
+    persistRisk,
+    persistContract,
+    persistCollectionStep,
+  } = useCounterpartyCard(counterparty, open);
   const [editing, setEditing] = useState<RiskSignal | null>(null);
   const [initialDecision, setInitialDecision] = useState<DecisionKind>("confirm");
   const [drawerOpen, setDrawerOpen] = useState(false);
