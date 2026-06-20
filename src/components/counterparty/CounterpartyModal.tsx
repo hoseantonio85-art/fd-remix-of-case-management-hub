@@ -279,7 +279,7 @@ export function CounterpartyModal({
 
     if (payload.kind === "dismiss") {
       if (prevStatus === "confirmed") {
-        moveCurrentStep(-1);
+        const changedSteps = shiftCurrentStep(-1);
         setStepAnim({ direction: "backward", tick: Date.now() });
         setTimeout(() => {
           setSteps((cur) => {
@@ -293,6 +293,11 @@ export function CounterpartyModal({
             return cur;
           });
         }, 0);
+        if (changedSteps.length > 0) {
+          Promise.all(changedSteps.map((s) => persistCollectionStep(s))).catch(() =>
+            toast.error("Не удалось сохранить откат этапа"),
+          );
+        }
       } else {
         setNotification({
           tone: "info",
@@ -316,7 +321,7 @@ export function CounterpartyModal({
       });
       return;
     }
-    moveCurrentStep(1);
+    const changedConfirm = shiftCurrentStep(1);
     setStepAnim({ direction: "forward", tick: Date.now() });
     setTimeout(() => {
       setSteps((cur) => {
@@ -330,6 +335,11 @@ export function CounterpartyModal({
         return cur;
       });
     }, 0);
+    if (changedConfirm.length > 0) {
+      Promise.all(changedConfirm.map((s) => persistCollectionStep(s))).catch(() =>
+        toast.error("Не удалось сохранить переход этапа"),
+      );
+    }
   };
 
   const pushHistory = (entry: DebtHistoryEntry) => setHistory((prev) => [entry, ...prev]);
