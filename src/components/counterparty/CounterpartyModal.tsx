@@ -98,15 +98,8 @@ export function CounterpartyModal({
 
   useEffect(() => {
     if (counterparty && open) {
-      const nextRisks = Array.isArray(counterparty.risks) ? counterparty.risks : [];
-      const nextContracts = Array.isArray(counterparty.contracts) ? counterparty.contracts : [];
       const nextCollection = Array.isArray(counterparty.collection) ? counterparty.collection : [];
-
-      setRisks(nextRisks.map((r) => ({ ...r })));
-      setContracts(
-        nextContracts.map((c) => ({ ...c, overdueHistory: [...(c.overdueHistory ?? [])] })),
-      );
-      setSteps(nextCollection.map((s) => ({ ...s })));
+      // risks/contracts/steps инициализируются в useCounterpartyCard.
       setStepperError(null);
       setNotification(null);
       setStepAnim(null);
