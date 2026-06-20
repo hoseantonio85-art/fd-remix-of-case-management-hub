@@ -1160,6 +1160,13 @@ export default function Index() {
         disagreement={null}
         defaultInn={assessmentForChecks.assessment?.inn}
         running={assessmentForChecks.loading}
+        error={assessmentForChecks.error}
+        onRetry={() =>
+          void assessmentForChecks.run(`ООО „Альтаир Логистик“`, assessmentForChecks.assessment?.inn ?? "", {
+            source: "auto",
+            variant: "positive",
+          })
+        }
         onConfirm={() => {}}
         onDisagree={() => {}}
         completionMode
