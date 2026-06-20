@@ -173,29 +173,47 @@ export function CounterpartyModal({
 
   if (!counterparty) return null;
 
-  const moveCurrentStep = (delta: 1 | -1) => {
-    setSteps((prev) => {
-      const curIdx = prev.findIndex((s) => s.status === "current");
-      if (curIdx === -1) return prev;
-      const targetIdx = Math.max(0, Math.min(prev.length - 1, curIdx + delta));
-      if (targetIdx === curIdx) return prev;
-      return prev.map((s, i) => {
-        if (i < targetIdx) return { ...s, status: "done" as const, overdue: false };
-        if (i === targetIdx)
-          return {
-            ...s,
-            status: "current" as const,
-            startDate: new Date().toLocaleDateString("ru-RU"),
-            sla: s.sla ?? "7 дней",
-            plannedDate:
-              s.plannedDate ?? new Date(Date.now() + 7 * 86400000).toLocaleDateString("ru-RU"),
-            overdue: false,
-            nextAction: s.nextAction ?? "Запланировать следующее действие",
-          };
-        return { ...s, status: "upcoming" as const };
-      });
+  // Сдвигает текущий этап на delta, возвращает изменённые шаги для persist.
+  const shiftCurrentStep = (delta: 1 | -1): CollectionSubStep[] => {
+    const curIdx = steps.findIndex((s) => s.status === "current");
+    if (curIdx === -1) return [];
+    const targetIdx = Math.max(0, Math.min(steps.length - 1, curIdx + delta));
+    if (targetIdx === curIdx) return [];
+    const changed: CollectionSubStep[] = [];
+    const next = steps.map((s, i) => {
+      if (i < targetIdx) {
+        if (s.status !== "done") {
+          const u = { ...s, status: "done" as const, overdue: false };
+          changed.push(u);
+          return u;
+        }
+        return s;
+      }
+      if (i === targetIdx) {
+        const u: CollectionSubStep = {
+          ...s,
+          status: "current",
+          startDate: new Date().toLocaleDateString("ru-RU"),
+          sla: s.sla ?? "7 дней",
+          plannedDate:
+            s.plannedDate ?? new Date(Date.now() + 7 * 86400000).toLocaleDateString("ru-RU"),
+          overdue: false,
+          nextAction: s.nextAction ?? "Запланировать следующее действие",
+        };
+        changed.push(u);
+        return u;
+      }
+      if (s.status !== "upcoming") {
+        const u = { ...s, status: "upcoming" as const };
+        changed.push(u);
+        return u;
+      }
+      return s;
     });
+    setSteps(next);
+    return changed;
   };
+  const moveCurrentStep = (delta: 1 | -1) => shiftCurrentStep(delta);
 
   const handleSave = (riskId: string, payload: RiskSavePayload) => {
     const prevRisk = risks.find((r) => r.id === riskId);
