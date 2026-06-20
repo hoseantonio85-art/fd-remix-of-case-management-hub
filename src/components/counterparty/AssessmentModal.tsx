@@ -185,7 +185,51 @@ export function AssessmentModal({
     toast("Замечания сохранены");
   };
 
-  if (!assessment) return null;
+  if (!assessment) {
+    if (!open) return null;
+    return (
+      <DialogPrimitive.Root open={open} onOpenChange={onOpenChange}>
+        <DialogPrimitive.Portal>
+          <DialogPrimitive.Overlay className="fixed inset-0 z-50 bg-slate-900/40" />
+          <DialogPrimitive.Content
+            className={cn(
+              largeModalContentClass,
+              "sm:max-w-[calc(100vw-32px)] sm:rounded-3xl flex items-center justify-center",
+            )}
+          >
+            <div className="flex flex-col items-center gap-4 p-10 text-center">
+              {error ? (
+                <>
+                  <AlertTriangle className="h-8 w-8 text-rose-600" />
+                  <div className="text-base font-medium">Не удалось загрузить оценку</div>
+                  <div className="max-w-md text-sm text-muted-foreground">{error.message}</div>
+                  <div className="flex gap-2">
+                    {onRetry && (
+                      <Button size="sm" variant="outline" onClick={onRetry}>
+                        Повторить
+                      </Button>
+                    )}
+                    <Button
+                      size="sm"
+                      variant="ghost"
+                      onClick={() => (onCloseFlow ? onCloseFlow() : onOpenChange(false))}
+                    >
+                      Закрыть
+                    </Button>
+                  </div>
+                </>
+              ) : (
+                <>
+                  <div className="h-8 w-8 animate-spin rounded-full border-2 border-primary/30 border-t-primary" />
+                  <div className="text-sm text-muted-foreground">Готовим оценку контрагента…</div>
+                </>
+              )}
+            </div>
+          </DialogPrimitive.Content>
+        </DialogPrimitive.Portal>
+      </DialogPrimitive.Root>
+    );
+  }
 
   const headerBg = positive
     ? "bg-gradient-to-b from-emerald-50 via-emerald-50/40 to-transparent"
