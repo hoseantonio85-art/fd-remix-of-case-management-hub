@@ -311,6 +311,15 @@ const problemChips: {
 ];
 
 export default function Index() {
+  // Источник истины по контрагентам — через repository / hook.
+  // Loading / error / empty состояния можно открыть в preview через ?state=loading|error|empty.
+  const {
+    data: counterpartiesData,
+    status: dataStatus,
+    error: dataError,
+    refetch,
+  } = useCounterparties();
+
   const [active, setActive] = useState<Counterparty | null>(null);
   const [selectedTiles, setSelectedTiles] = useState<Set<CategoryKey>>(new Set());
   const [riskFilter, setRiskFilter] = useState<RiskChipKey>("all");
@@ -355,21 +364,34 @@ export default function Index() {
   // DRPA update flow
   const [drpaOpen, setDrpaOpen] = useState(false);
   const [drpaConfirmed, setDrpaConfirmed] = useState(false);
-  const [drpaCards, setDrpaCards] = useState<DrpaCardData[]>(() =>
-    counterparties
-      .filter(
-        (c) =>
-          c.status === "overdue" || c.status === "overdue_risk" || (c.overdueAmountNum ?? 0) > 0,
-      )
-      .map((c) => ({
-        counterparty: c,
-        contracts: c.contracts.map((k) => ({ ...k, overdueHistory: [...k.overdueHistory] })),
-        updated: false,
-      })),
-  );
+  const [drpaCards, setDrpaCards] = useState<DrpaCardData[]>([]);
+  // Подтягиваем DRPA-карточки из загруженных контрагентов после первой загрузки.
+  useEffect(() => {
+    if (counterpartiesData.length === 0) return;
+    setDrpaCards((prev) =>
+      prev.length > 0
+        ? prev
+        : counterpartiesData
+            .filter(
+              (c) =>
+                c.status === "overdue" ||
+                c.status === "overdue_risk" ||
+                (c.overdueAmountNum ?? 0) > 0,
+            )
+            .map((c) => ({
+              counterparty: c,
+              contracts: c.contracts.map((k) => ({
+                ...k,
+                overdueHistory: [...k.overdueHistory],
+              })),
+              updated: false,
+            })),
+    );
+  }, [counterpartiesData]);
   const drpaTotal = drpaCards.length;
   const drpaUpdated = drpaCards.filter((c) => c.updated).length;
   const drpaInProgress = drpaUpdated > 0 && !drpaConfirmed;
+
 
   const applyOverride = (c: Counterparty): Counterparty => {
     const override = statusOverrides[c.inn];
