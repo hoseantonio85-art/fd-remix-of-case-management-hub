@@ -1,5 +1,5 @@
 import { useState } from "react";
-import * as DialogPrimitive from "@radix-ui/react-dialog";
+import { DialogPrimitive } from "@/shared/ui";
 import { X, AlertTriangle, ChevronRight } from "@/shared/ui";
 import { Button } from "@/shared/ui";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/shared/ui";

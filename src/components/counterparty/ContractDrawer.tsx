@@ -14,13 +14,7 @@ import {
   Pencil,
   Trash2,
 } from "@/shared/ui";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/shared/ui";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/shared/ui";
 
 const SETTLEMENT_STAGES = [
   "Мониторинг",

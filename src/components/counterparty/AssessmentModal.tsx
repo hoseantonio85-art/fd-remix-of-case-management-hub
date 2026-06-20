@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import * as DialogPrimitive from "@radix-ui/react-dialog";
+import { DialogPrimitive } from "@/shared/ui";
 import { X, ArrowLeft, ChevronRight, AlertTriangle, MessageSquare, Download } from "@/shared/ui";
 import { toast } from "sonner";
 import { NormAssistantIcon } from "./NormAssistantIcon";
