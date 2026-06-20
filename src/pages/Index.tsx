@@ -1114,12 +1114,14 @@ export default function Index() {
           if (!o) setActiveContractCheckId(null);
         }}
         onDelete={() => {
-          if (activeContractCheckId) {
-            void removeCheck(activeContractCheckId);
-          }
+          const id = activeContractCheckId;
           setContractModalOpen(false);
           setActiveContractCheckId(null);
-          toast("Результат проверки удалён");
+          if (id) {
+            removeCheck(id)
+              .then(() => toast("Результат проверки удалён"))
+              .catch(() => {});
+          }
         }}
       />
 
