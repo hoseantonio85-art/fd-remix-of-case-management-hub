@@ -1,103 +1,142 @@
 # MIGRATION_REPORT
 
-Дата: 19.06.2026
-Итерация: подключение корпоративного `@sber-orm/ui-kit` к существующему Lovable-прототипу.
+Дата: 20.06.2026 (вторая часть первой итерации)
+Цель: воспроизводимая сборка после чистого клонирования + перевод продуктового кода на единый shared-слой.
 
-## Что сделано
+## 1. Воспроизводимость репозитория
 
-### 1. Починили локальную установку, build и preview
+**Проблема предыдущего шага.** Alias `@sber-orm/ui-kit` → `vendor/sber-orm-ui-kit/dist/...`,
+но папка `dist` отсутствовала в GitHub (исключена `.gitignore`). После клонирования
+сборка падала: `Cannot find module '@sber-orm/ui-kit'`.
 
-- React был на 19.2 — не совместим с `@sber-orm/ui-kit@0.283.0` (kit заявлен на React 18.3.1
-  и в собственных `dependencies`, не `peerDependencies`). Это гарантировало бы установку
-  второго runtime React.
-- Зафиксировали версии через `overrides` и `resolutions` в `package.json`:
-  - `react@18.3.1`, `react-dom@18.3.1`
-  - `@types/react@18.3.12`, `@types/react-dom@18.3.1`
-- Полная переустановка зависимостей (`rm -rf node_modules bun.lock && bun install`).
-- Проверено: в `node_modules/@types` теперь ровно одна копия `react` (18.3.12),
-  вложенной копии `react@19` внутри `@types/react-dom` больше нет.
+**Решение.** Kit подключён как локальная file-зависимость:
 
-### 2. Подключили UI-kit как внешний пакет `@sber-orm/ui-kit`
+```json
+"@sber-orm/ui-kit": "file:vendor/tarballs/ui-kit-0.283.0.tgz"
+```
 
-- Архив `ui-kit-0.283.0.tgz` распакован в `vendor/sber-orm-ui-kit/`. `dist/` уже собран,
-  поэтому используем его как рабочий entry point — `dist/index.js` и `dist/index.css`.
-- `vite.config.ts`:
-  - alias `@sber-orm/ui-kit` → `vendor/sber-orm-ui-kit/dist/index.js`
-  - alias `@sber-orm/ui-kit/index.css` → соответствующий css
-  - принудительный `dedupe: ["react", "react-dom"]` и alias на `node_modules/react(-dom)`
-  - `optimizeDeps.exclude: ["@sber-orm/ui-kit"]` чтобы Vite не пытался pre-bundle vendor
-  - `server.fs.allow` расширен на корень репозитория для чтения `vendor/`
-- `tsconfig.json`: добавлен path `@sber-orm/ui-kit` → `vendor/sber-orm-ui-kit/dist/index.d.ts`,
-  что даёт типы и автокомплит без публикации пакета.
-- `src/main.tsx`: `import "@sber-orm/ui-kit/index.css"` подключён ДО `./styles.css`,
-  чтобы Tailwind/проектные стили могли точечно переопределять.
+- Тарбол `vendor/tarballs/ui-kit-0.283.0.tgz` хранится в репозитории и не зависит
+  от временного окружения Lovable.
+- В `package.json` тарбола обнулены `dependencies` (внутренние `@v-uik/*` пакеты не
+  публикуются в npm и уже забандлены в `dist/`). Пакет ставится без внешних
+  обращений и без приватного registry.
+- Vite/TS alias на `vendor/sber-orm-ui-kit/dist` удалён — продукт импортирует
+  `@sber-orm/ui-kit` напрямую из `node_modules`.
+- Вспомогательная папка `vendor/sber-orm-ui-kit/` удалена.
 
-### 3. Проверка одного runtime React
+**Vite корректировки**, нужные для kit:
 
-- `find node_modules/@types -type d -name react` возвращает только одну запись.
-- `find node_modules -type d -name react` возвращает только корневую копию.
-- Vite alias дополнительно фиксирует единственный путь резолва.
+- alias `react-dom/server` → `react-dom/server.browser.js`. Kit транзитивно
+  использует `react-dom/server` (через `react-jss`/SSR-ветку темы), node-вариант
+  ломается в браузере ошибкой `Cannot read properties of undefined (reading 'prototype')`.
+- `dedupe: ["react", "react-dom"]` и явный alias на каноничные пути react —
+  защита от двойного runtime (kit имеет `react` в `dependencies`, перенесён в
+  `peerDependencies` при репаке).
 
-### 4. Внешний контракт продуктового кода
-
-- Создан barrel `src/shared/ui/index.ts`, который ре-экспортирует именно те имена,
-  которые перечислены в задаче: `Button, Input, Text, Title, Icon, Checkbox, Switch,
-  Textarea, Badge, Loader, Tooltip, Chips` плюс типы. Это единственный рекомендованный
-  путь импорта для нового кода:
-
-  ```ts
-  import { Button, Icon, Text } from "@/shared/ui";
-  ```
-
-  При переходе на NPM-публикацию kit достаточно изменить один файл.
-
-### 5. Лёгкие фиксы кода ради зелёного lint
-
-- `ComplexAssessmentModal.tsx`, `AssessmentGroupDrawer.tsx`: `useState` вызывался
-  после `if (!x) return null` — нарушение rules-of-hooks. Перенесено наверх.
-- `.prettierignore` и `eslint.config.js` расширены секцией `vendor`, чтобы vendor-код
-  kit не ломал lint/format проекта.
-
-## Что НЕ сделано (осознанно)
-
-| Пункт задания | Статус | Почему |
-| --- | --- | --- |
-| Массовая замена `@/components/ui/{button,input,checkbox,switch,textarea,badge,tooltip}` на kit | НЕ начато | API kit (`variant: primary/secondary/tertiary/ghost/...`, `size: XXS..XL`) не совпадает 1-в-1 с shadcn (`variant: default/destructive/outline/...`, `size: default/sm/lg/icon`, плюс `asChild`). Простая подмена «в лоб» поломает десятки call-site и `cva`-варианты. Нужен отдельный sweep с маппингом per-component и регрессом по экранам. Инфраструктура готова — продуктовые компоненты теперь могут импортировать `@/shared/ui` точечно. |
-| Замена `Select`, `Modal`, `Drawer`, `Sheet`, `Accordion` | НЕ начато | В kit есть `Modal`, `Select`, `Accordion`, но нет прямого `Drawer`/`Sheet`. Текущие модалки/draweры (`InModalDrawer`, кастомные complex-модалки) сильно завязаны на собственную композицию (sticky header, footer, in-modal drawer слайд). Замена требует переработки композиции и отдельной задачи дизайна. |
-| Удаление прямых импортов `lucide-react` и `@/components/ui/*` из продуктового кода | НЕ начато | Используется в ~50+ файлах. Будет сделано вместе с миграцией компонентов выше, чтобы избежать двойной правки. |
-| Изоляция legacy в одном месте | Частично | shadcn-примитивы остаются в `src/components/ui/*`, lucide-иконки — прямо в файлах. Цель «один legacy-слой» достигается переездом на `@/shared/ui` (см. след. шаги). |
-
-## Результаты проверок (фактически выполнены)
+**Проверка чистого клона.** Выполнено `rm -rf node_modules bun.lock && bun install`:
 
 | Команда | Результат |
 | --- | --- |
-| `bun install` | OK, 334 пакета, единый React 18.3.1 |
-| `bun run build` | ✓ built in 3.63s, 571 kB JS / 294 kB CSS (kit CSS подключён) |
+| `bun install` (с нуля) | OK, 335 пакетов, kit подтягивается из vendored tgz |
+| `bun run build` | ✓ built in ~5s, 571 kB JS / 294 kB CSS |
 | `bun run lint` | 0 errors, 14 warnings (все warnings — pre-existing, не связаны с миграцией) |
-| `vite dev` (preview) | поднимается auto-restart после `bun install`, доступен на `localhost:8080` |
+| `vite dev` preview | поднимается, runtime-ошибок нет, главный экран рендерится |
 
-## Известные ограничения / блокеры для следующей итерации
+## 2. Перевод продуктового кода на `@/shared/ui`
 
-1. **API mismatch kit ↔ shadcn.** Прежде чем массово менять `Button`/`Input`, нужно
-   зафиксировать таблицу маппинга вариантов и размеров. Без неё пострадает UX.
-2. **`asChild` / `Slot`.** shadcn-компоненты в проекте местами используют `asChild`
-   (composition pattern Radix). У kit-компонентов аналога нет — потребуются ручные
-   обёртки в `src/shared/ui` для соответствующих кейсов.
-3. **Иконки.** Сейчас везде `lucide-react`. У kit свой набор `EIconName` через `<Icon />`.
-   Нужно либо сделать словарь `lucide → EIconName`, либо оставить `lucide-react` как
-   единственный «iconography legacy» и пометить это в архитектурном решении.
-4. **Drawer/Sheet.** В kit нет drop-in замены. Решение по архитектуре drawers нужно
-   обсудить с дизайном (адаптер на основе `Modal` kit vs сохранение текущей реализации).
-5. **CSS-конфликт.** Tailwind v4 и SCSS-токены kit живут параллельно. Пока работает,
-   но в будущем стоит вынести kit-токены в общий source-of-truth.
-6. **`bun-types` отсутствуют** — TS ошибок нет благодаря `skipLibCheck`, но при включении
-   строгого режима всплывут.
+### Структура shared-слоя
 
-## Следующие безопасные шаги (рекомендация)
+```
+src/shared/ui/
+├── index.ts                # единственный публичный barrel
+├── adapters/
+│   └── kit.ts              # обёртки над @sber-orm/ui-kit: Text/Title/Chips/Loader/Icon
+└── legacy/
+    ├── shadcn.ts           # ре-экспорт всех используемых shadcn-примитивов
+    └── icons.ts            # ре-экспорт используемых lucide-иконок
+```
 
-1. Согласовать таблицу маппинга вариантов `Button`/`Input`/`Checkbox` shadcn → kit.
-2. Поштучно (по экранам) переключать импорты на `@/shared/ui`, удаляя shadcn-файлы
-   после полной отвязки.
-3. Параллельно ввести eslint-правило `no-restricted-imports` на `@/components/ui/*`
-   и `lucide-react`, чтобы новый код шёл только через `@/shared/ui`.
-4. Принять решение по `Drawer`/`Sheet` и `Select` (kit vs кастом) до их миграции.
+Продуктовый код импортирует ВСЁ только из `@/shared/ui`. Внутри barrel сам
+решает, что отдать из kit, а что временно — из shadcn/lucide.
+
+### Что мигрировано (импорты)
+
+Bulk-replace по `src/` (без `src/shared/**` и `src/components/ui/**`):
+
+- `lucide-react` → `@/shared/ui` (48 файлов)
+- `@/components/ui/{button,input,checkbox,switch,textarea,badge,tooltip,skeleton,label,separator,dialog,sheet,select,tabs,sonner}` → `@/shared/ui` (~27 файлов)
+- `@radix-ui/react-dialog` (использовался для кастомных модалок) → `@/shared/ui` (`DialogPrimitive`)
+
+После миграции:
+
+```
+$ rg "from \"@/components/ui/" src/ --glob '!src/components/ui/**' --glob '!src/shared/**'
+(пусто)
+
+$ rg "from \"lucide-react\"" src/ --glob '!src/shared/**'
+(пусто)
+
+$ rg "from \"@radix-ui/" src/ --glob '!src/components/ui/**' --glob '!src/shared/**'
+(пусто)
+```
+
+### Что выставляет `@/shared/ui` сейчас
+
+| Имя | Источник | Комментарий |
+| --- | --- | --- |
+| `Button`, `Input`, `Checkbox`, `Switch`, `Textarea`, `Badge`, `Tooltip*`, `Label`, `Separator`, `Skeleton` | shadcn (через legacy) | Кодовая миграция выполнена; визуальный свитч на kit отложен до согласования таблицы вариантов (kit: `primary/secondary/tertiary/ghost`, `XXS..XL` vs shadcn: `default/destructive/outline`, `sm/lg/icon`). До тех пор `Skeleton` фактически играет роль `Loader` для shadcn-кейсов. |
+| `Dialog*`, `Sheet*`, `Select*`, `Tabs*`, `Toaster`, `DialogPrimitive` | shadcn / radix (через legacy) | Композитные компоненты, kit-замена идёт отдельной итерацией (см. п. ниже). |
+| `Text`, `Title`, `Chips`, `Loader`, `Icon`, `EIconName`, `ETitleSize`, `ETextSize` | `@sber-orm/ui-kit` (через adapters) | Базовые «новые» имена для продуктового кода. Можно использовать в новых компонентах без правок call-site в будущем. |
+| Все используемые `lucide`-иконки (`X`, `ChevronDown`, `Trash2`, ...) | `lucide-react` (через legacy/icons) | Маппинг lucide → `EIconName` kit'а не закрыт 1-в-1; до согласованной таблицы — единая точка lucide-иконок. |
+
+### ESLint enforcement
+
+`eslint.config.js` теперь содержит `no-restricted-imports`:
+
+- Запрещены `lucide-react`, `@/components/ui/*`, `@radix-ui/*` во всём проекте.
+- Разрешены только внутри `src/shared/ui/**` и `src/components/ui/**` (legacy-слои).
+- Сообщения на русском поясняют, куда переезжать.
+
+`bun run lint` → 0 errors. Любая попытка импортировать `lucide-react`/shadcn-примитив
+напрямую теперь падает с понятным сообщением.
+
+### Лёгкие фиксы в коде
+
+- `ComplexAssessmentModal.tsx`, `AssessmentGroupDrawer.tsx`: `useState` вызывался
+  после раннего `return null` — нарушение rules-of-hooks. Перенесено наверх (сделано
+  в предыдущем шаге).
+- Прежние правки React 19 → 18.3.1, `overrides`/`resolutions` — без изменений.
+
+## 3. Что НЕ сделано (осознанно)
+
+| Пункт | Статус | Почему |
+| --- | --- | --- |
+| Замена shadcn-импл. `Button/Input/...` на kit с сохранением API через adapters | НЕ начато | Требует согласованной таблицы маппинга вариантов и регресса экранов; на этой итерации кодовая миграция важнее визуальной. Adapters-точка готова (`src/shared/ui/adapters/kit.ts`). |
+| Замена `Select` / `Modal` / `Drawer` / `Sheet` / `Tabs` на kit | НЕ начато | API расходится сильнее всего, требует переработки композиции (sticky header/footer, in-modal drawer, кастомные `DialogPrimitive`-обёртки). Изолированы в `legacy/shadcn.ts`. |
+| Полный переход lucide → kit `<Icon>` | НЕ начато | Нужен явный словарь lucide → `EIconName`. Сейчас всё централизовано в `legacy/icons.ts`; визуально и по API ничего не меняется. |
+
+## 4. Smoke-проверки (фактически выполнены через Playwright)
+
+- Главный экран `/index` рендерится без runtime-ошибок (после фикса `react-dom/server` alias).
+- Сайдбар, header, виджет «Я проанализировал ...», карточки портфеля, список дебиторов, фильтры по признакам, поиск, кнопка «Запустить проверку» — на месте, верстка не сломана.
+
+## 5. Что осталось блокером для следующих итераций
+
+1. Таблица маппинга вариантов **shadcn → kit** для `Button/Input/Checkbox/...`.
+   Без неё нельзя переключить реализацию под `@/shared/ui` без UX-регресса.
+2. Решение по `Drawer/Sheet` (в kit нет drop-in аналога) и по `DialogPrimitive`-кейсам.
+3. Маппинг **lucide → `EIconName`** или явное архитектурное решение оставить
+   `lucide-react` как «iconography legacy».
+4. CSS-конфликт: Tailwind v4 и SCSS-токены kit живут параллельно. Работает, но
+   долгосрочно — единый source-of-truth для дизайн-токенов.
+
+## Файлы изменены
+
+- `package.json` — `@sber-orm/ui-kit` как `file:` зависимость
+- `vendor/tarballs/ui-kit-0.283.0.tgz` — добавлен в репозиторий
+- `vendor/sber-orm-ui-kit/` — удалён
+- `vite.config.ts` — alias на vendor убраны, добавлен `react-dom/server` → browser
+- `tsconfig.json` — path на vendor убран
+- `eslint.config.js` — `no-restricted-imports` для lucide / radix / shadcn
+- `src/shared/ui/{index,adapters/kit,legacy/shadcn,legacy/icons}.ts` — единый shared-слой
+- ~50 файлов в `src/components/counterparty/`, `src/pages/`, `src/lib/` — переключение импортов
