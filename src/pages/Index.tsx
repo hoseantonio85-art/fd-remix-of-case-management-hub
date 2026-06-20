@@ -328,12 +328,38 @@ export default function Index() {
   // Все проверки идут через CheckRepository + useChecks (нет setTimeout в UI).
   const {
     checks: checksDto,
-    runningCount: runningChecks,
-    doneCount: doneChecks,
-    run: runCheck,
-    remove: removeCheck,
+    error: checksError,
+    run: runCheckRaw,
+    remove: removeCheckRaw,
+    retry: retryChecks,
   } = useChecks();
   const checks: CheckRecord[] = checksDto;
+  useEffect(() => {
+    if (checksError) toast.error(`Ошибка проверок: ${checksError.message}`);
+  }, [checksError]);
+  const [checkActionId, setCheckActionId] = useState<string | null>(null);
+  const runCheck = async (input: { inn?: string; fileNames: string[]; type?: "counterparty" | "contract" | "complex" }) => {
+    try {
+      setCheckActionId("__run__");
+      await runCheckRaw(input);
+    } catch (e) {
+      toast.error(`Не удалось запустить проверку: ${(e as Error).message}`);
+    } finally {
+      setCheckActionId(null);
+    }
+  };
+  const removeCheck = async (id: string) => {
+    if (checkActionId === id) return;
+    try {
+      setCheckActionId(id);
+      await removeCheckRaw(id);
+    } catch (e) {
+      toast.error(`Не удалось удалить проверку: ${(e as Error).message}`);
+    } finally {
+      setCheckActionId(null);
+    }
+  };
+  void retryChecks;
 
   // Оценка контрагента строится через assessmentRepository.
   const assessmentForChecks = useAssessment();
