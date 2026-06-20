@@ -9,8 +9,8 @@ import {
   type CriterionStatus,
   groupCounts,
   statusFromPassed,
-  criterionStatusMeta,
 } from "@/domain/assessment";
+import { criterionStatusMeta } from "./assessment-ui";
 import { assessmentCountMeta, type AssessmentCountKind } from "./assessment-count-meta";
 
 export type GroupComment = {
