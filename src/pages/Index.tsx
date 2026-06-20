@@ -21,7 +21,11 @@ import {
   AlertTriangle,
 } from "@/shared/ui";
 import type { Counterparty, RiskType, ProcessStage } from "@/domain/counterparty";
-import { getCounterpartyProblemIndicators, type ProblemIndicatorKey } from "@/domain/counterparty";
+import {
+  getCounterpartyProblemIndicators,
+  searchCounterparties,
+  type ProblemIndicatorKey,
+} from "@/domain/counterparty";
 import type { Assessment } from "@/domain/assessment";
 import { useCounterparties } from "@/hooks/useCounterparties";
 import { useChecks } from "@/hooks/useChecks";
@@ -324,12 +328,42 @@ export default function Index() {
   // Все проверки идут через CheckRepository + useChecks (нет setTimeout в UI).
   const {
     checks: checksDto,
-    runningCount: runningChecks,
-    doneCount: doneChecks,
-    run: runCheck,
-    remove: removeCheck,
+    error: checksError,
+    run: runCheckRaw,
+    remove: removeCheckRaw,
+    retry: retryChecks,
   } = useChecks();
   const checks: CheckRecord[] = checksDto;
+  useEffect(() => {
+    if (checksError) toast.error(`Ошибка проверок: ${checksError.message}`);
+  }, [checksError]);
+  const [checkActionId, setCheckActionId] = useState<string | null>(null);
+  const runCheck = async (input: {
+    inn?: string;
+    fileNames: string[];
+    type?: "counterparty" | "contract" | "complex";
+  }) => {
+    try {
+      setCheckActionId("__run__");
+      await runCheckRaw(input);
+    } catch (e) {
+      toast.error(`Не удалось запустить проверку: ${(e as Error).message}`);
+    } finally {
+      setCheckActionId(null);
+    }
+  };
+  const removeCheck = async (id: string) => {
+    if (checkActionId === id) return;
+    try {
+      setCheckActionId(id);
+      await removeCheckRaw(id);
+    } catch (e) {
+      toast.error(`Не удалось удалить проверку: ${(e as Error).message}`);
+    } finally {
+      setCheckActionId(null);
+    }
+  };
+  void retryChecks;
 
   // Оценка контрагента строится через assessmentRepository.
   const assessmentForChecks = useAssessment();
@@ -525,11 +559,13 @@ export default function Index() {
   }, [riskCounts, riskFilter]);
 
   const filtered = useMemo(() => {
-    if (riskFilter === "all") return byCategory;
-    const chip = problemChips.find((c) => c.key === riskFilter);
-    if (!chip) return byCategory;
-    return byCategory.filter(chip.matches);
-  }, [byCategory, riskFilter]);
+    let list = byCategory;
+    if (riskFilter !== "all") {
+      const chip = problemChips.find((c) => c.key === riskFilter);
+      if (chip) list = list.filter(chip.matches);
+    }
+    return searchCounterparties(list, searchValue);
+  }, [byCategory, riskFilter, searchValue]);
 
   // Donut data:
   //  - 0 selected   → overview (top categories)
@@ -1128,6 +1164,17 @@ export default function Index() {
         disagreement={null}
         defaultInn={assessmentForChecks.assessment?.inn}
         running={assessmentForChecks.loading}
+        error={assessmentForChecks.error}
+        onRetry={() =>
+          void assessmentForChecks.run(
+            `ООО „Альтаир Логистик“`,
+            assessmentForChecks.assessment?.inn ?? "",
+            {
+              source: "auto",
+              variant: "positive",
+            },
+          )
+        }
         onConfirm={() => {}}
         onDisagree={() => {}}
         completionMode

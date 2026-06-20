@@ -85,6 +85,7 @@ export function CounterpartyModal({
   const {
     assessment,
     loading: assessmentRunning,
+    error: assessmentError,
     run: runAssessment,
     reset: resetAssessment,
   } = useAssessment();
@@ -199,13 +200,12 @@ export function CounterpartyModal({
   const handleSave = (riskId: string, payload: RiskSavePayload) => {
     const prevRisk = risks.find((r) => r.id === riskId);
     const prevStatus = prevRisk?.status;
+    if (!prevRisk) return;
 
-    setRisks((prev) =>
-      prev.map((r) => {
-        if (r.id !== riskId) return r;
-        if (payload.kind === "confirm")
-          return {
-            ...r,
+    const updatedRisk: RiskSignal =
+      payload.kind === "confirm"
+        ? {
+            ...prevRisk,
             status: "confirmed",
             decision: {
               date: payload.date,
@@ -215,38 +215,41 @@ export function CounterpartyModal({
             },
             verification: undefined,
             dismissal: undefined,
-          };
-        if (payload.kind === "dismiss")
-          return {
-            ...r,
-            status: "dismissed",
-            dismissal: {
-              date: payload.date,
-              comment: payload.comment,
-              responsible: payload.responsible,
-            },
-            decision: undefined,
-            verification: undefined,
-          };
-        return {
-          ...r,
-          status: "verification",
-          verification: {
-            date: payload.date,
-            plannedDate: payload.plannedDate,
-            comment: payload.comment,
-            responsible: payload.responsible,
-          },
-          decision: undefined,
-          dismissal: undefined,
-        };
-      }),
-    );
+          }
+        : payload.kind === "dismiss"
+          ? {
+              ...prevRisk,
+              status: "dismissed",
+              dismissal: {
+                date: payload.date,
+                comment: payload.comment,
+                responsible: payload.responsible,
+              },
+              decision: undefined,
+              verification: undefined,
+            }
+          : {
+              ...prevRisk,
+              status: "verification",
+              verification: {
+                date: payload.date,
+                plannedDate: payload.plannedDate,
+                comment: payload.comment,
+                responsible: payload.responsible,
+              },
+              decision: undefined,
+              dismissal: undefined,
+            };
 
-    // Персистентная мутация решения по риску.
-    if (prevRisk) {
-      void persistRisk({ ...prevRisk });
-    }
+    setRisks((prev) => prev.map((r) => (r.id === riskId ? updatedRisk : r)));
+
+    // Persist обновлённое решение по риску; откат при ошибке.
+    void persistRisk(updatedRisk)
+      .then(() => toast.success("Решение по риску сохранено"))
+      .catch(() => {
+        setRisks((prev) => prev.map((r) => (r.id === riskId ? prevRisk : r)));
+        toast.error("Не удалось сохранить решение по риску");
+      });
 
     if (payload.kind === "verify") {
       setNotification({
@@ -368,20 +371,22 @@ export function CounterpartyModal({
       return;
     }
 
+    const doneStep: CollectionSubStep = { ...steps[idx], status: "done", overdue: false };
+    const nextStep: CollectionSubStep = {
+      ...steps[idx + 1],
+      status: "current",
+      startDate: new Date().toLocaleDateString("ru-RU"),
+      sla: steps[idx + 1].sla ?? "7 дней",
+      plannedDate:
+        steps[idx + 1].plannedDate ??
+        new Date(Date.now() + 7 * 86400000).toLocaleDateString("ru-RU"),
+      overdue: false,
+      nextAction: steps[idx + 1].nextAction ?? "Запланировать следующее действие",
+    };
     setSteps((prev) => {
       const arr = [...prev];
-      arr[idx] = { ...arr[idx], status: "done", overdue: false };
-      arr[idx + 1] = {
-        ...arr[idx + 1],
-        status: "current",
-        startDate: new Date().toLocaleDateString("ru-RU"),
-        sla: arr[idx + 1].sla ?? "7 дней",
-        plannedDate:
-          arr[idx + 1].plannedDate ??
-          new Date(Date.now() + 7 * 86400000).toLocaleDateString("ru-RU"),
-        overdue: false,
-        nextAction: arr[idx + 1].nextAction ?? "Запланировать следующее действие",
-      };
+      arr[idx] = doneStep;
+      arr[idx + 1] = nextStep;
       return arr;
     });
     setStepAnim({ direction: "forward", tick: Date.now() });
@@ -391,6 +396,13 @@ export function CounterpartyModal({
       step: next.title,
       user: counterparty?.risks?.[0]?.decision?.responsible ?? "Михайлова Екатерина",
     });
+    // Persist обновлённые этапы; откат при ошибке.
+    Promise.all([persistCollectionStep(doneStep), persistCollectionStep(nextStep)])
+      .then(() => toast.success("Этап переведён"))
+      .catch(() => {
+        setSteps((_prev) => steps);
+        toast.error("Не удалось сохранить переход этапа");
+      });
   };
 
   const rollbackStage = (comment: string) => {
@@ -398,17 +410,10 @@ export function CounterpartyModal({
     const idx = steps.findIndex((s) => s.status === "current");
     if (idx <= 0) return;
     const prevStep = steps[idx - 1];
+    const updatedCurrent: CollectionSubStep = { ...steps[idx], status: "upcoming" };
+    const updatedPrev: CollectionSubStep = { ...prevStep, status: "current", overdue: false };
     setSteps((prev) =>
-      prev.map((s, i) => {
-        if (i === idx) return { ...s, status: "upcoming" as const };
-        if (i === idx - 1)
-          return {
-            ...s,
-            status: "current" as const,
-            overdue: false,
-          };
-        return s;
-      }),
+      prev.map((s, i) => (i === idx ? updatedCurrent : i === idx - 1 ? updatedPrev : s)),
     );
     setStepAnim({ direction: "backward", tick: Date.now() });
     pushHistory({
@@ -422,6 +427,12 @@ export function CounterpartyModal({
       tone: "info",
       text: "Этап возвращен. Комментарий сохранен в истории.",
     });
+    Promise.all([persistCollectionStep(updatedCurrent), persistCollectionStep(updatedPrev)]).catch(
+      () => {
+        setSteps((_p) => steps);
+        toast.error("Не удалось сохранить откат этапа");
+      },
+    );
   };
 
   const advanceContractStage = (id: string) => {
@@ -431,16 +442,22 @@ export function CounterpartyModal({
       "Принудительное взыскание",
       "Завершение работы",
     ];
+    let updated: Contract | null = null;
     setContracts((prev) =>
       prev.map((c) => {
         if (c.id !== id) return c;
         const i = stageOrder.indexOf(c.collectionStage ?? "");
-        return {
+        const next: Contract = {
           ...c,
           collectionStage: stageOrder[Math.min(i + 1, stageOrder.length - 1)] || stageOrder[0],
         };
+        updated = next;
+        return next;
       }),
     );
+    if (updated) {
+      void persistContract(updated).catch(() => toast.error("Не удалось сохранить этап договора"));
+    }
   };
 
   const addOverdue = (id: string, record: OverdueRecord) => {
@@ -755,6 +772,13 @@ export function CounterpartyModal({
         disagreement={assessmentDisagreement}
         defaultInn={counterparty.inn}
         running={assessmentRunning}
+        error={assessmentError}
+        onRetry={() =>
+          void runAssessment(counterparty.name, counterparty.inn, {
+            source: "auto",
+            variant: counterparty.status === "no_risk" ? "positive" : "negative",
+          })
+        }
         positive={counterparty.status === "no_risk"}
         onRun={(inn) => {
           void runAssessment(counterparty.name, inn, {
