@@ -737,22 +737,16 @@ export function CounterpartyModal({
         running={assessmentRunning}
         positive={counterparty.status === "no_risk"}
         onRun={(inn) => {
-          setAssessmentRunning(true);
-          setTimeout(() => {
-            setAssessment(
-              buildAssessment(
-                counterparty.name,
-                inn,
-                "manual",
-                undefined,
-                counterparty.status === "no_risk" ? "positive" : "negative",
-              ),
-            );
-            setAssessmentStatus("updated");
-            setAssessmentConfirmedAt(undefined);
-            setAssessmentDisagreement(null);
-            setAssessmentRunning(false);
-          }, 1200);
+          void runAssessment(counterparty.name, inn, {
+            source: "manual",
+            variant: counterparty.status === "no_risk" ? "positive" : "negative",
+          }).then((a) => {
+            if (a) {
+              setAssessmentStatus("updated");
+              setAssessmentConfirmedAt(undefined);
+              setAssessmentDisagreement(null);
+            }
+          });
         }}
         onConfirm={() => {
           setAssessmentStatus("confirmed");
