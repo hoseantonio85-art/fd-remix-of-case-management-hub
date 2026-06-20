@@ -213,7 +213,7 @@ export function CounterpartyModal({
     setSteps(next);
     return changed;
   };
-  const moveCurrentStep = (delta: 1 | -1) => shiftCurrentStep(delta);
+  
 
   const handleSave = (riskId: string, payload: RiskSavePayload) => {
     const prevRisk = risks.find((r) => r.id === riskId);
