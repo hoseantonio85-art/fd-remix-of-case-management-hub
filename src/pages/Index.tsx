@@ -331,7 +331,6 @@ export default function Index() {
     error: checksError,
     run: runCheckRaw,
     remove: removeCheckRaw,
-    retry: retryChecks,
   } = useChecks();
   const checks: CheckRecord[] = checksDto;
   useEffect(() => {
@@ -348,6 +347,7 @@ export default function Index() {
       await runCheckRaw(input);
     } catch (e) {
       toast.error(`Не удалось запустить проверку: ${(e as Error).message}`);
+      throw e;
     } finally {
       setCheckActionId(null);
     }
@@ -359,11 +359,11 @@ export default function Index() {
       await removeCheckRaw(id);
     } catch (e) {
       toast.error(`Не удалось удалить проверку: ${(e as Error).message}`);
+      throw e;
     } finally {
       setCheckActionId(null);
     }
   };
-  void retryChecks;
 
   // Оценка контрагента строится через assessmentRepository.
   const assessmentForChecks = useAssessment();
