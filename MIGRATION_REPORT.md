@@ -351,3 +351,64 @@ UX, визуал и сценарии не менялись.
   на HTTP-репозиторий разумно передавать context внутрь хука.
 - Глобальный mutation-layer (toast/progress политика, in-flight reg)
   всё ещё откладывается до подключения backend.
+
+## Итерация 2.4 — консистентность UI ↔ repository (20.06.2026)
+
+### Что исправлено
+
+1. **Risk + связанные этапы — одна UI-операция.**
+   `CounterpartyModal.handleSave` теперь персистирует риск и изменённые
+   `CollectionSubStep` одним `Promise.all([persistRisk, ...persistCollectionStep])`.
+   `toast.success("Решение по риску сохранено")` показывается только
+   когда успешны ВСЕ вызовы. При ошибке откатываются и `risks`, и `steps`
+   (snapshot `prevSteps` берётся до `shiftCurrentStep`). Два разных
+   toast’а на одну операцию больше не появляются.
+2. **Contract stage rollback включает drawer.** В `advanceContractStage`
+   теперь обновляется и откатывается одновременно `contracts` и
+   `contractDrawer` — раньше при ошибке UI оставлял drawer на новом этапе,
+   а список возвращался на старый. Дублирующая логика обновления drawer
+   в `onAdvanceStage` callback’е удалена.
+3. **`useCounterparties.add/updateStatus` — rollback внутри hook.**
+   - `updateStatus` запоминает текущий `status` контрагента в `setData`
+     functional updater, выполняет repo-вызов и при ошибке возвращает
+     состояние. Локальные `active`/`manualFlowTarget` в `Index`
+     откатываются как раньше.
+   - `add` оптимистично добавляет контрагента, в случае ошибки удаляет
+     его из списка и восстанавливает прежний `LoadStatus`
+     (важно для `empty → success → empty`).
+4. **`useAssessment` очищает старый результат.** На каждом `run()`
+   `assessment` сбрасывается в `null` до запроса; ошибка тоже обнуляет
+   результат. Повторный сбой больше не оставляет старую оценку
+   как «актуальную»; UI показывает loading/error поверх пустого state.
+5. **Checks — один способ показа ошибки.**
+   - Удалён `useEffect`, который дублировал toast по `checksError`.
+   - `runCheck` в Index больше не пробрасывает ошибку (вызывается через
+     `void` из `RunCheckDialog`); один `toast.error` показывается
+     внутри catch. `removeCheck` сохранил `throw`, т.к. вызывается
+     с `.catch(()=>{})` и rethrow безопасен.
+   - Unhandled promise rejection в `void runCheck(...)` устранён.
+
+### Проверки
+
+| Команда / сценарий | Результат |
+| --- | --- |
+| `bun run build` | ✓ 4.16s, 580.40 kB JS / 293.98 kB CSS |
+| `bun run lint` | 0 errors, 14 warnings (pre-existing) |
+| Risk save (mock OK) | один success toast после persist всех записей |
+| Risk save (имитация ошибки persist) | rollback и risks, и steps; один error toast |
+| Contract advance (ошибка repo) | rollback contracts + contractDrawer одновременно |
+| `updateStatus` (ошибка repo) | data в hook возвращается к прежнему статусу |
+| `add` (ошибка repo) | контрагент исчезает из списка, status восстановлен |
+| Assessment retry → ошибка | старая `assessment` очищена, виден error block |
+| `runCheck` (ошибка repo) | один toast, нет unhandled rejection |
+
+### Остаточный долг
+
+- `useAssessment.run` каждый раз дёргает repository заново; кэш
+  результатов и in-flight dedup — задача HTTP-слоя.
+- `useCounterparties.add` не откатывается частично, если параллельно
+  пришёл рефетч из repo с тем же `inn`; конкурентные мутации
+  будут сериализоваться вместе с HTTP-репозиторием.
+- Для прочих мутаций (notification copy, animations) toast/rollback
+  политика всё ещё дублируется покомпонентно — общий `useMutation`
+  откладывается до интеграции с backend.
