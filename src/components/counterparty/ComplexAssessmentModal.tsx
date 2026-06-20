@@ -5,7 +5,7 @@ import { Button } from "@/shared/ui";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/shared/ui";
 import { cn } from "@/lib/utils";
 import { largeModalContentClass } from "@/lib/modal-styles";
-import { type Assessment, type AssessmentGroup, MAIN_GROUP_IDS } from "@/lib/assessment-data";
+import { type Assessment, type AssessmentGroup, MAIN_GROUP_IDS } from "@/domain/assessment";
 import { GroupCard, AssessmentInfoWidget } from "./AssessmentModal";
 import {
   LEVEL_ORDER,

@@ -1,5 +1,5 @@
 import { Eye, ShieldAlert, Scale, Archive, type LucideIcon } from "@/shared/ui";
-import type { ProcessStage } from "./mock-data";
+import type { ProcessStage } from "@/domain/counterparty";
 
 type CategoryKey = "risk" | "overdue_risk" | "no_risk" | "overdue";
 

@@ -3,7 +3,7 @@ import { largeModalContentClass } from "@/lib/modal-styles";
 import { CounterpartyStatusBadge } from "./CounterpartyStatusBadge";
 import { Clock, X } from "@/shared/ui";
 import { Button } from "@/shared/ui";
-import type { Counterparty } from "@/lib/mock-data";
+import type { Counterparty } from "@/domain/counterparty";
 import { CounterpartyHeaderMeta } from "./CounterpartyHeaderMeta";
 
 export function PendingAssessmentModal({

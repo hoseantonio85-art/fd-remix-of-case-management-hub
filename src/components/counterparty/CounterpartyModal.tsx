@@ -13,7 +13,7 @@ import type {
   RiskSignal,
   CollectionSubStep,
   OverdueRecord,
-} from "@/lib/mock-data";
+} from "@/domain/counterparty";
 import { RiskDrawer, type DecisionKind, type RiskSavePayload } from "./RiskDrawer";
 import { ContractDrawer } from "./ContractDrawer";
 
@@ -28,7 +28,7 @@ import { CounterpartyStatusBadge } from "./CounterpartyStatusBadge";
 import { getCounterpartyProblemIndicators, problemIndicatorMeta } from "@/lib/problem-indicators";
 import { ResolutionCard } from "./ResolutionCard";
 import { AssessmentModal, type AssessmentStatus, type Disagreement } from "./AssessmentModal";
-import { buildAssessment, type Assessment } from "@/lib/assessment-data";
+import { buildAssessment, type Assessment } from "@/domain/assessment";
 import { defaultOgrn, defaultRegistrationInfo } from "./RegistrationInfoWidget";
 import { RegistrationInfoDrawer } from "./RegistrationInfoDrawer";
 import { AddContractDrawer } from "./AddContractDrawer";

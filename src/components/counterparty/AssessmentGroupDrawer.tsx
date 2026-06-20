@@ -10,7 +10,7 @@ import {
   groupCounts,
   statusFromPassed,
   criterionStatusMeta,
-} from "@/lib/assessment-data";
+} from "@/domain/assessment";
 import { assessmentCountMeta, type AssessmentCountKind } from "./assessment-count-meta";
 
 export type GroupComment = {
