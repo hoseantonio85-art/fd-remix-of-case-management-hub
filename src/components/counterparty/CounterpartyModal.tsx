@@ -463,57 +463,42 @@ export function CounterpartyModal({
     );
   };
 
+  const stageOrder = [
+    "Досудебное урегулирование",
+    "Судебная работа",
+    "Принудительное взыскание",
+    "Завершение работы",
+  ];
+
   const advanceContractStage = (id: string) => {
-    const stageOrder = [
-      "Досудебное урегулирование",
-      "Судебная работа",
-      "Принудительное взыскание",
-      "Завершение работы",
-    ];
-    let updated: Contract | null = null;
-    setContracts((prev) =>
-      prev.map((c) => {
-        if (c.id !== id) return c;
-        const i = stageOrder.indexOf(c.collectionStage ?? "");
-        const next: Contract = {
-          ...c,
-          collectionStage: stageOrder[Math.min(i + 1, stageOrder.length - 1)] || stageOrder[0],
-        };
-        updated = next;
-        return next;
-      }),
-    );
-    if (updated) {
-      void persistContract(updated).catch(() => toast.error("Не удалось сохранить этап договора"));
-    }
+    const cur = contracts.find((c) => c.id === id);
+    if (!cur) return;
+    const i = stageOrder.indexOf(cur.collectionStage ?? "");
+    const nextStage = stageOrder[Math.min(i + 1, stageOrder.length - 1)] || stageOrder[0];
+    const updated: Contract = { ...cur, collectionStage: nextStage };
+    setContracts((prev) => prev.map((c) => (c.id === id ? updated : c)));
+    void persistContract(updated).catch(() => {
+      setContracts((prev) => prev.map((c) => (c.id === id ? cur : c)));
+      toast.error("Не удалось сохранить этап договора");
+    });
   };
 
   const addOverdue = (id: string, record: OverdueRecord) => {
-    let nextContract: Contract | null = null;
-    setContracts((prev) =>
-      prev.map((c) => {
-        if (c.id !== id) return c;
-        const updated: Contract = {
-          ...c,
-          overdue: toFiniteNumber(c.overdue) + toFiniteNumber(record.amount),
-          overdueDays: Math.max(toFiniteNumber(c.overdueDays), toFiniteNumber(record.days)),
-          overdueHistory: [record, ...(c.overdueHistory ?? [])],
-        };
-        nextContract = updated;
-        return updated;
-      }),
-    );
-    setContractDrawer((prev) =>
-      prev && prev.id === id
-        ? {
-            ...prev,
-            overdue: toFiniteNumber(prev.overdue) + toFiniteNumber(record.amount),
-            overdueDays: Math.max(toFiniteNumber(prev.overdueDays), toFiniteNumber(record.days)),
-            overdueHistory: [record, ...(prev.overdueHistory ?? [])],
-          }
-        : prev,
-    );
-    if (nextContract) void persistContract(nextContract);
+    const cur = contracts.find((c) => c.id === id);
+    if (!cur) return;
+    const updated: Contract = {
+      ...cur,
+      overdue: toFiniteNumber(cur.overdue) + toFiniteNumber(record.amount),
+      overdueDays: Math.max(toFiniteNumber(cur.overdueDays), toFiniteNumber(record.days)),
+      overdueHistory: [record, ...(cur.overdueHistory ?? [])],
+    };
+    setContracts((prev) => prev.map((c) => (c.id === id ? updated : c)));
+    setContractDrawer((prev) => (prev && prev.id === id ? updated : prev));
+    void persistContract(updated).catch(() => {
+      setContracts((prev) => prev.map((c) => (c.id === id ? cur : c)));
+      setContractDrawer((prev) => (prev && prev.id === id ? cur : prev));
+      toast.error("Не удалось сохранить просрочку по договору");
+    });
   };
 
   const problemIndicators = getCounterpartyProblemIndicators(counterparty)
