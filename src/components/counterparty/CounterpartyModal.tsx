@@ -725,7 +725,14 @@ export function CounterpartyModal({
             });
           }}
           onUpdateContract={(id, patch) => {
-            setContracts((prev) => prev.map((c) => (c.id === id ? { ...c, ...patch } : c)));
+            setContracts((prev) =>
+              prev.map((c) => {
+                if (c.id !== id) return c;
+                const updated = { ...c, ...patch };
+                void persistContract(updated);
+                return updated;
+              }),
+            );
             setContractDrawer((prev) => (prev && prev.id === id ? { ...prev, ...patch } : prev));
           }}
         />
