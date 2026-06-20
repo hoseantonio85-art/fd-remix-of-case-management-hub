@@ -1005,19 +1005,11 @@ export default function Index() {
           const hasFiles = files.length > 0;
           const recordType: "counterparty" | "contract" | "complex" =
             hasInn && hasFiles ? "complex" : hasInn ? "counterparty" : "contract";
-          const id = `check-${inn || "contract"}-${Date.now()}`;
-          const rec: CheckRecord = {
-            id,
+          void runCheck({
             inn: inn || undefined,
             fileNames: files.map((f) => f.name),
-            status: "running",
-            createdAt: Date.now(),
             type: recordType,
-          };
-          setChecks((prev) => [rec, ...prev]);
-          window.setTimeout(() => {
-            setChecks((prev) => prev.map((c) => (c.id === id ? { ...c, status: "done" } : c)));
-          }, 5000);
+          });
         }}
       />
 
@@ -1040,11 +1032,13 @@ export default function Index() {
           const recordType =
             c.type ?? (hasInn && hasFiles ? "complex" : hasInn ? "counterparty" : "contract");
           if (recordType === "complex") {
-            const a = buildAssessment(`ООО „Альтаир Логистик“`, c.inn ?? "", "auto");
             setActiveComplexCheckId(c.id);
-            setComplexAssessment(a);
             setCheckDrawerOpen(false);
             setComplexModalOpen(true);
+            void assessmentForComplex.run(`ООО „Альтаир Логистик“`, c.inn ?? "", {
+              source: "auto",
+              variant: "positive",
+            });
             return;
           }
           if (recordType === "contract") {
@@ -1053,11 +1047,13 @@ export default function Index() {
             setContractModalOpen(true);
             return;
           }
-          const a = buildAssessment(`ООО „Альтаир Логистик“`, c.inn ?? "", "auto");
           setActiveCheckId(c.id);
-          setCheckAssessment(a);
           setCheckDrawerOpen(false);
           setCheckAssessmentOpen(true);
+          void assessmentForChecks.run(`ООО „Альтаир Логистик“`, c.inn ?? "", {
+            source: "auto",
+            variant: "positive",
+          });
         }}
       />
 
@@ -1069,7 +1065,7 @@ export default function Index() {
         }}
         onDelete={() => {
           if (activeContractCheckId) {
-            setChecks((prev) => prev.filter((c) => c.id !== activeContractCheckId));
+            void removeCheck(activeContractCheckId);
           }
           setContractModalOpen(false);
           setActiveContractCheckId(null);
@@ -1078,23 +1074,23 @@ export default function Index() {
       />
 
       <ComplexAssessmentModal
-        assessment={complexAssessment}
+        assessment={assessmentForComplex.assessment}
         open={complexModalOpen}
         onOpenChange={(o) => {
           setComplexModalOpen(o);
           if (!o) {
             setActiveComplexCheckId(null);
-            setComplexAssessment(null);
+            assessmentForComplex.reset();
           }
         }}
         positive
         onDelete={() => {
           if (activeComplexCheckId) {
-            setChecks((prev) => prev.filter((c) => c.id !== activeComplexCheckId));
+            void removeCheck(activeComplexCheckId);
           }
           setComplexModalOpen(false);
           setActiveComplexCheckId(null);
-          setComplexAssessment(null);
+          assessmentForComplex.reset();
           toast("Результат проверки удалён");
         }}
         onAddToList={() => {
@@ -1110,40 +1106,39 @@ export default function Index() {
             tag: "Нет риска",
             status: "no_risk",
           };
-          setAddedCounterparties((prev) =>
-            prev.some((c) => c.inn === cp.inn) ? prev : [cp, ...prev],
-          );
-          setChecks((prev) => prev.filter((c) => c.id !== check.id));
+          void addCounterparty(cp);
+          void removeCheck(check.id);
           setComplexModalOpen(false);
           setActiveComplexCheckId(null);
-          setComplexAssessment(null);
+          assessmentForComplex.reset();
           toast.success("Контрагент добавлен в список дебиторов");
         }}
       />
 
       <AssessmentModal
-        assessment={checkAssessment}
+        assessment={assessmentForChecks.assessment}
         open={checkAssessmentOpen}
         onOpenChange={(o) => {
           setCheckAssessmentOpen(o);
           if (!o) {
-            setCheckAssessment(null);
+            assessmentForChecks.reset();
             setActiveCheckId(null);
           }
         }}
         status="updated"
         disagreement={null}
-        defaultInn={checkAssessment?.inn}
+        defaultInn={assessmentForChecks.assessment?.inn}
+        running={assessmentForChecks.loading}
         onConfirm={() => {}}
         onDisagree={() => {}}
         completionMode
         positive
         onDeleteResult={() => {
           if (activeCheckId) {
-            setChecks((prev) => prev.filter((c) => c.id !== activeCheckId));
+            void removeCheck(activeCheckId);
           }
           setCheckAssessmentOpen(false);
-          setCheckAssessment(null);
+          assessmentForChecks.reset();
           setActiveCheckId(null);
           toast("Результат проверки удалён");
         }}
@@ -1157,16 +1152,15 @@ export default function Index() {
             tag: "Нет риска",
             status: "no_risk",
           };
-          setAddedCounterparties((prev) =>
-            prev.some((c) => c.inn === cp.inn) ? prev : [cp, ...prev],
-          );
-          setChecks((prev) => prev.filter((c) => c.id !== check.id));
+          void addCounterparty(cp);
+          void removeCheck(check.id);
           setCheckAssessmentOpen(false);
-          setCheckAssessment(null);
+          assessmentForChecks.reset();
           setActiveCheckId(null);
           toast.success("Контрагент добавлен в список дебиторов");
         }}
       />
+
 
       <AssessmentModal
         assessment={manualAssessment}
