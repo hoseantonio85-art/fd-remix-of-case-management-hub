@@ -113,12 +113,7 @@ const legalReputation: AssessmentGroup = {
   ],
 };
 
-export const defaultGroups: AssessmentGroup[] = [
-  legalStatus,
-  management,
-  finance,
-  legalReputation,
-];
+export const defaultGroups: AssessmentGroup[] = [legalStatus, management, finance, legalReputation];
 
 export const MAIN_GROUP_IDS: AssessmentGroupId[] = [
   "legal_status",

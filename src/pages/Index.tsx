@@ -21,10 +21,7 @@ import {
   AlertTriangle,
 } from "@/shared/ui";
 import type { Counterparty, RiskType, ProcessStage } from "@/domain/counterparty";
-import {
-  getCounterpartyProblemIndicators,
-  type ProblemIndicatorKey,
-} from "@/domain/counterparty";
+import { getCounterpartyProblemIndicators, type ProblemIndicatorKey } from "@/domain/counterparty";
 import { buildAssessment, type Assessment } from "@/domain/assessment";
 import { useCounterparties } from "@/hooks/useCounterparties";
 import { CounterpartyModal } from "@/components/counterparty/CounterpartyModal";
@@ -391,7 +388,6 @@ export default function Index() {
   const drpaTotal = drpaCards.length;
   const drpaUpdated = drpaCards.filter((c) => c.updated).length;
   const drpaInProgress = drpaUpdated > 0 && !drpaConfirmed;
-
 
   const applyOverride = (c: Counterparty): Counterparty => {
     const override = statusOverrides[c.inn];
@@ -882,15 +878,13 @@ export default function Index() {
                   </Button>
                 </div>
               )}
-              {dataStatus !== "loading" &&
-                dataStatus !== "error" &&
-                filtered.length === 0 && (
-                  <div className="rounded-2xl border border-border bg-white p-8 text-center text-sm text-muted-foreground">
-                    {dataStatus === "empty"
-                      ? "Список контрагентов пуст"
-                      : "Нет дебиторов в этой категории"}
-                  </div>
-                )}
+              {dataStatus !== "loading" && dataStatus !== "error" && filtered.length === 0 && (
+                <div className="rounded-2xl border border-border bg-white p-8 text-center text-sm text-muted-foreground">
+                  {dataStatus === "empty"
+                    ? "Список контрагентов пуст"
+                    : "Нет дебиторов в этой категории"}
+                </div>
+              )}
 
               {filtered.map((c) => {
                 const isPending = c.tag === "На оценке";

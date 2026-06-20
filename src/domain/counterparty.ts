@@ -189,9 +189,7 @@ export type ProblemIndicatorKey =
   | "group_contract_nonperformance"
   | "negative_factors";
 
-export function getCounterpartyProblemIndicators(
-  c?: Counterparty | null,
-): ProblemIndicatorKey[] {
+export function getCounterpartyProblemIndicators(c?: Counterparty | null): ProblemIndicatorKey[] {
   if (!c || !Array.isArray(c.risks)) return [];
   if (c.status === "no_risk") return [];
   const result: ProblemIndicatorKey[] = [];
@@ -207,7 +205,5 @@ export function getCounterpartyProblemIndicators(
 export function searchCounterparties(list: Counterparty[], query: string): Counterparty[] {
   const q = query.trim().toLowerCase();
   if (!q) return list;
-  return list.filter(
-    (c) => c.name.toLowerCase().includes(q) || c.inn.toLowerCase().includes(q),
-  );
+  return list.filter((c) => c.name.toLowerCase().includes(q) || c.inn.toLowerCase().includes(q));
 }

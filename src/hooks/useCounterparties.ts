@@ -88,21 +88,16 @@ export function useCounterparties(): UseCounterpartiesResult {
       list = list.filter((c) => c.processStage === filters.processStage);
     }
     if (filters.selectedStatuses.size > 0) {
-      list = list.filter(
-        (c) => c.tag !== "На оценке" && filters.selectedStatuses.has(c.status),
-      );
+      list = list.filter((c) => c.tag !== "На оценке" && filters.selectedStatuses.has(c.status));
     }
     list = searchCounterparties(list, filters.query);
     return list;
   }, [data, filters]);
 
-  const updateStatusLocally = useCallback(
-    (inn: string, st: Counterparty["status"]) => {
-      setData((prev) => prev.map((c) => (c.inn === inn ? { ...c, status: st } : c)));
-      void counterpartyRepository.updateStatus(inn, st);
-    },
-    [],
-  );
+  const updateStatusLocally = useCallback((inn: string, st: Counterparty["status"]) => {
+    setData((prev) => prev.map((c) => (c.inn === inn ? { ...c, status: st } : c)));
+    void counterpartyRepository.updateStatus(inn, st);
+  }, []);
 
   const prepend = useCallback((cp: Counterparty) => {
     setData((prev) => (prev.some((c) => c.inn === cp.inn) ? prev : [cp, ...prev]));
