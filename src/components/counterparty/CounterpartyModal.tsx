@@ -738,18 +738,7 @@ export function CounterpartyModal({
           open={!!contractDrawer}
           onOpenChange={(o) => !o && setContractDrawer(null)}
           onAddOverdue={addOverdue}
-          onAdvanceStage={(id) => {
-            advanceContractStage(id);
-            setContractDrawer((prev) => {
-              if (!prev || prev.id !== id) return prev;
-              const i = stageOrder.indexOf(prev.collectionStage ?? "");
-              return {
-                ...prev,
-                collectionStage:
-                  stageOrder[Math.min(i + 1, stageOrder.length - 1)] || stageOrder[0],
-              };
-            });
-          }}
+          onAdvanceStage={(id) => advanceContractStage(id)}
           onUpdateContract={(id, patch) => {
             const cur = contracts.find((c) => c.id === id);
             if (!cur) return;
