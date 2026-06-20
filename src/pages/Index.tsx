@@ -21,7 +21,11 @@ import {
   AlertTriangle,
 } from "@/shared/ui";
 import type { Counterparty, RiskType, ProcessStage } from "@/domain/counterparty";
-import { getCounterpartyProblemIndicators, type ProblemIndicatorKey } from "@/domain/counterparty";
+import {
+  getCounterpartyProblemIndicators,
+  searchCounterparties,
+  type ProblemIndicatorKey,
+} from "@/domain/counterparty";
 import type { Assessment } from "@/domain/assessment";
 import { useCounterparties } from "@/hooks/useCounterparties";
 import { useChecks } from "@/hooks/useChecks";
