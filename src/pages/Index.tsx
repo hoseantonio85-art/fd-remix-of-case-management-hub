@@ -399,12 +399,12 @@ export default function Index() {
   };
 
   const allCounterparties = useMemo(
-    () => [...addedCounterparties, ...counterparties].map(applyOverride),
+    () => [...addedCounterparties, ...counterpartiesData].map(applyOverride),
     [addedCounterparties, statusOverrides],
   );
 
   const handleStatusChange = (inn: string, status: Counterparty["status"]) => {
-    const base = [...addedCounterparties, ...counterparties].find((c) => c.inn === inn);
+    const base = [...addedCounterparties, ...counterpartiesData].find((c) => c.inn === inn);
     const current = statusOverrides[inn] ?? base?.status;
     if (current && current !== status) {
       setStatusChanges((prev) => ({ ...prev, [inn]: { from: current, to: status } }));
