@@ -436,14 +436,22 @@ export default function Index() {
   const drpaUpdated = drpaCards.filter((c) => c.updated).length;
   const drpaInProgress = drpaUpdated > 0 && !drpaConfirmed;
 
-  const handleStatusChange = (inn: string, status: Counterparty["status"]) => {
+  const handleStatusChange = async (inn: string, status: Counterparty["status"]) => {
     const current = allCounterparties.find((c) => c.inn === inn)?.status;
-    if (current && current !== status) {
-      setStatusChanges((prev) => ({ ...prev, [inn]: { from: current, to: status } }));
-    }
-    void updateStatus(inn, status);
     setActive((prev) => (prev && prev.inn === inn ? { ...prev, status } : prev));
     setManualFlowTarget((prev) => (prev && prev.inn === inn ? { ...prev, status } : prev));
+    try {
+      await updateStatus(inn, status);
+      if (current && current !== status) {
+        setStatusChanges((prev) => ({ ...prev, [inn]: { from: current, to: status } }));
+      }
+    } catch (e) {
+      setActive((prev) => (prev && prev.inn === inn && current ? { ...prev, status: current } : prev));
+      setManualFlowTarget((prev) =>
+        prev && prev.inn === inn && current ? { ...prev, status: current } : prev,
+      );
+      toast.error(`Не удалось изменить статус: ${(e as Error).message}`);
+    }
   };
 
   const categoryLabel: Record<CategoryKey, string> = {
