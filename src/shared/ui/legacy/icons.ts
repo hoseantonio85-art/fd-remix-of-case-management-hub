@@ -5,13 +5,19 @@
  * (`EIconName`). Маппинг lucide → kit icons не закрыт 1-в-1, поэтому до
  * согласованной таблицы маппинга все иконки идут через этот файл.
  *
- * Прямые импорты `lucide-react` в продуктовом коде запрещены ESLint-правилом.
+ * Прямые импорты `lucide-react` в продуктовом коде запрещены ESLint-правилом
+ * `no-restricted-imports`. Новые иконки добавляются ТОЛЬКО сюда.
  */
 export {
   AlertTriangle,
   Archive,
   ArrowLeft,
   ArrowRight,
+  ArrowUp,
+  Ban,
+  BarChart3,
+  Bot,
+  CalendarClock,
   Check,
   CheckCircle2,
   ChevronDown,
@@ -29,9 +35,15 @@ export {
   FileClock,
   FileText,
   FileX,
+  Flame,
+  Gauge,
+  GraduationCap,
   GripVertical,
+  Headphones,
   History,
+  Home,
   Info,
+  LayoutGrid,
   Loader2,
   MessageSquare,
   MessageSquareWarning,
@@ -39,16 +51,23 @@ export {
   MinusCircle,
   MoreHorizontal,
   PanelLeft,
+  Paperclip,
   Pencil,
   Plus,
   RotateCw,
   Scale,
   Search,
+  Shield,
   ShieldAlert,
   ShieldCheck,
+  SlidersHorizontal,
   Sparkles,
+  Trash2,
   TrendingDown,
   Upload,
+  UserCog,
+  Users,
+  UsersRound,
   X,
 } from "lucide-react";
 export type { LucideIcon } from "lucide-react";
