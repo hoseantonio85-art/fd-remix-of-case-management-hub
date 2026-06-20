@@ -16,7 +16,7 @@ import {
   sumGroupCounts,
   MAIN_GROUP_IDS,
   OTHER_GROUP_IDS,
-} from "@/lib/assessment-data";
+} from "@/domain/assessment";
 import { ChevronDown } from "@/shared/ui";
 import { AssessmentGroupDrawer, type GroupComment } from "./AssessmentGroupDrawer";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/shared/ui";

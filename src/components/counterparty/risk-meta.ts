@@ -9,7 +9,7 @@ import {
   LayoutGrid,
   type LucideIcon,
 } from "@/shared/ui";
-import type { RiskType } from "@/lib/mock-data";
+import type { RiskType } from "@/domain/counterparty";
 
 export type RiskMetaItem = {
   icon: LucideIcon;

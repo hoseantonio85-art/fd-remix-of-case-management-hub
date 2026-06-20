@@ -9,7 +9,7 @@ import {
   Clock,
   History as HistoryIcon,
 } from "@/shared/ui";
-import type { CollectionSubStep } from "@/lib/mock-data";
+import type { CollectionSubStep } from "@/domain/counterparty";
 import { InModalDrawer } from "./InModalDrawer";
 import type { StepAnim } from "./DebtSummaryCard";
 import {

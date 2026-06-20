@@ -24,7 +24,7 @@ const SETTLEMENT_STAGES = [
   "Сопровождение банкротства",
   "Сопровождение ликвидации",
 ] as const;
-import type { Contract, OverdueRecord } from "@/lib/mock-data";
+import type { Contract, OverdueRecord } from "@/domain/counterparty";
 import { toneStyles } from "./header-theme";
 import { InModalDrawer } from "./InModalDrawer";
 import {

@@ -1,5 +1,5 @@
 import { AlertTriangle, Info } from "@/shared/ui";
-import type { CollectionSubStep } from "@/lib/mock-data";
+import type { CollectionSubStep } from "@/domain/counterparty";
 
 export type StepAnim = { direction: "forward" | "backward"; tick: number } | null;
 

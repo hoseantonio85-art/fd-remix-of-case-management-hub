@@ -18,23 +18,21 @@ import {
   SlidersHorizontal,
   X,
   ShieldCheck,
+  AlertTriangle,
 } from "@/shared/ui";
-import {
-  counterparties,
-  type Counterparty,
-  type RiskType,
-  type ProcessStage,
-} from "@/lib/mock-data";
+import type { Counterparty, RiskType, ProcessStage } from "@/domain/counterparty";
+import { getCounterpartyProblemIndicators, type ProblemIndicatorKey } from "@/domain/counterparty";
+import { buildAssessment, type Assessment } from "@/domain/assessment";
+import { useCounterparties } from "@/hooks/useCounterparties";
 import { CounterpartyModal } from "@/components/counterparty/CounterpartyModal";
 import { CounterpartyStatusBadge } from "@/components/counterparty/CounterpartyStatusBadge";
 import { riskMeta, allChipMeta } from "@/components/counterparty/risk-meta";
-import { getCounterpartyProblemIndicators, problemIndicatorMeta } from "@/lib/problem-indicators";
+import { problemIndicatorMeta } from "@/lib/problem-indicators";
 import {
   AssessmentModal,
   type AssessmentStatus,
   type Disagreement,
 } from "@/components/counterparty/AssessmentModal";
-import { buildAssessment, type Assessment } from "@/lib/assessment-data";
 import { Button } from "@/shared/ui";
 import { ProcessFilterDrawer } from "@/components/counterparty/ProcessFilterDrawer";
 import { processMeta, processOrder } from "@/lib/process-meta";
@@ -310,6 +308,15 @@ const problemChips: {
 ];
 
 export default function Index() {
+  // Источник истины по контрагентам — через repository / hook.
+  // Loading / error / empty состояния можно открыть в preview через ?state=loading|error|empty.
+  const {
+    data: counterpartiesData,
+    status: dataStatus,
+    error: dataError,
+    refetch,
+  } = useCounterparties();
+
   const [active, setActive] = useState<Counterparty | null>(null);
   const [selectedTiles, setSelectedTiles] = useState<Set<CategoryKey>>(new Set());
   const [riskFilter, setRiskFilter] = useState<RiskChipKey>("all");
@@ -354,18 +361,30 @@ export default function Index() {
   // DRPA update flow
   const [drpaOpen, setDrpaOpen] = useState(false);
   const [drpaConfirmed, setDrpaConfirmed] = useState(false);
-  const [drpaCards, setDrpaCards] = useState<DrpaCardData[]>(() =>
-    counterparties
-      .filter(
-        (c) =>
-          c.status === "overdue" || c.status === "overdue_risk" || (c.overdueAmountNum ?? 0) > 0,
-      )
-      .map((c) => ({
-        counterparty: c,
-        contracts: c.contracts.map((k) => ({ ...k, overdueHistory: [...k.overdueHistory] })),
-        updated: false,
-      })),
-  );
+  const [drpaCards, setDrpaCards] = useState<DrpaCardData[]>([]);
+  // Подтягиваем DRPA-карточки из загруженных контрагентов после первой загрузки.
+  useEffect(() => {
+    if (counterpartiesData.length === 0) return;
+    setDrpaCards((prev) =>
+      prev.length > 0
+        ? prev
+        : counterpartiesData
+            .filter(
+              (c) =>
+                c.status === "overdue" ||
+                c.status === "overdue_risk" ||
+                (c.overdueAmountNum ?? 0) > 0,
+            )
+            .map((c) => ({
+              counterparty: c,
+              contracts: c.contracts.map((k) => ({
+                ...k,
+                overdueHistory: [...k.overdueHistory],
+              })),
+              updated: false,
+            })),
+    );
+  }, [counterpartiesData]);
   const drpaTotal = drpaCards.length;
   const drpaUpdated = drpaCards.filter((c) => c.updated).length;
   const drpaInProgress = drpaUpdated > 0 && !drpaConfirmed;
@@ -376,12 +395,12 @@ export default function Index() {
   };
 
   const allCounterparties = useMemo(
-    () => [...addedCounterparties, ...counterparties].map(applyOverride),
+    () => [...addedCounterparties, ...counterpartiesData].map(applyOverride),
     [addedCounterparties, statusOverrides],
   );
 
   const handleStatusChange = (inn: string, status: Counterparty["status"]) => {
-    const base = [...addedCounterparties, ...counterparties].find((c) => c.inn === inn);
+    const base = [...addedCounterparties, ...counterpartiesData].find((c) => c.inn === inn);
     const current = statusOverrides[inn] ?? base?.status;
     if (current && current !== status) {
       setStatusChanges((prev) => ({ ...prev, [inn]: { from: current, to: status } }));
@@ -839,11 +858,34 @@ export default function Index() {
             </div>
 
             <div className="space-y-2.5">
-              {filtered.length === 0 && (
-                <div className="rounded-2xl border border-border bg-white p-8 text-center text-sm text-muted-foreground">
-                  Нет дебиторов в этой категории
+              {dataStatus === "loading" && (
+                <div className="flex items-center justify-center gap-2 rounded-2xl border border-border bg-white p-8 text-sm text-muted-foreground">
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                  Загружаем список контрагентов…
                 </div>
               )}
+              {dataStatus === "error" && (
+                <div className="flex flex-col items-center gap-3 rounded-2xl border border-rose-200 bg-rose-50/40 p-8 text-center">
+                  <AlertTriangle className="h-6 w-6 text-rose-600" />
+                  <div className="text-sm font-medium text-rose-900">
+                    Не удалось загрузить контрагентов
+                  </div>
+                  <div className="max-w-md text-xs text-muted-foreground">
+                    {dataError?.message ?? "Неизвестная ошибка"}
+                  </div>
+                  <Button size="sm" variant="outline" onClick={() => void refetch()}>
+                    Повторить
+                  </Button>
+                </div>
+              )}
+              {dataStatus !== "loading" && dataStatus !== "error" && filtered.length === 0 && (
+                <div className="rounded-2xl border border-border bg-white p-8 text-center text-sm text-muted-foreground">
+                  {dataStatus === "empty"
+                    ? "Список контрагентов пуст"
+                    : "Нет дебиторов в этой категории"}
+                </div>
+              )}
+
               {filtered.map((c) => {
                 const isPending = c.tag === "На оценке";
                 const indicators = isPending ? [] : getCounterpartyProblemIndicators(c);

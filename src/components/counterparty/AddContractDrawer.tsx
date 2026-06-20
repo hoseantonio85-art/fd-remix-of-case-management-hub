@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { InModalDrawer } from "./InModalDrawer";
 import { Button } from "@/shared/ui";
 import { Input } from "@/shared/ui";
-import type { Contract } from "@/lib/mock-data";
+import type { Contract } from "@/domain/counterparty";
 
 const CONTRACT_STAGES = [
   "Мониторинг",

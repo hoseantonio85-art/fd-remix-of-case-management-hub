@@ -1,5 +1,5 @@
 import { Check, AlertTriangle } from "@/shared/ui";
-import type { CollectionSubStep } from "@/lib/mock-data";
+import type { CollectionSubStep } from "@/domain/counterparty";
 import type { StepAnim } from "./DebtSummaryCard";
 
 const stages = [

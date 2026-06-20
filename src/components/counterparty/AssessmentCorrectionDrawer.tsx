@@ -6,7 +6,7 @@ import { Input } from "@/shared/ui";
 import { cn } from "@/lib/utils";
 import { InModalDrawer } from "./InModalDrawer";
 import { getToneForTag, toneStyles } from "./header-theme";
-import type { Counterparty } from "@/lib/mock-data";
+import type { Counterparty } from "@/domain/counterparty";
 
 export type CounterpartyStatus = Counterparty["status"];
 

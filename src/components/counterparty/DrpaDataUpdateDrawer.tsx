@@ -4,7 +4,7 @@ import { Button } from "@/shared/ui";
 import { Input } from "@/shared/ui";
 import { Pencil, Plus, CheckCircle2, ShieldCheck } from "@/shared/ui";
 import { toast } from "sonner";
-import type { Contract, Counterparty } from "@/lib/mock-data";
+import type { Contract, Counterparty } from "@/domain/counterparty";
 
 const CONTRACT_STAGES = [
   "Коммуникация с должником",

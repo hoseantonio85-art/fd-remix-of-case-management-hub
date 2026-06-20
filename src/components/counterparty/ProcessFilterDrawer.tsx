@@ -3,7 +3,7 @@ import { Sheet, SheetContent } from "@/shared/ui";
 import { Button } from "@/shared/ui";
 import { X } from "@/shared/ui";
 import { processMeta, processOrder } from "@/lib/process-meta";
-import type { ProcessStage } from "@/lib/mock-data";
+import type { ProcessStage } from "@/domain/counterparty";
 import { cn } from "@/lib/utils";
 
 interface ProcessFilterDrawerProps {

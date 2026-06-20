@@ -1,18 +1,11 @@
+// DEPRECATED shim. Используйте `@/domain/counterparty` (getCounterpartyProblemIndicators)
+// и `@/components/counterparty/problem-indicator-meta` для UI-меты.
 import { AlertTriangle, Scale, FileX, TrendingDown, type LucideIcon } from "@/shared/ui";
-import type { Counterparty, RiskType } from "@/lib/mock-data";
 import { riskMeta, type RiskMetaItem } from "@/components/counterparty/risk-meta";
+import type { RiskType } from "@/domain/counterparty";
 
-export type ProblemIndicatorKey =
-  | "bankruptcy_liquidation"
-  | "group_contract_nonperformance"
-  | "negative_factors";
-
-const NEGATIVE_RISK_TYPES: RiskType[] = [
-  "Ухудшилось финансовое состояние",
-  "Уголовное дело",
-  "Ограничения деятельности",
-  "Административные нарушения",
-];
+export { getCounterpartyProblemIndicators } from "@/domain/counterparty";
+export type { ProblemIndicatorKey } from "@/domain/counterparty";
 
 const FALLBACK_META: RiskMetaItem = {
   icon: AlertTriangle,
@@ -31,7 +24,7 @@ function safeMeta(key: RiskType, fallbackIcon: LucideIcon): RiskMetaItem {
   return { ...FALLBACK_META, icon: fallbackIcon };
 }
 
-export const problemIndicatorMeta: Record<ProblemIndicatorKey, RiskMetaItem & { label: string }> = {
+export const problemIndicatorMeta = {
   bankruptcy_liquidation: {
     ...safeMeta("Банкротство / ликвидация", Scale),
     label: "Банкротство / ликвидация",
@@ -47,22 +40,4 @@ export const problemIndicatorMeta: Record<ProblemIndicatorKey, RiskMetaItem & { 
     label: "Наличие негативных факторов",
     short: "Наличие негативных факторов",
   },
-};
-
-export function getCounterpartyProblemIndicators(c?: Counterparty | null): ProblemIndicatorKey[] {
-  if (!c || !Array.isArray(c.risks)) return [];
-  // «Нет риска» counterparties never display problem indicators, regardless
-  // of any residual risk entries in mock data.
-  if (c.status === "no_risk") return [];
-  const result: ProblemIndicatorKey[] = [];
-  if (c.risks.some((r) => r?.type === "Банкротство / ликвидация")) {
-    result.push("bankruptcy_liquidation");
-  }
-  if (c.risks.some((r) => r?.type === "Неисполнение контракта группы")) {
-    result.push("group_contract_nonperformance");
-  }
-  if (c.risks.some((r) => r?.type && NEGATIVE_RISK_TYPES.includes(r.type))) {
-    result.push("negative_factors");
-  }
-  return result;
-}
+} as const;

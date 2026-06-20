@@ -4,7 +4,7 @@ import { Button } from "@/shared/ui";
 import { Textarea } from "@/shared/ui";
 import { cn } from "@/lib/utils";
 import { InModalDrawer } from "./InModalDrawer";
-import { type AssessmentGroup, type AssessmentGroupId } from "@/lib/assessment-data";
+import { type AssessmentGroup, type AssessmentGroupId } from "@/domain/assessment";
 
 export type AssessmentCommentPayload = {
   comments: { groupId: AssessmentGroupId; groupTitle: string; text: string }[];

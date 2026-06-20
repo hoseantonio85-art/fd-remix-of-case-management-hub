@@ -3,7 +3,7 @@ import { Checkbox } from "@/shared/ui";
 import { Input } from "@/shared/ui";
 import { Textarea } from "@/shared/ui";
 import { Button } from "@/shared/ui";
-import { measuresByRisk, type RiskSignal } from "@/lib/mock-data";
+import { measuresByRisk, type RiskSignal } from "@/domain/counterparty";
 import { InModalDrawer } from "./InModalDrawer";
 
 export type DecisionKind = "confirm" | "dismiss" | "verify";
