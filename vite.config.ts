@@ -13,6 +13,10 @@ export default defineConfig({
       // Гарантируем единый runtime React / react-dom (защита от двойного React,
       // т.к. @sber-orm/ui-kit имеет react в peerDependencies)
       react: path.resolve(__dirname, "node_modules/react"),
+      "react-dom/server": path.resolve(
+        __dirname,
+        "node_modules/react-dom/server.browser.js",
+      ),
       "react-dom": path.resolve(__dirname, "node_modules/react-dom"),
     },
     dedupe: ["react", "react-dom"],
