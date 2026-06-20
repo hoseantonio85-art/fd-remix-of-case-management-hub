@@ -18,23 +18,24 @@ import {
   SlidersHorizontal,
   X,
   ShieldCheck,
+  AlertTriangle,
 } from "@/shared/ui";
+import type { Counterparty, RiskType, ProcessStage } from "@/domain/counterparty";
 import {
-  counterparties,
-  type Counterparty,
-  type RiskType,
-  type ProcessStage,
-} from "@/lib/mock-data";
+  getCounterpartyProblemIndicators,
+  type ProblemIndicatorKey,
+} from "@/domain/counterparty";
+import { buildAssessment, type Assessment } from "@/domain/assessment";
+import { useCounterparties } from "@/hooks/useCounterparties";
 import { CounterpartyModal } from "@/components/counterparty/CounterpartyModal";
 import { CounterpartyStatusBadge } from "@/components/counterparty/CounterpartyStatusBadge";
 import { riskMeta, allChipMeta } from "@/components/counterparty/risk-meta";
-import { getCounterpartyProblemIndicators, problemIndicatorMeta } from "@/lib/problem-indicators";
+import { problemIndicatorMeta } from "@/lib/problem-indicators";
 import {
   AssessmentModal,
   type AssessmentStatus,
   type Disagreement,
 } from "@/components/counterparty/AssessmentModal";
-import { buildAssessment, type Assessment } from "@/lib/assessment-data";
 import { Button } from "@/shared/ui";
 import { ProcessFilterDrawer } from "@/components/counterparty/ProcessFilterDrawer";
 import { processMeta, processOrder } from "@/lib/process-meta";
