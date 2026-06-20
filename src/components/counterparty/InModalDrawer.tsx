@@ -1,5 +1,5 @@
 import { ReactNode, useEffect } from "react";
-import { X } from "lucide-react";
+import { X } from "@/shared/ui";
 import { cn } from "@/lib/utils";
 
 /**

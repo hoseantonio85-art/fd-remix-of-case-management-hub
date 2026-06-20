@@ -8,7 +8,7 @@ import {
   FileText,
   Clock,
   History as HistoryIcon,
-} from "lucide-react";
+} from "@/shared/ui";
 import type { CollectionSubStep } from "@/lib/mock-data";
 import { InModalDrawer } from "./InModalDrawer";
 import type { StepAnim } from "./DebtSummaryCard";

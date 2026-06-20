@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
-import { Check, Info } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Textarea } from "@/components/ui/textarea";
-import { Input } from "@/components/ui/input";
+import { Check, Info } from "@/shared/ui";
+import { Button } from "@/shared/ui";
+import { Textarea } from "@/shared/ui";
+import { Input } from "@/shared/ui";
 import { cn } from "@/lib/utils";
 import { InModalDrawer } from "./InModalDrawer";
 import { getToneForTag, toneStyles } from "./header-theme";

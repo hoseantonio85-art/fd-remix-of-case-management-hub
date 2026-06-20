@@ -1,8 +1,8 @@
 import { useState } from "react";
-import * as DialogPrimitive from "@radix-ui/react-dialog";
-import { X, AlertTriangle, ChevronRight } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
+import { DialogPrimitive } from "@/shared/ui";
+import { X, AlertTriangle, ChevronRight } from "@/shared/ui";
+import { Button } from "@/shared/ui";
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/shared/ui";
 import { cn } from "@/lib/utils";
 import { largeModalContentClass } from "@/lib/modal-styles";
 import { type Assessment, type AssessmentGroup, MAIN_GROUP_IDS } from "@/lib/assessment-data";

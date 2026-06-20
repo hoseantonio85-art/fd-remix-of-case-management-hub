@@ -1,4 +1,4 @@
-import { Check, AlertTriangle } from "lucide-react";
+import { Check, AlertTriangle } from "@/shared/ui";
 import type { CollectionSubStep } from "@/lib/mock-data";
 import type { StepAnim } from "./DebtSummaryCard";
 

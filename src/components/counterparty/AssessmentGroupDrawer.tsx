@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { ChevronDown, MessageSquare } from "lucide-react";
+import { ChevronDown, MessageSquare } from "@/shared/ui";
 import { cn } from "@/lib/utils";
 import { InModalDrawer } from "./InModalDrawer";
 import { NormAssistantIcon } from "./NormAssistantIcon";

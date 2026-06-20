@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
-import { ChevronDown, MessageSquare } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Textarea } from "@/components/ui/textarea";
+import { ChevronDown, MessageSquare } from "@/shared/ui";
+import { Button } from "@/shared/ui";
+import { Textarea } from "@/shared/ui";
 import { cn } from "@/lib/utils";
 import { InModalDrawer } from "./InModalDrawer";
 import { type AssessmentGroup, type AssessmentGroupId } from "@/lib/assessment-data";

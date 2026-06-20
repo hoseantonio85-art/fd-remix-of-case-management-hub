@@ -1,11 +1,11 @@
 import { useEffect, useMemo, useState } from "react";
-import { Dialog, DialogContent } from "@/components/ui/dialog";
+import { Dialog, DialogContent } from "@/shared/ui";
 import { cn } from "@/lib/utils";
 import { largeModalContentClass } from "@/lib/modal-styles";
 import { toast } from "sonner";
-import { Button } from "@/components/ui/button";
+import { Button } from "@/shared/ui";
 
-import { ChevronRight, ChevronDown, X, CheckCircle2, Info as InfoIcon, Plus } from "lucide-react";
+import { ChevronRight, ChevronDown, X, CheckCircle2, Info as InfoIcon, Plus } from "@/shared/ui";
 
 import type {
   Counterparty,

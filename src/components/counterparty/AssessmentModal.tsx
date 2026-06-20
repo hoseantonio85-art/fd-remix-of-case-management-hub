@@ -1,9 +1,9 @@
 import { useEffect, useState } from "react";
-import * as DialogPrimitive from "@radix-ui/react-dialog";
-import { X, ArrowLeft, ChevronRight, AlertTriangle, MessageSquare, Download } from "lucide-react";
+import { DialogPrimitive } from "@/shared/ui";
+import { X, ArrowLeft, ChevronRight, AlertTriangle, MessageSquare, Download } from "@/shared/ui";
 import { toast } from "sonner";
 import { NormAssistantIcon } from "./NormAssistantIcon";
-import { Button } from "@/components/ui/button";
+import { Button } from "@/shared/ui";
 import { cn } from "@/lib/utils";
 import { largeModalContentClass } from "@/lib/modal-styles";
 import { type CounterpartyStatus } from "./AssessmentCorrectionDrawer";
@@ -17,9 +17,9 @@ import {
   MAIN_GROUP_IDS,
   OTHER_GROUP_IDS,
 } from "@/lib/assessment-data";
-import { ChevronDown } from "lucide-react";
+import { ChevronDown } from "@/shared/ui";
 import { AssessmentGroupDrawer, type GroupComment } from "./AssessmentGroupDrawer";
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/shared/ui";
 import { defaultOgrn, defaultRegistrationInfo } from "./RegistrationInfoWidget";
 import { RegistrationInfoDrawer } from "./RegistrationInfoDrawer";
 import { KeyAnomaliesWidget } from "./KeyAnomaliesWidget";

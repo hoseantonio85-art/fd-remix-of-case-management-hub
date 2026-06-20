@@ -1,8 +1,8 @@
 import { useEffect, useMemo, useState } from "react";
-import { Checkbox } from "@/components/ui/checkbox";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
-import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/shared/ui";
+import { Input } from "@/shared/ui";
+import { Textarea } from "@/shared/ui";
+import { Button } from "@/shared/ui";
 import { measuresByRisk, type RiskSignal } from "@/lib/mock-data";
 import { InModalDrawer } from "./InModalDrawer";
 

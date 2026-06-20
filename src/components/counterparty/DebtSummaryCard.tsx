@@ -1,4 +1,4 @@
-import { AlertTriangle, Info } from "lucide-react";
+import { AlertTriangle, Info } from "@/shared/ui";
 import type { CollectionSubStep } from "@/lib/mock-data";
 
 export type StepAnim = { direction: "forward" | "backward"; tick: number } | null;

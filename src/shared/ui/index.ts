@@ -1,28 +1,15 @@
 /**
- * Корпоративный UI-kit — единственный рекомендованный источник базовых компонентов
- * для нового кода. Re-export нужен, чтобы продуктовый код импортировал из
- * `@/shared/ui`, а не из `@/components/ui/*` (shadcn legacy) или `lucide-react`.
+ * Единственный публичный barrel UI-слоя для продуктового кода.
  *
- * При переезде на пакет `@sber-orm/ui-kit` из npm-registry достаточно поменять
- * этот файл — все потребители продолжат работать без правок.
+ * - Базовые формы/контролы (Button, Input, Checkbox, ...) — ре-экспорт shadcn,
+ *   обёрнут в `./legacy/shadcn`. Сохраняем текущий UX на первой итерации.
+ * - Композитные (Dialog/Sheet/Select/Tabs/...) — там же, до отдельной итерации
+ *   по их замене на kit.
+ * - Loader / Icon / Text / Title / Chips и enum'ы — приходят из kit через
+ *   `./adapters/kit`.
+ * - Иконки lucide — централизованы в `./legacy/icons` и реэкспортированы здесь
+ *   как именованные. Прямые импорты `lucide-react` в продукте запрещены ESLint.
  */
-export {
-  Button,
-  Input,
-  Textarea,
-  Checkbox,
-  Switch,
-  Badge,
-  Loader,
-  Tooltip,
-  Chips,
-  Icon,
-  EIconName,
-  // Typography
-  Text,
-  Title,
-  ETitleSize,
-  ETextSize,
-} from "@sber-orm/ui-kit";
-
-export type { IButtonProperties, TButtonVariants, TButtonSizes } from "@sber-orm/ui-kit";
+export * from "./legacy/shadcn";
+export * from "./adapters/kit";
+export * from "./legacy/icons";

@@ -1,5 +1,5 @@
-import { AlertTriangle, CheckCircle2, ChevronRight } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { AlertTriangle, CheckCircle2, ChevronRight } from "@/shared/ui";
+import { Button } from "@/shared/ui";
 
 type Variant = "negative" | "positive";
 

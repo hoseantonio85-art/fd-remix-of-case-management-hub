@@ -1,4 +1,4 @@
-import { Eye, ShieldAlert, Scale, Archive, type LucideIcon } from "lucide-react";
+import { Eye, ShieldAlert, Scale, Archive, type LucideIcon } from "@/shared/ui";
 import type { ProcessStage } from "./mock-data";
 
 type CategoryKey = "risk" | "overdue_risk" | "no_risk" | "overdue";

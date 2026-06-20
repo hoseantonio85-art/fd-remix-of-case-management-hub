@@ -1,15 +1,7 @@
 import { useState } from "react";
-import * as DialogPrimitive from "@radix-ui/react-dialog";
-import {
-  X,
-  ChevronDown,
-  ArrowUp,
-  Flame,
-  Download,
-  AlertTriangle,
-  ChevronRight,
-} from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { DialogPrimitive } from "@/shared/ui";
+import { X, ChevronDown, ArrowUp, Flame, Download, AlertTriangle, ChevronRight } from "@/shared/ui";
+import { Button } from "@/shared/ui";
 import { cn } from "@/lib/utils";
 import { largeModalContentClass } from "@/lib/modal-styles";
 import { AssessmentInfoWidget } from "./AssessmentModal";

@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+import { Button } from "@/shared/ui";
+import { Input } from "@/shared/ui";
 import {
   Plus,
   ChevronDown,
@@ -13,14 +13,8 @@ import {
   X,
   Pencil,
   Trash2,
-} from "lucide-react";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+} from "@/shared/ui";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/shared/ui";
 
 const SETTLEMENT_STAGES = [
   "Мониторинг",

@@ -1,4 +1,4 @@
-import { AlertTriangle, CheckCircle2, MinusCircle } from "lucide-react";
+import { AlertTriangle, CheckCircle2, MinusCircle } from "@/shared/ui";
 
 export type AssessmentCountKind = "risk" | "clear" | "no_data";
 

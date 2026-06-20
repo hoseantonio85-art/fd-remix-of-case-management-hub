@@ -1,4 +1,4 @@
-import { Sparkles } from "lucide-react";
+import { Sparkles } from "@/shared/ui";
 import { cn } from "@/lib/utils";
 
 /**
