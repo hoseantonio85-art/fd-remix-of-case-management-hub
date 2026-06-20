@@ -742,30 +742,26 @@ export function CounterpartyModal({
           onAdvanceStage={(id) => {
             advanceContractStage(id);
             setContractDrawer((prev) => {
-              if (!prev) return prev;
-              const stages = [
-                "Досудебное урегулирование",
-                "Судебная работа",
-                "Принудительное взыскание",
-                "Завершение работы",
-              ];
-              const i = stages.indexOf(prev.collectionStage ?? "");
+              if (!prev || prev.id !== id) return prev;
+              const i = stageOrder.indexOf(prev.collectionStage ?? "");
               return {
                 ...prev,
-                collectionStage: stages[Math.min(i + 1, stages.length - 1)] || stages[0],
+                collectionStage:
+                  stageOrder[Math.min(i + 1, stageOrder.length - 1)] || stageOrder[0],
               };
             });
           }}
           onUpdateContract={(id, patch) => {
-            setContracts((prev) =>
-              prev.map((c) => {
-                if (c.id !== id) return c;
-                const updated = { ...c, ...patch };
-                void persistContract(updated);
-                return updated;
-              }),
-            );
-            setContractDrawer((prev) => (prev && prev.id === id ? { ...prev, ...patch } : prev));
+            const cur = contracts.find((c) => c.id === id);
+            if (!cur) return;
+            const updated = { ...cur, ...patch };
+            setContracts((prev) => prev.map((c) => (c.id === id ? updated : c)));
+            setContractDrawer((prev) => (prev && prev.id === id ? updated : prev));
+            void persistContract(updated).catch(() => {
+              setContracts((prev) => prev.map((c) => (c.id === id ? cur : c)));
+              setContractDrawer((prev) => (prev && prev.id === id ? cur : prev));
+              toast.error("Не удалось сохранить договор");
+            });
           }}
         />
 
