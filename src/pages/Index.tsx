@@ -529,11 +529,13 @@ export default function Index() {
   }, [riskCounts, riskFilter]);
 
   const filtered = useMemo(() => {
-    if (riskFilter === "all") return byCategory;
-    const chip = problemChips.find((c) => c.key === riskFilter);
-    if (!chip) return byCategory;
-    return byCategory.filter(chip.matches);
-  }, [byCategory, riskFilter]);
+    let list = byCategory;
+    if (riskFilter !== "all") {
+      const chip = problemChips.find((c) => c.key === riskFilter);
+      if (chip) list = list.filter(chip.matches);
+    }
+    return searchCounterparties(list, searchValue);
+  }, [byCategory, riskFilter, searchValue]);
 
   // Donut data:
   //  - 0 selected   → overview (top categories)
