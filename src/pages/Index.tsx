@@ -496,13 +496,20 @@ export default function Index() {
   const handleManualFlowCpOpenChange = (o: boolean) => {
     setManualFlowCpOpen(o);
     if (!o) {
-      if (manualFlowTarget) {
-        const inn = manualFlowTarget.inn;
-        if (manualFlowIsNew) {
-          void addCounterparty(manualFlowTarget);
-          toast.success("Контрагент добавлен в список", {
-            description: `Оценка сохранена по ИНН ${inn}`,
-          });
+      const target = manualFlowTarget;
+      const isNew = manualFlowIsNew;
+      if (target) {
+        const inn = target.inn;
+        if (isNew) {
+          addCounterparty(target)
+            .then(() =>
+              toast.success("Контрагент добавлен в список", {
+                description: `Оценка сохранена по ИНН ${inn}`,
+              }),
+            )
+            .catch((e) =>
+              toast.error(`Не удалось добавить контрагента: ${(e as Error).message}`),
+            );
         } else {
           toast("Контрагент уже есть в списке", {
             description: `ИНН ${inn} найден в рабочем списке`,
