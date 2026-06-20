@@ -30,6 +30,7 @@ import { ResolutionCard } from "./ResolutionCard";
 import { AssessmentModal, type AssessmentStatus, type Disagreement } from "./AssessmentModal";
 import type { Assessment } from "@/domain/assessment";
 import { useAssessment } from "@/hooks/useAssessment";
+import { useCounterpartyCard } from "@/hooks/useCounterpartyCard";
 import { defaultOgrn, defaultRegistrationInfo } from "./RegistrationInfoWidget";
 import { RegistrationInfoDrawer } from "./RegistrationInfoDrawer";
 import { AddContractDrawer } from "./AddContractDrawer";
