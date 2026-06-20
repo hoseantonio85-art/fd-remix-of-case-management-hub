@@ -93,3 +93,72 @@ ESLint `no-restricted-imports` запрещает в продуктовом ко
 2. Решение по composite (`Dialog`/`Sheet`/`Tabs`/`Select`) с учётом kit `Modal` API.
 3. Маппинг lucide → `EIconName`.
 4. Единый source-of-truth для дизайн-токенов (Tailwind v4 + SCSS kit пока сосуществуют).
+
+---
+
+## Iteration 2 — architecture and data
+
+### Extracted data and business logic
+
+- Доменные типы и чистые хелперы вынесены из `src/lib/*` в `src/domain/`:
+  - `src/domain/counterparty.ts` — типы `Counterparty`, `Contract`, `RiskSignal`, `RiskType`, `CollectionSubStep`, `ProcessStage`, константа `measuresByRisk`, чистые хелперы `getCounterpartyProblemIndicators`, `searchCounterparties`.
+  - `src/domain/assessment.ts` — типы `Assessment`/`AssessmentGroup`/`AssessmentCriterion`, `buildAssessment`, `groupCounts`, `sumGroupCounts`, `statusFromPassed`, `toneStyles`, `criterionStatusMeta`.
+- Mock-датасет (`counterparties`, `makeCollection`, `todayLabel`) перенесён в `src/data/mock/counterparties.ts`. UI-код к нему напрямую больше не обращается.
+- `src/lib/mock-data.ts`, `src/lib/assessment-data.ts`, `src/lib/problem-indicators.ts` оставлены как **deprecated re-export shims** на короткий период совместимости.
+
+### Created domain models, hooks and repositories
+
+```
+src/domain/
+  counterparty.ts        # типы + чистая бизнес-логика
+  assessment.ts          # типы + builder/aggregators
+src/data/
+  mock/counterparties.ts # in-memory dataset
+  repositories/
+    types.ts             # CounterpartyRepository, AssessmentRepository
+    mock/counterparty.ts # имитация async + in-memory mutations
+    mock/assessment.ts
+    index.ts             # единственная точка выбора реализации
+src/hooks/
+  useCounterparties.ts   # data/filtered/status/error/refetch/updateStatusLocally/prepend
+  useAssessment.ts       # run()/reset()/loading/error
+```
+
+Точка переключения mock → http — `src/data/repositories/index.ts`. Mock-репозитории имитируют сетевую задержку через `VITE_MOCK_LATENCY_MS` (по умолчанию 250 мс).
+
+### Refactored modules
+
+- `src/pages/Index.tsx` теперь получает контрагентов через `useCounterparties()`, не импортирует `@/lib/mock-data` напрямую. Локальные `addedCounterparties` / `statusOverrides` / `statusChanges` сохранены как UI-состояние поверх данных репозитория. DRPA-карточки заполняются через `useEffect` после первой загрузки.
+- Все 17 UI-компонентов counterparty-домена переключены с `@/lib/mock-data` → `@/domain/counterparty` и с `@/lib/assessment-data` → `@/domain/assessment` (массовый sed; импорты типов не изменились семантически).
+- `CounterpartyModal.tsx` сохранил структуру — менялся только источник типов. Дробление компонента отложено: его ответственность — это полностью композиция (RiskDrawer, ContractDrawer, AssessmentModal, DebtProcessDrawer и т.п. уже выделены), и дальнейшее разделение без архитектурной необходимости не оправдано на этой итерации.
+
+### Implemented states
+
+В `useCounterparties` реализованы реальные состояния: `loading | refreshing | success | empty | error`. Состояния доступны в preview через query-параметр `?state=loading|error|empty`:
+
+- `loading` — спиннер «Загружаем список контрагентов…»
+- `error` — карточка с сообщением об ошибке + кнопка «Повторить» (`refetch`)
+- `empty` — текст «Список контрагентов пуст»
+
+В нормальном режиме mock-задержка ~250 мс кратко проявляет loading-стейт.
+
+### Remaining architectural debt
+
+1. **`CounterpartyModal.tsx` (869 строк)** содержит большой пул `useState` для рисков/договоров/шагов взыскания. Кандидат на выделение в `useCounterpartyCard(cp)` hook + sub-views (RisksTab, DebtTab) — но требует продуктового тест-плана. Отложено в следующую итерацию.
+2. `RunCheckDialog` → `setChecks` с `setTimeout` остаётся в `Index.tsx`. Кандидат на `useChecks()` hook с `CheckRepository`.
+3. `statusOverrides` / `statusChanges` / `addedCounterparties` — UI-state, который логически принадлежит репозиторию (после http-backend они отпадут). Сейчас выкидывать преждевременно.
+4. `src/lib/*` shim'ы — удалить, когда внешние интеграции (если есть) перестанут на них ссылаться.
+
+### Verification
+
+| Проверка | Результат |
+| --- | --- |
+| `bun install` (clean) | OK |
+| `bun run build` | ✓ 4.54s, 574 kB JS / 294 kB CSS |
+| `bun run lint` | 0 errors, 14 warnings (pre-existing) |
+| Playwright `/` | 0 runtime errors |
+| Playwright `?state=loading` | 0 runtime errors, виден спиннер |
+| Playwright `?state=error` | 0 runtime errors, видна error-карточка + Retry |
+| Playwright `?state=empty` | 0 runtime errors, виден empty-text |
+
+Визуальная композиция, маршрутизация, тексты и продуктовые сценарии не изменялись.
