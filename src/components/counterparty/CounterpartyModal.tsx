@@ -771,6 +771,13 @@ export function CounterpartyModal({
         disagreement={assessmentDisagreement}
         defaultInn={counterparty.inn}
         running={assessmentRunning}
+        error={assessmentError}
+        onRetry={() =>
+          void runAssessment(counterparty.name, counterparty.inn, {
+            source: "auto",
+            variant: counterparty.status === "no_risk" ? "positive" : "negative",
+          })
+        }
         positive={counterparty.status === "no_risk"}
         onRun={(inn) => {
           void runAssessment(counterparty.name, inn, {
