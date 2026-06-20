@@ -681,10 +681,15 @@ export function CounterpartyModal({
                   onOpenChange={setAddContractOpen}
                   onAdd={(c) => {
                     setContracts((prev) => [...prev, c]);
-                    void persistContract(c);
-                    toast.success("Договор добавлен");
+                    persistContract(c)
+                      .then(() => toast.success("Договор добавлен"))
+                      .catch(() => {
+                        setContracts((prev) => prev.filter((x) => x.id !== c.id));
+                        toast.error("Не удалось сохранить договор");
+                      });
                   }}
                 />
+
               </section>
             </div>
 
