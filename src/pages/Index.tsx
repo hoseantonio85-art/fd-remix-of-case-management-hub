@@ -458,9 +458,7 @@ export default function Index() {
       if (manualFlowTarget) {
         const inn = manualFlowTarget.inn;
         if (manualFlowIsNew) {
-          setAddedCounterparties((prev) =>
-            prev.some((c) => c.inn === inn) ? prev : [manualFlowTarget, ...prev],
-          );
+          void addCounterparty(manualFlowTarget);
           toast.success("Контрагент добавлен в список", {
             description: `Оценка сохранена по ИНН ${inn}`,
           });
