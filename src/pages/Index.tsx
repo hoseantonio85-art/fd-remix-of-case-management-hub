@@ -22,8 +22,10 @@ import {
 } from "@/shared/ui";
 import type { Counterparty, RiskType, ProcessStage } from "@/domain/counterparty";
 import { getCounterpartyProblemIndicators, type ProblemIndicatorKey } from "@/domain/counterparty";
-import { buildAssessment, type Assessment } from "@/domain/assessment";
+import type { Assessment } from "@/domain/assessment";
 import { useCounterparties } from "@/hooks/useCounterparties";
+import { useChecks } from "@/hooks/useChecks";
+import { useAssessment } from "@/hooks/useAssessment";
 import { CounterpartyModal } from "@/components/counterparty/CounterpartyModal";
 import { CounterpartyStatusBadge } from "@/components/counterparty/CounterpartyStatusBadge";
 import { riskMeta, allChipMeta } from "@/components/counterparty/risk-meta";
@@ -311,11 +313,27 @@ export default function Index() {
   // Источник истины по контрагентам — через repository / hook.
   // Loading / error / empty состояния можно открыть в preview через ?state=loading|error|empty.
   const {
-    data: counterpartiesData,
+    data: allCounterparties,
     status: dataStatus,
     error: dataError,
     refetch,
+    add: addCounterparty,
+    updateStatus,
   } = useCounterparties();
+
+  // Все проверки идут через CheckRepository + useChecks (нет setTimeout в UI).
+  const {
+    checks: checksDto,
+    runningCount: runningChecks,
+    doneCount: doneChecks,
+    run: runCheck,
+    remove: removeCheck,
+  } = useChecks();
+  const checks: CheckRecord[] = checksDto;
+
+  // Оценка контрагента строится через assessmentRepository.
+  const assessmentForChecks = useAssessment();
+  const assessmentForComplex = useAssessment();
 
   const [active, setActive] = useState<Counterparty | null>(null);
   const [selectedTiles, setSelectedTiles] = useState<Set<CategoryKey>>(new Set());
@@ -325,16 +343,13 @@ export default function Index() {
   const [runDialogOpen, setRunDialogOpen] = useState(false);
   const [pendingCp, setPendingCp] = useState<Counterparty | null>(null);
   const [pendingCpOpen, setPendingCpOpen] = useState(false);
-  const [checks, setChecks] = useState<CheckRecord[]>([]);
   const [checkDrawerOpen, setCheckDrawerOpen] = useState(false);
   const [activeCheckId, setActiveCheckId] = useState<string | null>(null);
-  const [checkAssessment, setCheckAssessment] = useState<Assessment | null>(null);
   const [checkAssessmentOpen, setCheckAssessmentOpen] = useState(false);
   const [contractModalOpen, setContractModalOpen] = useState(false);
   const [activeContractCheckId, setActiveContractCheckId] = useState<string | null>(null);
   const [complexModalOpen, setComplexModalOpen] = useState(false);
   const [activeComplexCheckId, setActiveComplexCheckId] = useState<string | null>(null);
-  const [complexAssessment, setComplexAssessment] = useState<Assessment | null>(null);
   const [searchOpen, setSearchOpen] = useState(false);
   const [searchValue, setSearchValue] = useState("");
   // Legacy manual assessment flow (kept for AssessmentModal scenarios from existing cards)
@@ -342,14 +357,12 @@ export default function Index() {
   const [manualAssessmentOpen, setManualAssessmentOpen] = useState(false);
   const [manualStatus, setManualStatus] = useState<AssessmentStatus>("updated");
   const [manualDisagreement, setManualDisagreement] = useState<Disagreement | null>(null);
-  const [addedCounterparties, setAddedCounterparties] = useState<Counterparty[]>([]);
   const [manualFlowTarget, setManualFlowTarget] = useState<Counterparty | null>(null);
   const [manualFlowIsNew, setManualFlowIsNew] = useState(false);
   const [manualFlowCpOpen, setManualFlowCpOpen] = useState(false);
 
-  const [statusOverrides, setStatusOverrides] = useState<Record<string, Counterparty["status"]>>(
-    {},
-  );
+  // Чисто визуальная история изменений статуса (показывает «Статус изменён» бейдж).
+  // Данные мутации идут в repository через updateStatus().
   const [statusChanges, setStatusChanges] = useState<
     Record<string, { from: Counterparty["status"]; to: Counterparty["status"] }>
   >({
@@ -364,11 +377,11 @@ export default function Index() {
   const [drpaCards, setDrpaCards] = useState<DrpaCardData[]>([]);
   // Подтягиваем DRPA-карточки из загруженных контрагентов после первой загрузки.
   useEffect(() => {
-    if (counterpartiesData.length === 0) return;
+    if (allCounterparties.length === 0) return;
     setDrpaCards((prev) =>
       prev.length > 0
         ? prev
-        : counterpartiesData
+        : allCounterparties
             .filter(
               (c) =>
                 c.status === "overdue" ||
@@ -384,28 +397,17 @@ export default function Index() {
               updated: false,
             })),
     );
-  }, [counterpartiesData]);
+  }, [allCounterparties]);
   const drpaTotal = drpaCards.length;
   const drpaUpdated = drpaCards.filter((c) => c.updated).length;
   const drpaInProgress = drpaUpdated > 0 && !drpaConfirmed;
 
-  const applyOverride = (c: Counterparty): Counterparty => {
-    const override = statusOverrides[c.inn];
-    return override && override !== c.status ? { ...c, status: override } : c;
-  };
-
-  const allCounterparties = useMemo(
-    () => [...addedCounterparties, ...counterpartiesData].map(applyOverride),
-    [addedCounterparties, statusOverrides],
-  );
-
   const handleStatusChange = (inn: string, status: Counterparty["status"]) => {
-    const base = [...addedCounterparties, ...counterpartiesData].find((c) => c.inn === inn);
-    const current = statusOverrides[inn] ?? base?.status;
+    const current = allCounterparties.find((c) => c.inn === inn)?.status;
     if (current && current !== status) {
       setStatusChanges((prev) => ({ ...prev, [inn]: { from: current, to: status } }));
     }
-    setStatusOverrides((prev) => ({ ...prev, [inn]: status }));
+    void updateStatus(inn, status);
     setActive((prev) => (prev && prev.inn === inn ? { ...prev, status } : prev));
     setManualFlowTarget((prev) => (prev && prev.inn === inn ? { ...prev, status } : prev));
   };
@@ -455,9 +457,7 @@ export default function Index() {
       if (manualFlowTarget) {
         const inn = manualFlowTarget.inn;
         if (manualFlowIsNew) {
-          setAddedCounterparties((prev) =>
-            prev.some((c) => c.inn === inn) ? prev : [manualFlowTarget, ...prev],
-          );
+          void addCounterparty(manualFlowTarget);
           toast.success("Контрагент добавлен в список", {
             description: `Оценка сохранена по ИНН ${inn}`,
           });
@@ -1004,19 +1004,11 @@ export default function Index() {
           const hasFiles = files.length > 0;
           const recordType: "counterparty" | "contract" | "complex" =
             hasInn && hasFiles ? "complex" : hasInn ? "counterparty" : "contract";
-          const id = `check-${inn || "contract"}-${Date.now()}`;
-          const rec: CheckRecord = {
-            id,
+          void runCheck({
             inn: inn || undefined,
             fileNames: files.map((f) => f.name),
-            status: "running",
-            createdAt: Date.now(),
             type: recordType,
-          };
-          setChecks((prev) => [rec, ...prev]);
-          window.setTimeout(() => {
-            setChecks((prev) => prev.map((c) => (c.id === id ? { ...c, status: "done" } : c)));
-          }, 5000);
+          });
         }}
       />
 
@@ -1039,11 +1031,13 @@ export default function Index() {
           const recordType =
             c.type ?? (hasInn && hasFiles ? "complex" : hasInn ? "counterparty" : "contract");
           if (recordType === "complex") {
-            const a = buildAssessment(`ООО „Альтаир Логистик“`, c.inn ?? "", "auto");
             setActiveComplexCheckId(c.id);
-            setComplexAssessment(a);
             setCheckDrawerOpen(false);
             setComplexModalOpen(true);
+            void assessmentForComplex.run(`ООО „Альтаир Логистик“`, c.inn ?? "", {
+              source: "auto",
+              variant: "positive",
+            });
             return;
           }
           if (recordType === "contract") {
@@ -1052,11 +1046,13 @@ export default function Index() {
             setContractModalOpen(true);
             return;
           }
-          const a = buildAssessment(`ООО „Альтаир Логистик“`, c.inn ?? "", "auto");
           setActiveCheckId(c.id);
-          setCheckAssessment(a);
           setCheckDrawerOpen(false);
           setCheckAssessmentOpen(true);
+          void assessmentForChecks.run(`ООО „Альтаир Логистик“`, c.inn ?? "", {
+            source: "auto",
+            variant: "positive",
+          });
         }}
       />
 
@@ -1068,7 +1064,7 @@ export default function Index() {
         }}
         onDelete={() => {
           if (activeContractCheckId) {
-            setChecks((prev) => prev.filter((c) => c.id !== activeContractCheckId));
+            void removeCheck(activeContractCheckId);
           }
           setContractModalOpen(false);
           setActiveContractCheckId(null);
@@ -1077,23 +1073,23 @@ export default function Index() {
       />
 
       <ComplexAssessmentModal
-        assessment={complexAssessment}
+        assessment={assessmentForComplex.assessment}
         open={complexModalOpen}
         onOpenChange={(o) => {
           setComplexModalOpen(o);
           if (!o) {
             setActiveComplexCheckId(null);
-            setComplexAssessment(null);
+            assessmentForComplex.reset();
           }
         }}
         positive
         onDelete={() => {
           if (activeComplexCheckId) {
-            setChecks((prev) => prev.filter((c) => c.id !== activeComplexCheckId));
+            void removeCheck(activeComplexCheckId);
           }
           setComplexModalOpen(false);
           setActiveComplexCheckId(null);
-          setComplexAssessment(null);
+          assessmentForComplex.reset();
           toast("Результат проверки удалён");
         }}
         onAddToList={() => {
@@ -1109,40 +1105,39 @@ export default function Index() {
             tag: "Нет риска",
             status: "no_risk",
           };
-          setAddedCounterparties((prev) =>
-            prev.some((c) => c.inn === cp.inn) ? prev : [cp, ...prev],
-          );
-          setChecks((prev) => prev.filter((c) => c.id !== check.id));
+          void addCounterparty(cp);
+          void removeCheck(check.id);
           setComplexModalOpen(false);
           setActiveComplexCheckId(null);
-          setComplexAssessment(null);
+          assessmentForComplex.reset();
           toast.success("Контрагент добавлен в список дебиторов");
         }}
       />
 
       <AssessmentModal
-        assessment={checkAssessment}
+        assessment={assessmentForChecks.assessment}
         open={checkAssessmentOpen}
         onOpenChange={(o) => {
           setCheckAssessmentOpen(o);
           if (!o) {
-            setCheckAssessment(null);
+            assessmentForChecks.reset();
             setActiveCheckId(null);
           }
         }}
         status="updated"
         disagreement={null}
-        defaultInn={checkAssessment?.inn}
+        defaultInn={assessmentForChecks.assessment?.inn}
+        running={assessmentForChecks.loading}
         onConfirm={() => {}}
         onDisagree={() => {}}
         completionMode
         positive
         onDeleteResult={() => {
           if (activeCheckId) {
-            setChecks((prev) => prev.filter((c) => c.id !== activeCheckId));
+            void removeCheck(activeCheckId);
           }
           setCheckAssessmentOpen(false);
-          setCheckAssessment(null);
+          assessmentForChecks.reset();
           setActiveCheckId(null);
           toast("Результат проверки удалён");
         }}
@@ -1156,12 +1151,10 @@ export default function Index() {
             tag: "Нет риска",
             status: "no_risk",
           };
-          setAddedCounterparties((prev) =>
-            prev.some((c) => c.inn === cp.inn) ? prev : [cp, ...prev],
-          );
-          setChecks((prev) => prev.filter((c) => c.id !== check.id));
+          void addCounterparty(cp);
+          void removeCheck(check.id);
           setCheckAssessmentOpen(false);
-          setCheckAssessment(null);
+          assessmentForChecks.reset();
           setActiveCheckId(null);
           toast.success("Контрагент добавлен в список дебиторов");
         }}

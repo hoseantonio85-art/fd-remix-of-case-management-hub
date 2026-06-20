@@ -1,10 +1,16 @@
 // Единственная точка выбора реализации репозиториев.
-// Сейчас всегда mock. В будущей итерации сюда добавится http-реализация и
-// switch по `import.meta.env.VITE_DATA_SOURCE`.
 import { mockCounterpartyRepository } from "./mock/counterparty";
 import { mockAssessmentRepository } from "./mock/assessment";
+import { mockCheckRepository } from "./mock/check";
 
 export const counterpartyRepository = mockCounterpartyRepository;
 export const assessmentRepository = mockAssessmentRepository;
+export const checkRepository = mockCheckRepository;
 
-export type { CounterpartyRepository, AssessmentRepository } from "./types";
+export type {
+  CounterpartyRepository,
+  AssessmentRepository,
+  CheckRepository,
+  CheckRecordDto,
+  CheckType,
+} from "./types";

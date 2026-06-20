@@ -36,8 +36,8 @@ export interface UseCounterpartiesResult {
   setSelectedStatuses: (s: Set<Counterparty["status"]>) => void;
   setProcessStage: (s: ProcessStage | null) => void;
   refetch: () => Promise<void>;
-  updateStatusLocally: (inn: string, status: Counterparty["status"]) => void;
-  prepend: (cp: Counterparty) => void;
+  updateStatus: (inn: string, status: Counterparty["status"]) => Promise<void>;
+  add: (cp: Counterparty) => Promise<void>;
 }
 
 export function useCounterparties(): UseCounterpartiesResult {
@@ -94,13 +94,15 @@ export function useCounterparties(): UseCounterpartiesResult {
     return list;
   }, [data, filters]);
 
-  const updateStatusLocally = useCallback((inn: string, st: Counterparty["status"]) => {
+  const updateStatus = useCallback(async (inn: string, st: Counterparty["status"]) => {
     setData((prev) => prev.map((c) => (c.inn === inn ? { ...c, status: st } : c)));
-    void counterpartyRepository.updateStatus(inn, st);
+    await counterpartyRepository.updateStatus(inn, st);
   }, []);
 
-  const prepend = useCallback((cp: Counterparty) => {
+  const add = useCallback(async (cp: Counterparty) => {
     setData((prev) => (prev.some((c) => c.inn === cp.inn) ? prev : [cp, ...prev]));
+    setStatus((s) => (s === "empty" ? "success" : s));
+    await counterpartyRepository.add(cp);
   }, []);
 
   return {
@@ -113,7 +115,7 @@ export function useCounterparties(): UseCounterpartiesResult {
     setSelectedStatuses,
     setProcessStage,
     refetch,
-    updateStatusLocally,
-    prepend,
+    updateStatus,
+    add,
   };
 }

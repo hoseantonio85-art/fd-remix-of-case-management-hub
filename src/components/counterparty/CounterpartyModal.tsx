@@ -28,7 +28,9 @@ import { CounterpartyStatusBadge } from "./CounterpartyStatusBadge";
 import { getCounterpartyProblemIndicators, problemIndicatorMeta } from "@/lib/problem-indicators";
 import { ResolutionCard } from "./ResolutionCard";
 import { AssessmentModal, type AssessmentStatus, type Disagreement } from "./AssessmentModal";
-import { buildAssessment, type Assessment } from "@/domain/assessment";
+import type { Assessment } from "@/domain/assessment";
+import { useAssessment } from "@/hooks/useAssessment";
+import { useCounterpartyCard } from "@/hooks/useCounterpartyCard";
 import { defaultOgrn, defaultRegistrationInfo } from "./RegistrationInfoWidget";
 import { RegistrationInfoDrawer } from "./RegistrationInfoDrawer";
 import { AddContractDrawer } from "./AddContractDrawer";
@@ -50,9 +52,18 @@ export function CounterpartyModal({
   onOpenChange: (o: boolean) => void;
   onStatusChange?: (inn: string, status: Counterparty["status"]) => void;
 }) {
-  const [risks, setRisks] = useState<RiskSignal[]>([]);
-  const [contracts, setContracts] = useState<Contract[]>([]);
-  const [steps, setSteps] = useState<CollectionSubStep[]>([]);
+  // Состояние карточки (risks/contracts/steps) + персистентные мутации — в hook.
+  const {
+    risks,
+    setRisks,
+    contracts,
+    setContracts,
+    steps,
+    setSteps,
+    persistRisk,
+    persistContract,
+    persistCollectionStep,
+  } = useCounterpartyCard(counterparty, open);
   const [editing, setEditing] = useState<RiskSignal | null>(null);
   const [initialDecision, setInitialDecision] = useState<DecisionKind>("confirm");
   const [drawerOpen, setDrawerOpen] = useState(false);
@@ -71,8 +82,12 @@ export function CounterpartyModal({
   const [completedFields, setCompletedFields] = useState<CompletedFields>({});
   const [history, setHistory] = useState<DebtHistoryEntry[]>([]);
   const [assessmentOpen, setAssessmentOpen] = useState(false);
-  const [assessment, setAssessment] = useState<Assessment | null>(null);
-  const [assessmentRunning, setAssessmentRunning] = useState(false);
+  const {
+    assessment,
+    loading: assessmentRunning,
+    run: runAssessment,
+    reset: resetAssessment,
+  } = useAssessment();
   const [assessmentStatus, setAssessmentStatus] = useState<AssessmentStatus>("pending");
   const [assessmentConfirmedAt, setAssessmentConfirmedAt] = useState<string | undefined>(undefined);
   const [assessmentDisagreement, setAssessmentDisagreement] = useState<Disagreement | null>(null);
@@ -83,33 +98,21 @@ export function CounterpartyModal({
 
   useEffect(() => {
     if (counterparty && open) {
-      const nextRisks = Array.isArray(counterparty.risks) ? counterparty.risks : [];
-      const nextContracts = Array.isArray(counterparty.contracts) ? counterparty.contracts : [];
       const nextCollection = Array.isArray(counterparty.collection) ? counterparty.collection : [];
-
-      setRisks(nextRisks.map((r) => ({ ...r })));
-      setContracts(
-        nextContracts.map((c) => ({ ...c, overdueHistory: [...(c.overdueHistory ?? [])] })),
-      );
-      setSteps(nextCollection.map((s) => ({ ...s })));
+      // risks/contracts/steps инициализируются в useCounterpartyCard.
       setStepperError(null);
       setNotification(null);
       setStepAnim(null);
       setCompletedFields({});
-      setAssessment(
-        buildAssessment(
-          counterparty.name,
-          counterparty.inn,
-          "auto",
-          undefined,
-          counterparty.status === "no_risk" ? "positive" : "negative",
-        ),
-      );
+      resetAssessment();
+      void runAssessment(counterparty.name, counterparty.inn, {
+        source: "auto",
+        variant: counterparty.status === "no_risk" ? "positive" : "negative",
+      });
       setAssessmentStatus("pending");
       setAssessmentConfirmedAt(undefined);
       setAssessmentDisagreement(null);
       setAssessmentOpen(false);
-      setAssessmentRunning(false);
       const curStep = nextCollection.find((s) => s.status === "current");
       setHistory(
         curStep
@@ -194,7 +197,8 @@ export function CounterpartyModal({
   };
 
   const handleSave = (riskId: string, payload: RiskSavePayload) => {
-    const prevStatus = risks.find((r) => r.id === riskId)?.status;
+    const prevRisk = risks.find((r) => r.id === riskId);
+    const prevStatus = prevRisk?.status;
 
     setRisks((prev) =>
       prev.map((r) => {
@@ -238,6 +242,11 @@ export function CounterpartyModal({
         };
       }),
     );
+
+    // Персистентная мутация решения по риску.
+    if (prevRisk) {
+      void persistRisk({ ...prevRisk });
+    }
 
     if (payload.kind === "verify") {
       setNotification({
@@ -435,17 +444,19 @@ export function CounterpartyModal({
   };
 
   const addOverdue = (id: string, record: OverdueRecord) => {
+    let nextContract: Contract | null = null;
     setContracts((prev) =>
-      prev.map((c) =>
-        c.id === id
-          ? {
-              ...c,
-              overdue: toFiniteNumber(c.overdue) + toFiniteNumber(record.amount),
-              overdueDays: Math.max(toFiniteNumber(c.overdueDays), toFiniteNumber(record.days)),
-              overdueHistory: [record, ...(c.overdueHistory ?? [])],
-            }
-          : c,
-      ),
+      prev.map((c) => {
+        if (c.id !== id) return c;
+        const updated: Contract = {
+          ...c,
+          overdue: toFiniteNumber(c.overdue) + toFiniteNumber(record.amount),
+          overdueDays: Math.max(toFiniteNumber(c.overdueDays), toFiniteNumber(record.days)),
+          overdueHistory: [record, ...(c.overdueHistory ?? [])],
+        };
+        nextContract = updated;
+        return updated;
+      }),
     );
     setContractDrawer((prev) =>
       prev && prev.id === id
@@ -457,6 +468,7 @@ export function CounterpartyModal({
           }
         : prev,
     );
+    if (nextContract) void persistContract(nextContract);
   };
 
   const problemIndicators = getCounterpartyProblemIndicators(counterparty)
@@ -639,6 +651,7 @@ export function CounterpartyModal({
                   onOpenChange={setAddContractOpen}
                   onAdd={(c) => {
                     setContracts((prev) => [...prev, c]);
+                    void persistContract(c);
                     toast.success("Договор добавлен");
                   }}
                 />
@@ -709,7 +722,14 @@ export function CounterpartyModal({
             });
           }}
           onUpdateContract={(id, patch) => {
-            setContracts((prev) => prev.map((c) => (c.id === id ? { ...c, ...patch } : c)));
+            setContracts((prev) =>
+              prev.map((c) => {
+                if (c.id !== id) return c;
+                const updated = { ...c, ...patch };
+                void persistContract(updated);
+                return updated;
+              }),
+            );
             setContractDrawer((prev) => (prev && prev.id === id ? { ...prev, ...patch } : prev));
           }}
         />
@@ -737,22 +757,16 @@ export function CounterpartyModal({
         running={assessmentRunning}
         positive={counterparty.status === "no_risk"}
         onRun={(inn) => {
-          setAssessmentRunning(true);
-          setTimeout(() => {
-            setAssessment(
-              buildAssessment(
-                counterparty.name,
-                inn,
-                "manual",
-                undefined,
-                counterparty.status === "no_risk" ? "positive" : "negative",
-              ),
-            );
-            setAssessmentStatus("updated");
-            setAssessmentConfirmedAt(undefined);
-            setAssessmentDisagreement(null);
-            setAssessmentRunning(false);
-          }, 1200);
+          void runAssessment(counterparty.name, inn, {
+            source: "manual",
+            variant: counterparty.status === "no_risk" ? "positive" : "negative",
+          }).then((a) => {
+            if (a) {
+              setAssessmentStatus("updated");
+              setAssessmentConfirmedAt(undefined);
+              setAssessmentDisagreement(null);
+            }
+          });
         }}
         onConfirm={() => {
           setAssessmentStatus("confirmed");

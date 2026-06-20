@@ -1,4 +1,4 @@
-import { buildAssessment } from "@/domain/assessment";
+import { buildAssessment } from "@/data/mock/assessment";
 import type { AssessmentRepository } from "../types";
 
 const LATENCY_MS = Number(import.meta.env.VITE_MOCK_LATENCY_MS ?? 250);

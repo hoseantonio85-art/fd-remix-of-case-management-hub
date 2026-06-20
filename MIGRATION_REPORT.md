@@ -162,3 +162,82 @@ src/hooks/
 | Playwright `?state=empty` | 0 runtime errors, виден empty-text |
 
 Визуальная композиция, маршрутизация, тексты и продуктовые сценарии не изменялись.
+
+---
+
+## Iteration 2.1 — wiring data layer to real scenarios
+
+### Hooks подключены к UI
+
+- **`useCounterparties`** — расширен:
+  - `add(cp)` идёт через `counterpartyRepository.add()` + локальная синхронизация;
+  - `updateStatus(inn, st)` идёт через `counterpartyRepository.updateStatus()` (раньше был `updateStatusLocally`).
+  - В `Index.tsx` удалены `addedCounterparties` и `statusOverrides`. Список приходит сразу из hook (`data: allCounterparties`). Остался только `statusChanges` — чисто визуальный бейдж «Статус изменён», который не дублирует данные.
+
+- **`useChecks` + `mockCheckRepository`** (новое):
+  - Mock-репозиторий с переходом `running → done` через таймер внутри репо (не в UI).
+  - `subscribe()` push-уведомляет хук об изменениях.
+  - `run()` / `remove()` доступны UI без работы с таймерами.
+  - В `Index.tsx` удалены: ручной `setChecks`, `window.setTimeout` для перехода в `done`, прямые мутации массива checks.
+
+- **`useAssessment`** — теперь реально используется:
+  - `Index.tsx` создаёт две инстанции (`assessmentForChecks`, `assessmentForComplex`) вместо прямого `buildAssessment`. Loading прокидывается в `AssessmentModal` через `running`.
+  - `CounterpartyModal.tsx` использует hook и для авто-оценки при открытии карточки, и для ручного re-run по кнопке.
+
+- **`useCounterpartyCard`** (новое):
+  - Лифт `risks` / `contracts` / `steps` из `CounterpartyModal` + персистентные мутации `persistRisk`, `persistContract`, `persistCollectionStep`.
+  - Инициализация state при `open && counterparty` живёт в hook (раньше — в `useEffect` модалки).
+  - UI-state (notifications, stepAnim, history, completedFields) остался в модалке — это чистая презентация и не относится к данным карточки.
+
+### Repository расширен
+
+`CounterpartyRepository` теперь содержит:
+
+```
+list, byInn,
+add,
+updateStatus,
+saveRiskDecision,
+addOrUpdateContract,
+updateCollectionStep
+```
+
+`CheckRepository`:
+
+```
+list, run, remove, subscribe
+```
+
+Реализации — `src/data/repositories/mock/{counterparty,assessment,check}.ts`. Точка переключения mock → http по-прежнему `src/data/repositories/index.ts`.
+
+### Domain очищен от UI
+
+- Из `src/domain/assessment.ts` удалены `criterionStatusMeta` (UI-presentation) и `toneStyles` (UI-presentation, ранее не использовалась — header'ы продолжают пользоваться `./header-theme`).
+- `criterionStatusMeta` + `assessmentChangeToneStyles` переехали в `src/components/counterparty/assessment-ui.ts`. `AssessmentGroupDrawer.tsx` теперь импортирует оттуда.
+- Mock-данные оценки (`defaultGroups`, `buildAssessment`, `toPositiveGroups`, ok/nd/risk helpers) переехали в `src/data/mock/assessment.ts`. `src/data/repositories/mock/assessment.ts` импортирует builder оттуда.
+- В `src/domain/assessment.ts` остались только: типы, `statusFromPassed`, `groupCounts`, `sumGroupCounts`, `MAIN_GROUP_IDS`, `OTHER_GROUP_IDS`.
+
+### Что осталось в `Index.tsx` / `CounterpartyModal.tsx`
+
+- **`Index.tsx`** — UI-композиция (tiles, chips, donut, layout), routing подпотока manual-assessment, статус-changes badge. Никакой бизнес-логики оценки, мутаций контрагентов или setTimeout по проверкам.
+- **`CounterpartyModal.tsx`** — UI-композиция модалки + UI-state (notifications, stepperError, history, stepAnim, completedFields), которые остались как чистая презентация. Stepper-правила (`advanceStage`, `rollbackStage`, `moveCurrentStep`) — UI-flow с правилами валидации, не основная бизнес-логика. Дальнейшее дробление stepper в отдельный hook возможно, но избыточно для текущей итерации.
+
+### Verification
+
+| Проверка | Результат |
+| --- | --- |
+| `bun install` (clean) | OK |
+| `bun run build` | ✓ 4.37s, 577 kB JS / 294 kB CSS |
+| `bun run lint` | 0 errors, 14 warnings (pre-existing) |
+| Playwright `/` | 0 runtime errors |
+| Playwright `?state=loading\|error\|empty` | 0 runtime errors |
+| Playwright «Запустить проверку» / открытие карточки | 0 runtime errors |
+
+UX, визуал и сценарии не менялись.
+
+### Остаточный долг
+
+1. `Index.tsx` локально вычисляет `byProcess` / `byCategory` / `riskCounts` / `filtered` поверх `data` из hook — это UI-derivations (tile chip + process), не дублирующая фильтрация. Можно перевести в `useCounterparties.filters` после согласования product-логики chip-фильтров. Сейчас оставлено как есть.
+2. Stepper-логика в `CounterpartyModal` (advanceStage / rollbackStage с правилами «нельзя в суд без сверки» и т.п.) — кандидат на `useDebtStepper`. Не делалось, чтобы не задеть многочисленные UI-привязки (notifications + history + stepAnim).
+3. `manualAssessment` flow (правка статуса контрагента из AssessmentModal) пока работает через локальный state в `Index.tsx` без отдельного hook — это переходный сценарий, который уйдёт после унификации флоу проверок.
+4. `src/lib/*` shim'ы по-прежнему остаются для внешней совместимости.
