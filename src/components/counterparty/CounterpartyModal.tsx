@@ -199,13 +199,12 @@ export function CounterpartyModal({
   const handleSave = (riskId: string, payload: RiskSavePayload) => {
     const prevRisk = risks.find((r) => r.id === riskId);
     const prevStatus = prevRisk?.status;
+    if (!prevRisk) return;
 
-    setRisks((prev) =>
-      prev.map((r) => {
-        if (r.id !== riskId) return r;
-        if (payload.kind === "confirm")
-          return {
-            ...r,
+    const updatedRisk: RiskSignal =
+      payload.kind === "confirm"
+        ? {
+            ...prevRisk,
             status: "confirmed",
             decision: {
               date: payload.date,
@@ -215,38 +214,41 @@ export function CounterpartyModal({
             },
             verification: undefined,
             dismissal: undefined,
-          };
-        if (payload.kind === "dismiss")
-          return {
-            ...r,
-            status: "dismissed",
-            dismissal: {
-              date: payload.date,
-              comment: payload.comment,
-              responsible: payload.responsible,
-            },
-            decision: undefined,
-            verification: undefined,
-          };
-        return {
-          ...r,
-          status: "verification",
-          verification: {
-            date: payload.date,
-            plannedDate: payload.plannedDate,
-            comment: payload.comment,
-            responsible: payload.responsible,
-          },
-          decision: undefined,
-          dismissal: undefined,
-        };
-      }),
-    );
+          }
+        : payload.kind === "dismiss"
+          ? {
+              ...prevRisk,
+              status: "dismissed",
+              dismissal: {
+                date: payload.date,
+                comment: payload.comment,
+                responsible: payload.responsible,
+              },
+              decision: undefined,
+              verification: undefined,
+            }
+          : {
+              ...prevRisk,
+              status: "verification",
+              verification: {
+                date: payload.date,
+                plannedDate: payload.plannedDate,
+                comment: payload.comment,
+                responsible: payload.responsible,
+              },
+              decision: undefined,
+              dismissal: undefined,
+            };
 
-    // Персистентная мутация решения по риску.
-    if (prevRisk) {
-      void persistRisk({ ...prevRisk });
-    }
+    setRisks((prev) => prev.map((r) => (r.id === riskId ? updatedRisk : r)));
+
+    // Persist обновлённое решение по риску; откат при ошибке.
+    void persistRisk(updatedRisk)
+      .then(() => toast.success("Решение по риску сохранено"))
+      .catch(() => {
+        setRisks((prev) => prev.map((r) => (r.id === riskId ? prevRisk : r)));
+        toast.error("Не удалось сохранить решение по риску");
+      });
 
     if (payload.kind === "verify") {
       setNotification({
