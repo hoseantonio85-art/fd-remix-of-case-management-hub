@@ -1,6 +1,6 @@
 import { useRef, useState } from "react";
 import { createPortal } from "react-dom";
-import { Dialog, DialogContent } from "@/shared/ui";
+import { Dialog, DialogContent, EllipseIconButton } from "@/shared/ui";
 import { Button } from "@/shared/ui";
 import { Input } from "@/shared/ui";
 import { Sparkles, Upload, X, Info, FileText } from "@/shared/ui";
