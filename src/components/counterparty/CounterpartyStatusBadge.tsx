@@ -1,4 +1,4 @@
-import { StatusBadge, type StatusTone } from "@/shared/ui";
+import { StatusBadge, type StatusTone, type StatusBadgeSize } from "@/shared/ui";
 
 function tagToTone(tag: string): StatusTone {
   const t = tag.toLowerCase();
@@ -15,12 +15,13 @@ function tagToTone(tag: string): StatusTone {
 
 type Props = {
   tag: string;
+  size?: StatusBadgeSize;
   className?: string;
 };
 
-export function CounterpartyStatusBadge({ tag, className }: Props) {
+export function CounterpartyStatusBadge({ tag, size = "compact", className }: Props) {
   return (
-    <StatusBadge tone={tagToTone(tag)} className={className}>
+    <StatusBadge tone={tagToTone(tag)} size={size} className={className}>
       {tag}
     </StatusBadge>
   );

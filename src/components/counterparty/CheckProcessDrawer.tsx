@@ -1,7 +1,6 @@
 import { useState } from "react";
-import { Sheet, SheetContent } from "@/shared/ui";
-import { CheckCircle2, Loader2, ClipboardList } from "@/shared/ui";
-import { cn } from "@/lib/utils";
+import { Sheet, SheetContent, StatusBadge, RadioChips, Button } from "@/shared/ui";
+import { Loader2, ClipboardList } from "@/shared/ui";
 
 export type CheckProcessStatus = "running" | "done";
 export type CheckRecordType = "counterparty" | "contract" | "complex";
@@ -91,13 +90,9 @@ export function ChecksDrawer({
                 Не удалось загрузить проверки: {error.message}
               </div>
               {onRetry && (
-                <button
-                  type="button"
-                  onClick={onRetry}
-                  className="shrink-0 rounded-md border border-rose-300 bg-white px-2 py-1 text-[11px] font-medium text-rose-700 hover:bg-rose-100"
-                >
+                <Button variant="secondary" size="sm" onClick={onRetry}>
                   Повторить
-                </button>
+                </Button>
               )}
             </div>
           )}
@@ -105,34 +100,16 @@ export function ChecksDrawer({
 
         {checks.length > 0 && (
           <div className="border-b border-border px-6 py-3">
-            <div className="flex flex-wrap gap-1.5">
-              {FILTERS.map((f) => {
-                const active = filter === f.value;
-                return (
-                  <button
-                    key={f.value}
-                    type="button"
-                    onClick={() => setFilter(f.value)}
-                    className={cn(
-                      "inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-[11px] font-medium transition",
-                      active
-                        ? "border-primary/30 bg-primary/5 text-primary"
-                        : "border-slate-200 bg-white text-slate-600 hover:bg-slate-50",
-                    )}
-                  >
-                    {f.label}
-                    <span
-                      className={cn(
-                        "rounded-full px-1.5 py-px text-[10px]",
-                        active ? "bg-white/70 text-primary" : "bg-slate-100 text-slate-600",
-                      )}
-                    >
-                      {counts[f.value]}
-                    </span>
-                  </button>
-                );
-              })}
-            </div>
+            <RadioChips
+              value={filter}
+              items={FILTERS.map((f) => ({
+                id: f.value,
+                title: f.label,
+                count: counts[f.value],
+              }))}
+              onChange={(id) => setFilter(id as CheckTypeFilter)}
+              wrap
+            />
           </div>
         )}
 
@@ -178,19 +155,20 @@ export function ChecksDrawer({
                     >
                       <div className="flex flex-wrap items-center gap-1.5">
                         {isDone ? (
-                          <span className="inline-flex items-center gap-1 rounded-full bg-emerald-50 px-2 py-0.5 text-[11px] font-medium text-emerald-700">
-                            <CheckCircle2 className="h-3 w-3" />
+                          <StatusBadge tone="success" size="compact">
                             Проверка завершена
-                          </span>
+                          </StatusBadge>
                         ) : (
-                          <span className="inline-flex items-center gap-1 rounded-full bg-slate-100 px-2 py-0.5 text-[11px] font-medium text-slate-700">
+                          <span className="inline-flex items-center gap-1.5">
                             <Loader2 className="h-3 w-3 animate-spin text-primary" />
-                            На проверке
+                            <StatusBadge tone="info" size="compact">
+                              На проверке
+                            </StatusBadge>
                           </span>
                         )}
-                        <span className="inline-flex items-center rounded-full border border-violet-100 bg-violet-50 px-2 py-0.5 text-[11px] font-medium text-violet-700">
+                        <StatusBadge tone="violet" size="compact">
                           {typeBadgeLabel[recordType]}
-                        </span>
+                        </StatusBadge>
                       </div>
                       <div className="text-sm font-semibold text-foreground">{title}</div>
                       <div className="text-[11px] text-muted-foreground">{meta}</div>

@@ -550,7 +550,7 @@ export function CounterpartyModal({
                   <X className="h-4 w-4" />
                 </button>
                 <div className="flex flex-wrap items-center gap-1.5">
-                  <CounterpartyStatusBadge tag={tagLabel} />
+                  <CounterpartyStatusBadge tag={tagLabel} size="regular" />
                   {problemIndicators.map((item) => {
                     const Icon = item.Icon;
                     return (

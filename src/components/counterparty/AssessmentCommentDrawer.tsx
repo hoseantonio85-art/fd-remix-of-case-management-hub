@@ -103,10 +103,9 @@ export function AssessmentCommentDrawer({
                   </button>
                   {isOpen && (
                     <div className="border-t border-slate-100 px-3 py-3">
-                      <label className="mb-1.5 block text-xs font-medium text-muted-foreground">
-                        Комментарий по группе
-                      </label>
                       <Textarea
+                        label="Комментарий по группе"
+                        labelInside
                         rows={4}
                         placeholder="Опишите, с чем вы не согласны в этой группе"
                         value={value}

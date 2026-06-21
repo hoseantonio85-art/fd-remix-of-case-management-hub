@@ -13,4 +13,4 @@
 export * from "./legacy/shadcn";
 export * from "./adapters/kit";
 export * from "./legacy/icons";
-export { StatusBadge, type StatusTone } from "./status-badge";
+export { StatusBadge, type StatusTone, type StatusBadgeSize } from "./status-badge";

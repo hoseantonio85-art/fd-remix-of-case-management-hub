@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import { InModalDrawer } from "./InModalDrawer";
-import { Button } from "@/shared/ui";
-import { Input } from "@/shared/ui";
+import { Button, Input, SimpleSelect } from "@/shared/ui";
 import type { Contract } from "@/domain/counterparty";
 
 const CONTRACT_STAGES = [
@@ -142,22 +141,16 @@ export function AddContractDrawer({
               />
             </div>
 
-            <Field
+            <SimpleSelect
               label="Этапы урегулирования"
-              error={showErrors && errors.stage ? "Обязательное поле" : null}
-            >
-              <select
-                value={stage}
-                onChange={(e) => setStage(e.target.value)}
-                className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
-              >
-                {CONTRACT_STAGES.map((s) => (
-                  <option key={s} value={s}>
-                    {s}
-                  </option>
-                ))}
-              </select>
-            </Field>
+              labelInside
+              required
+              value={stage}
+              onChange={setStage}
+              options={CONTRACT_STAGES.map((s) => ({ value: s, label: s }))}
+              error={showErrors && errors.stage}
+              helperText={showErrors && errors.stage ? "Обязательное поле" : undefined}
+            />
           </div>
         </div>
 
@@ -179,20 +172,3 @@ export function AddContractDrawer({
   );
 }
 
-function Field({
-  label,
-  error,
-  children,
-}: {
-  label: string;
-  error?: string | null;
-  children: React.ReactNode;
-}) {
-  return (
-    <div className="space-y-1">
-      <label className="text-xs font-medium text-muted-foreground">{label}</label>
-      {children}
-      {error && <div className="text-[11px] text-rose-600">{error}</div>}
-    </div>
-  );
-}

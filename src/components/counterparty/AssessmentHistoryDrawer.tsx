@@ -2,7 +2,7 @@ import { Download, FileClock, FileText, History } from "@/shared/ui";
 import { Button } from "@/shared/ui";
 import { cn } from "@/lib/utils";
 import { InModalDrawer } from "./InModalDrawer";
-import { getToneForTag, toneStyles } from "./header-theme";
+import { CounterpartyStatusBadge } from "./CounterpartyStatusBadge";
 
 // ---------- Types ----------
 
@@ -22,22 +22,6 @@ export type DownloadRecord = {
   tag: string;
   fileName: string;
 };
-
-// ---------- Shared bits ----------
-
-function TagPill({ tag }: { tag: string }) {
-  const tone = getToneForTag(tag);
-  return (
-    <span
-      className={cn(
-        "inline-flex h-6 items-center rounded-full px-2.5 text-[11px] font-medium",
-        toneStyles[tone].badge,
-      )}
-    >
-      {tag}
-    </span>
-  );
-}
 
 // ---------- Correction history ----------
 

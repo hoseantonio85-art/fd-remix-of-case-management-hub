@@ -1,8 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { Checkbox } from "@/shared/ui";
-import { Input } from "@/shared/ui";
-import { Textarea } from "@/shared/ui";
-import { Button } from "@/shared/ui";
+import { Checkbox, Input, Textarea, Button, StatusBadge, type StatusTone } from "@/shared/ui";
 import { measuresByRisk, type RiskSignal } from "@/domain/counterparty";
 import { InModalDrawer } from "./InModalDrawer";
 
@@ -13,10 +10,10 @@ export type RiskSavePayload =
   | { kind: "dismiss"; date: string; comment: string; responsible: string }
   | { kind: "verify"; date: string; plannedDate: string; comment: string; responsible: string };
 
-const kindBadge: Record<string, string> = {
-  required: "bg-foreground/5 text-foreground border border-border",
-  recommended: "bg-primary/10 text-primary",
-  situational: "bg-muted text-muted-foreground",
+const kindTone: Record<string, StatusTone> = {
+  required: "neutral",
+  recommended: "info",
+  situational: "neutral",
 };
 const kindLabel: Record<string, string> = {
   required: "обязательная",
@@ -131,11 +128,9 @@ export function RiskDrawer({
                       <div className="min-w-0 flex-1">
                         <div className="flex flex-wrap items-center gap-2">
                           <span className="text-sm font-medium">{m.name}</span>
-                          <span
-                            className={`rounded-full px-2 py-0.5 text-[10px] ${kindBadge[m.kind]}`}
-                          >
+                          <StatusBadge tone={kindTone[m.kind]} size="compact">
                             {kindLabel[m.kind]}
-                          </span>
+                          </StatusBadge>
                         </div>
                         <div className="mt-0.5 text-xs text-muted-foreground">{m.hint}</div>
                       </div>
