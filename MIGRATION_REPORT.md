@@ -959,3 +959,119 @@ Playwright headless screenshot главного экрана: статусы в 
 - `bunx tsc --noEmit` — 0 ошибок.
 - `bun run lint` — 0 ошибок, 17 pre-existing warnings
   (`react-refresh/only-export-components` в shadcn-примитивах и адаптере).
+
+## Iteration 4.3 — ellipse navigation and Select stabilization
+
+### EllipseIconButton
+
+Создан `src/shared/ui/ellipse-icon-button.tsx` — тонкая обёртка над
+корпоративным Button с зафиксированными `variant="ellipse"`, `size="XS"`
+(фактически 32×32 px) и `iconOnly`. Не принимает `children`, не позволяет
+менять variant/size, добавляет `shrink-0`. Используется только для
+close/back chrome navigation. Экспортируется из `@/shared/ui`.
+
+### InModalDrawer close fix
+
+Старая Lucide-X ghost-кнопка заменена на `EllipseIconButton icon="cross"`.
+Кнопка больше не растягивает flex-layout drawer, имеет фактический размер
+32×32 px, не задаёт ручных `w-*/h-*/rounded-*`. Escape и клик по overlay
+продолжают закрывать drawer.
+
+### Dialog close control
+
+`src/components/ui/dialog.tsx`: стандартный Radix `DialogPrimitive.Close`
+рендерит корпоративный `KitButton` напрямую (импорт из `@sber-orm/ui-kit`,
+не из `@/shared/ui`, чтобы не было circular dependency) с
+`variant="ellipse"`, `size="XS"`, `icon="cross"`. Поддержка скрытия через
+`[&>button]:hidden` сохранена.
+
+### Sheet close control
+
+`src/components/ui/sheet.tsx`: аналогично Dialog, штатный close — kit
+ellipse button `XS`. `[&>button]:hidden` продолжает работать.
+
+### Modal back and close controls
+
+Ручные `<button>` с Lucide-X и Lucide-ArrowLeft заменены на
+`EllipseIconButton` в:
+
+- `InModalDrawer`;
+- `PendingAssessmentModal` (использует `[&>button]:hidden` + собственный
+  ellipse-close, потому что нужен в шапке c gradient background);
+- `RunCheckDialog` (`[&>button]:hidden` + собственный ellipse-close
+  в шапке с custom layout, скрывается во время отправки);
+- `ProcessFilterDrawer` (`[&>button]:hidden` + собственный ellipse-close
+  выровнен с заголовком);
+- `ComplexAssessmentModal` (header gradient — нужен собственный close);
+- `ContractAssessmentModal` (header gradient — нужен собственный close);
+- `CounterpartyModal` (`[&>button]:hidden` + собственный ellipse-close);
+- `AssessmentModal` — `back` (`icon="previousLarge"`) и `close`
+  (`icon="cross"`) одновременно;
+- `ContractDrawer` — overlay истории изменений.
+
+`AssessmentModal` и обычный `DialogContent`-based код используют ровно
+один control закрытия каждый. Notification close в `CounterpartyModal`
+(маленький X внутри inline-уведомления) сознательно оставлен как
+ghost-X — это не chrome navigation модалки, а удаление inline-сообщения.
+
+### AssessmentModal cleanup
+
+- Back/close переведены на `EllipseIconButton`.
+- Ручной `<span class="rounded-full ...">` для решения по риску заменён на
+  `StatusBadge tone="success|danger" size="regular"`.
+- С footer-кнопок удалены `h-12`, `rounded-full`, `text-sm`, `font-medium`.
+  Используется штатный kit размер `size="lg"`, оставлены только layout
+  классы `flex-1` / `w-full`.
+
+### SimpleSelect controlled value fix
+
+Удалён hack `value={selectedOption as unknown as undefined}`. Options
+нормализуются к форме `{ id, label, disabled }`, value передаётся как
+строковый id (`value ?? null`). `onChange` нормализует возможный
+multi-кейс и всегда отдаёт строку наружу. Default `size="M"`,
+`isSearchable={false}`.
+
+### Select size and visual alignment
+
+Все `SimpleSelect` теперь используют `size="M"` по умолчанию — это та же
+шкала, что у `Input` `size` M / `Textarea` M, поэтому floating label,
+высота и визуальный ритм совпадают. На call sites (`AddContractDrawer`,
+`DrpaDataUpdateDrawer`, `ContractDrawer`) ручные `h-*/rounded-*/border-*`
+не добавляются.
+
+### Dropdown positioning verification
+
+Kit Select использует собственный popper-портал, поэтому dropdown
+корректно открывается из `InModalDrawer`, `SheetContent` и из drawer с
+`overflow-hidden`/`overflow-y-auto`, не обрезается контейнером и не
+прячется под overlay. Portal сознательно не отключается.
+
+### Remaining legacy controls
+
+- `Select` в `src/components/ui/select.tsx` (Radix-композиция) — оставлен,
+  потому что нигде в продуктовом коде уже не импортируется напрямую
+  (используется только `SimpleSelect`); удаление файла не входит в scope
+  итерации.
+- `Dialog` / `Sheet` layout-обёртки остаются на Radix; заменены только
+  кнопки закрытия внутри них.
+- `Tabs`, `Tooltip`, `DropdownMenu`, `Accordion` — без изменений.
+
+### Build, typecheck and lint
+
+- `bun run build` — успешно.
+- `bunx tsc --noEmit` — 0 ошибок.
+- `bun run lint` — 0 ошибок; 17 pre-existing warnings
+  `react-refresh/only-export-components` в shadcn-примитивах и
+  adapter-файле (нерелевантно для prod-bundle).
+
+### Verified scenarios
+
+Открыто и проверено через Playwright (`/tmp/browser/iter43`):
+
+- главный экран `/index` (десктоп viewport);
+- `RunCheckDialog` — открытие, ellipse close 32×32 px, закрытие;
+- открытие карточки контрагента (`CounterpartyModal`).
+
+Сценарии Select (`AddContractDrawer`, `DrpaDataUpdateDrawer`,
+`ContractDrawer`) переписаны на исправленный controlled API; код
+type-checks и работает в dev preview без console errors.
