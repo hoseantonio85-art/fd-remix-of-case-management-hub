@@ -1,5 +1,17 @@
-import { getToneForTag, toneStyles } from "./header-theme";
-import { cn } from "@/lib/utils";
+import { StatusBadge, type StatusTone } from "@/shared/ui";
+
+function tagToTone(tag: string): StatusTone {
+  const t = tag.toLowerCase();
+  if (t.includes("просрочено с риском") || (t.includes("дефолт") && t.includes("просроч")))
+    return "danger";
+  if (t.includes("риск дефолта")) return "warning";
+  if (t.includes("просроч")) return "danger";
+  if (t.includes("нет риска")) return "success";
+  if (t.includes("снят")) return "success";
+  if (t.includes("на оценке")) return "violet";
+  if (t.includes("подтвержд")) return "danger";
+  return "neutral";
+}
 
 type Props = {
   tag: string;
@@ -7,17 +19,9 @@ type Props = {
 };
 
 export function CounterpartyStatusBadge({ tag, className }: Props) {
-  const tone = getToneForTag(tag);
-  const styles = toneStyles[tone];
   return (
-    <span
-      className={cn(
-        "inline-flex w-fit items-center rounded-full px-2.5 py-1 text-[11px] font-medium",
-        styles.badge,
-        className,
-      )}
-    >
+    <StatusBadge tone={tagToTone(tag)} className={className}>
       {tag}
-    </span>
+    </StatusBadge>
   );
 }
