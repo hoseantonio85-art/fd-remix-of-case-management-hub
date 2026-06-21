@@ -506,3 +506,27 @@ legacy, известный технический долг, чек-лист пе
   из `src/components/**` и `src/hooks/**`, не добавлено — контролируется ревью.
 - React/Vite alias-workaround для kit остаётся (см. итерация 1).
 - Tailwind v4 + SCSS kit — нет единого источника токенов.
+
+## Итерация 3.1 — checks flow API-ready
+
+- `useChecks` теперь **всегда** выполняет первичную загрузку через
+  `checkRepository.list()` при монтировании. `subscribe()` подключается
+  дополнительно — только для live-обновлений (running → done, изменения
+  от других клиентов) и не блокирует базовый сценарий, если транспорт noop.
+- После `run()` UI добавляет/обновляет возвращённый `CheckRecordDto` в
+  локальном state с дедупликацией по `id`. После `remove()` запись удаляется
+  локально. Оба пути работают без live-транспорта.
+- Перед `list/run/remove` хук очищает предыдущую ошибку. `retry()` повторяет
+  `list()` и сбрасывает error.
+- `ChecksDrawer` принимает `loading`, `error`, `onRetry` и показывает
+  компактный блок «Не удалось загрузить проверки … Повторить» внутри
+  существующего шапочного блока — без нового большого UI-компонента.
+- `Index.tsx` пробрасывает `checksLoading/checksError/retryChecks` в
+  `ChecksDrawer`; `void checksError` больше нет.
+- API-реализация `createApiCheckRepository.subscribe` оставлена noop как
+  явная точка расширения (polling/SSE/WS) — list/run/remove работают и
+  без live-транспорта (см. API_CONTRACT.md §11).
+- Проверено: mock-режим — список, запуск, удаление, переход running→done,
+  фильтры, error/retry; API-режим без `VITE_API_BASE_URL` — ChecksDrawer
+  показывает нормализованную ошибку `API_NOT_CONFIGURED` и кнопку
+  «Повторить». `bun run build` и `bun run lint` — без ошибок.
