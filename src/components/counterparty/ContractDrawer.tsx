@@ -1,8 +1,11 @@
 import { useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
-import { Button } from "@/shared/ui";
-import { Input } from "@/shared/ui";
 import {
+  Button,
+  Input,
+  SimpleSelect,
+  RadioChips,
+  StatusBadge,
   Plus,
   ChevronDown,
   ChevronRight,
@@ -14,7 +17,6 @@ import {
   Pencil,
   Trash2,
 } from "@/shared/ui";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/shared/ui";
 
 const SETTLEMENT_STAGES = [
   "Мониторинг",
@@ -487,11 +489,9 @@ export function ContractDrawer({
       <div className="relative flex h-full min-h-0 flex-col">
         {/* HEADER */}
         <div className={`shrink-0 px-6 pt-6 pb-5 ${styles.gradient}`}>
-          <span
-            className={`inline-flex w-fit items-center rounded-full px-2.5 py-1 text-[11px] font-medium ${styles.badge}`}
-          >
+          <StatusBadge tone={hasOverdue ? "danger" : "success"} size="regular">
             {tagLabel}
-          </span>
+          </StatusBadge>
           <h2 className="mt-3 text-2xl font-semibold tracking-tight">{contract.number}</h2>
           {counterpartyName && (
             <p className="mt-1 text-sm text-muted-foreground">{counterpartyName}</p>
@@ -511,47 +511,36 @@ export function ContractDrawer({
           <section className="rounded-2xl border border-border bg-white p-4">
             <div className="mb-3 flex items-center justify-between gap-2">
               <div className="text-base font-semibold">Задолженность</div>
-              <button
+              <Button
                 type="button"
+                variant="ghost"
+                size="icon"
+                iconOnly
                 aria-label="Добавить корректировку"
                 onClick={() => {
                   setShowAddAdjustment((v) => !v);
                   setAdjError(null);
                 }}
-                className="flex h-9 w-9 items-center justify-center rounded-full border border-border bg-muted/40 text-muted-foreground transition hover:bg-muted"
               >
                 {showAddAdjustment ? <X className="h-4 w-4" /> : <Plus className="h-4 w-4" />}
-              </button>
+              </Button>
             </div>
 
             {showAddAdjustment && (
               <div className="mb-3 rounded-2xl border border-border bg-muted/30 p-3">
                 <div className="space-y-2">
-                  <div>
-                    <div className="mb-1 text-xs text-muted-foreground">Тип операции</div>
-                    <div className="flex gap-2">
-                      <button
-                        type="button"
-                        onClick={() => {
-                          setAdjType("increase");
-                          setAdjError(null);
-                        }}
-                        className={`flex h-9 flex-1 items-center justify-center rounded-full border text-sm font-medium transition ${adjType === "increase" ? "border-primary bg-primary text-primary-foreground" : "border-border bg-muted/40 text-muted-foreground hover:bg-muted"}`}
-                      >
-                        Увеличить
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => {
-                          setAdjType("decrease");
-                          setAdjError(null);
-                        }}
-                        className={`flex h-9 flex-1 items-center justify-center rounded-full border text-sm font-medium transition ${adjType === "decrease" ? "border-primary bg-primary text-primary-foreground" : "border-border bg-muted/40 text-muted-foreground hover:bg-muted"}`}
-                      >
-                        Уменьшить
-                      </button>
-                    </div>
-                  </div>
+                  <RadioChips
+                    label="Тип операции"
+                    value={adjType}
+                    items={[
+                      { id: "increase", title: "Увеличить" },
+                      { id: "decrease", title: "Уменьшить" },
+                    ]}
+                    onChange={(id) => {
+                      setAdjType(id as "increase" | "decrease");
+                      setAdjError(null);
+                    }}
+                  />
                   <LabeledInput
                     label="Сумма"
                     value={adjAmount}
@@ -638,28 +627,32 @@ export function ContractDrawer({
                           </div>
                         </button>
                         <div className="flex shrink-0 items-center gap-1">
-                          <button
+                          <Button
                             type="button"
+                            variant="ghost"
+                            size="icon"
+                            iconOnly
                             aria-label="Редактировать"
                             onClick={(e) => {
                               e.stopPropagation();
                               openEditAdjustment(a);
                             }}
-                            className="flex h-7 w-7 items-center justify-center rounded-full text-muted-foreground transition hover:bg-white hover:text-foreground"
                           >
                             <Pencil className="h-3.5 w-3.5" />
-                          </button>
-                          <button
+                          </Button>
+                          <Button
                             type="button"
+                            variant="ghost"
+                            size="icon"
+                            iconOnly
                             aria-label="Удалить"
                             onClick={(e) => {
                               e.stopPropagation();
                               handleDeleteAdjustment(a.id);
                             }}
-                            className="flex h-7 w-7 items-center justify-center rounded-full text-muted-foreground transition hover:bg-white hover:text-rose-600"
                           >
                             <Trash2 className="h-3.5 w-3.5" />
-                          </button>
+                          </Button>
                         </div>
                       </div>
 
@@ -668,33 +661,18 @@ export function ContractDrawer({
                           {isEditing ? (
                             <div className="rounded-2xl border border-border bg-white p-3">
                               <div className="space-y-2">
-                                <div>
-                                  <div className="mb-1 text-xs text-muted-foreground">
-                                    Тип операции
-                                  </div>
-                                  <div className="flex gap-2">
-                                    <button
-                                      type="button"
-                                      onClick={() => {
-                                        setEditAdjType("increase");
-                                        setEditAdjError(null);
-                                      }}
-                                      className={`flex h-9 flex-1 items-center justify-center rounded-full border text-sm font-medium transition ${editAdjType === "increase" ? "border-primary bg-primary text-primary-foreground" : "border-border bg-white text-muted-foreground hover:bg-muted"}`}
-                                    >
-                                      Увеличить
-                                    </button>
-                                    <button
-                                      type="button"
-                                      onClick={() => {
-                                        setEditAdjType("decrease");
-                                        setEditAdjError(null);
-                                      }}
-                                      className={`flex h-9 flex-1 items-center justify-center rounded-full border text-sm font-medium transition ${editAdjType === "decrease" ? "border-primary bg-primary text-primary-foreground" : "border-border bg-white text-muted-foreground hover:bg-muted"}`}
-                                    >
-                                      Уменьшить
-                                    </button>
-                                  </div>
-                                </div>
+                                <RadioChips
+                                  label="Тип операции"
+                                  value={editAdjType}
+                                  items={[
+                                    { id: "increase", title: "Увеличить" },
+                                    { id: "decrease", title: "Уменьшить" },
+                                  ]}
+                                  onChange={(id) => {
+                                    setEditAdjType(id as "increase" | "decrease");
+                                    setEditAdjError(null);
+                                  }}
+                                />
                                 <LabeledInput
                                   label="Сумма"
                                   value={editAdjAmount}
@@ -772,17 +750,19 @@ export function ContractDrawer({
           <section className="rounded-2xl border border-border bg-white p-4">
             <div className="mb-3 flex items-center justify-between gap-2">
               <div className="text-base font-semibold">Просроченная ДЗ</div>
-              <button
+              <Button
                 type="button"
+                variant="ghost"
+                size="icon"
+                iconOnly
                 aria-label="Добавить просрочку"
                 onClick={() => {
                   setShowAddOverdue((v) => !v);
                   setOverdueError(null);
                 }}
-                className="flex h-9 w-9 items-center justify-center rounded-full border border-border bg-muted/40 text-muted-foreground transition hover:bg-muted"
               >
                 {showAddOverdue ? <X className="h-4 w-4" /> : <Plus className="h-4 w-4" />}
-              </button>
+              </Button>
             </div>
 
             {showAddOverdue && (
@@ -803,21 +783,13 @@ export function ContractDrawer({
                     onChange={setDueDate}
                     placeholder="ДД.ММ.ГГГГ"
                   />
-                  <div>
-                    <div className="mb-1 text-xs text-muted-foreground">Этапы урегулирования</div>
-                    <Select value={newOverdueStage} onValueChange={(v) => setNewOverdueStage(v)}>
-                      <SelectTrigger className="h-9 w-full border-input text-sm shadow-sm">
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {SETTLEMENT_STAGES.map((s) => (
-                          <SelectItem key={s} value={s}>
-                            {s}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
+                  <SimpleSelect
+                    label="Этапы урегулирования"
+                    labelInside
+                    value={newOverdueStage}
+                    onChange={setNewOverdueStage}
+                    options={SETTLEMENT_STAGES.map((s) => ({ value: s, label: s }))}
+                  />
                 </div>
                 {computedDays !== null && (
                   <div className="mt-2 text-xs text-muted-foreground">
@@ -897,33 +869,37 @@ export function ContractDrawer({
                           </div>
                         </button>
                         {fullyPaid && (
-                          <span className="inline-flex shrink-0 items-center rounded-full bg-emerald-100 px-2 py-0.5 text-[11px] font-medium text-emerald-800">
+                          <StatusBadge tone="success" size="compact" className="shrink-0">
                             Погашено полностью
-                          </span>
+                          </StatusBadge>
                         )}
                         <div className="flex shrink-0 items-center gap-1">
-                          <button
+                          <Button
                             type="button"
+                            variant="ghost"
+                            size="icon"
+                            iconOnly
                             aria-label="Редактировать"
                             onClick={(e) => {
                               e.stopPropagation();
                               openEditOverdue(i);
                             }}
-                            className="flex h-7 w-7 items-center justify-center rounded-full text-muted-foreground transition hover:bg-white hover:text-foreground"
                           >
                             <Pencil className="h-3.5 w-3.5" />
-                          </button>
-                          <button
+                          </Button>
+                          <Button
                             type="button"
+                            variant="ghost"
+                            size="icon"
+                            iconOnly
                             aria-label="Удалить"
                             onClick={(e) => {
                               e.stopPropagation();
                               handleDeleteOverdue(i);
                             }}
-                            className="flex h-7 w-7 items-center justify-center rounded-full text-muted-foreground transition hover:bg-white hover:text-rose-600"
                           >
                             <Trash2 className="h-3.5 w-3.5" />
-                          </button>
+                          </Button>
                         </div>
                       </div>
 
@@ -950,23 +926,13 @@ export function ContractDrawer({
                                   }}
                                   placeholder="ДД.ММ.ГГГГ"
                                 />
-                                <div>
-                                  <div className="mb-1 text-xs text-muted-foreground">
-                                    Этапы урегулирования
-                                  </div>
-                                  <Select value={editOvStage} onValueChange={setEditOvStage}>
-                                    <SelectTrigger className="h-9 w-full border-input text-sm shadow-sm">
-                                      <SelectValue />
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                      {SETTLEMENT_STAGES.map((s) => (
-                                        <SelectItem key={s} value={s}>
-                                          {s}
-                                        </SelectItem>
-                                      ))}
-                                    </SelectContent>
-                                  </Select>
-                                </div>
+                                <SimpleSelect
+                                  label="Этапы урегулирования"
+                                  labelInside
+                                  value={editOvStage}
+                                  onChange={setEditOvStage}
+                                  options={SETTLEMENT_STAGES.map((s) => ({ value: s, label: s }))}
+                                />
                               </div>
                               {editOvError && (
                                 <div className="mt-2 flex items-start gap-2 rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 text-xs text-amber-900">
@@ -1008,9 +974,9 @@ export function ContractDrawer({
                               <div>
                                 <div className="text-xs text-muted-foreground">Этап</div>
                                 <div className="mt-0.5">
-                                  <span className="inline-flex items-center rounded-full bg-muted px-2 py-0.5 text-xs font-medium text-foreground">
+                                  <StatusBadge tone="neutral" size="compact">
                                     {o.stage}
-                                  </span>
+                                  </StatusBadge>
                                 </div>
                               </div>
                             </div>
@@ -1117,10 +1083,10 @@ export function ContractDrawer({
           <Button
             type="button"
             variant="outline"
-            className="h-11 w-full rounded-xl"
+            className="w-full"
             onClick={() => setHistoryOpen(true)}
           >
-            <HistoryIcon className="mr-1.5 h-4 w-4" />
+            <HistoryIcon className="h-4 w-4" />
             История изменений
           </Button>
         </div>
@@ -1135,13 +1101,15 @@ export function ContractDrawer({
                   Действия по договору: корректировки, просрочки, погашения.
                 </p>
               </div>
-              <button
-                onClick={() => setHistoryOpen(false)}
-                className="rounded-full p-1.5 text-muted-foreground hover:bg-muted"
+              <Button
+                variant="ghost"
+                size="icon"
+                iconOnly
                 aria-label="Закрыть"
+                onClick={() => setHistoryOpen(false)}
               >
                 <X className="h-4 w-4" />
-              </button>
+              </Button>
             </div>
             <div className="flex-1 overflow-y-auto px-6 py-4">
               {changeHistory.length === 0 ? (
@@ -1170,6 +1138,8 @@ export function ContractDrawer({
   );
 }
 
+// Thin wrapper preserving the (value, v) string API of legacy call sites,
+// while rendering corporate Input with floating labelInside.
 function LabeledInput({
   label,
   value,
@@ -1182,10 +1152,13 @@ function LabeledInput({
   placeholder?: string;
 }) {
   return (
-    <div>
-      <div className="mb-1 text-xs text-muted-foreground">{label}</div>
-      <Input value={value} onChange={(e) => onChange(e.target.value)} placeholder={placeholder} />
-    </div>
+    <Input
+      label={label}
+      labelInside
+      value={value}
+      onChange={(e) => onChange(e.target.value)}
+      placeholder={placeholder}
+    />
   );
 }
 

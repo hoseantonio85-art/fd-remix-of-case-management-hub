@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react";
-import { Sheet, SheetContent, StatusBadge } from "@/shared/ui";
+import { Sheet, SheetContent, StatusBadge, SimpleSelect } from "@/shared/ui";
 import { Button } from "@/shared/ui";
 import { Input } from "@/shared/ui";
 import { Pencil, Plus, CheckCircle2, ShieldCheck } from "@/shared/ui";
@@ -112,10 +112,12 @@ export function DrpaDataUpdateDrawer({
                 Обновлено {updatedCount} из {total} контрагентов
               </span>
               {confirmed && (
-                <span className="inline-flex items-center gap-1 rounded-full bg-emerald-50 px-2 py-0.5 text-[11px] font-medium text-emerald-800">
-                  <ShieldCheck className="h-3 w-3" />
-                  Зафиксировано
-                </span>
+                <StatusBadge tone="success" size="regular">
+                  <span className="inline-flex items-center gap-1">
+                    <ShieldCheck className="h-3 w-3" />
+                    Зафиксировано
+                  </span>
+                </StatusBadge>
               )}
             </div>
             <div className="mt-2 h-1.5 w-full overflow-hidden rounded-full bg-muted">
@@ -257,10 +259,10 @@ function DrpaCounterpartyCard({
             <Button
               type="button"
               variant="secondary"
+              className="w-full"
               onClick={() => setAddOpen(true)}
-              className="h-10 w-full justify-center rounded-xl border border-border bg-slate-50 text-sm font-medium text-foreground hover:bg-slate-100"
             >
-              <Plus className="mr-1.5 h-4 w-4" />
+              <Plus className="h-4 w-4" />
               Добавить договор
             </Button>
           ))}
@@ -268,13 +270,8 @@ function DrpaCounterpartyCard({
 
       {!readOnly && !card.updated && (
         <div className="mt-3 flex justify-end">
-          <Button
-            type="button"
-            variant="outline"
-            onClick={onMarkActual}
-            className="h-9 rounded-full text-xs"
-          >
-            <CheckCircle2 className="mr-1.5 h-3.5 w-3.5" />
+          <Button type="button" variant="outline" size="sm" onClick={onMarkActual}>
+            <CheckCircle2 className="h-3.5 w-3.5" />
             Данные актуальны
           </Button>
         </div>
@@ -324,10 +321,10 @@ function ContractRow({
         <Button
           type="button"
           variant="ghost"
-          size="sm"
-          onClick={onEdit}
-          className="h-8 shrink-0 px-2 text-xs"
+          size="icon"
+          iconOnly
           aria-label="Редактировать договор"
+          onClick={onEdit}
         >
           <Pencil className="h-3.5 w-3.5" />
         </Button>
@@ -375,18 +372,27 @@ function ContractEditForm({
   return (
     <div className="space-y-3 rounded-xl border border-primary/30 bg-primary/5 p-3">
       <FormGrid>
-        <Field label="Название договора">
-          <Input value={name} onChange={(e) => setName(e.target.value)} />
-        </Field>
-        <Field label="Задолженность">
-          <Input value={debt} onChange={(e) => setDebt(e.target.value)} placeholder="0" />
-        </Field>
-        <Field label="Просрочка">
-          <Input value={overdue} onChange={(e) => setOverdue(e.target.value)} placeholder="0" />
-        </Field>
-        <Field label="Этап">
-          <StageSelect value={stage} onChange={setStage} />
-        </Field>
+        <Input
+          label="Название договора"
+          labelInside
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+        />
+        <Input
+          label="Задолженность"
+          labelInside
+          value={debt}
+          onChange={(e) => setDebt(e.target.value)}
+          placeholder="0"
+        />
+        <Input
+          label="Просрочка"
+          labelInside
+          value={overdue}
+          onChange={(e) => setOverdue(e.target.value)}
+          placeholder="0"
+        />
+        <StageSelect value={stage} onChange={setStage} label="Этап" />
       </FormGrid>
       <div className="flex justify-end gap-2">
         <Button variant="outline" size="sm" onClick={onCancel}>
@@ -445,22 +451,45 @@ function ContractAddForm({
   return (
     <div className="space-y-3 rounded-xl border border-border bg-slate-50 p-3">
       <FormGrid>
-        <Field label="Название договора" error={error && !name.trim()}>
-          <Input
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            placeholder="Например, Договор поставки № 245"
-          />
-        </Field>
-        <Field label="Задолженность" error={error && !debt.trim()}>
-          <Input value={debt} onChange={(e) => setDebt(e.target.value)} placeholder="0 ₽" />
-        </Field>
-        <Field label="Просрочка" error={error && !overdue.trim()}>
-          <Input value={overdue} onChange={(e) => setOverdue(e.target.value)} placeholder="0 ₽" />
-        </Field>
-        <Field label="Этап" error={error && !stage}>
-          <StageSelect value={stage} onChange={setStage} placeholder="Выберите этап" />
-        </Field>
+        <Input
+          label="Название договора"
+          labelInside
+          required
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+          placeholder="Например, Договор поставки № 245"
+          error={error && !name.trim()}
+          helperText={error && !name.trim() ? "Обязательное поле" : undefined}
+        />
+        <Input
+          label="Задолженность"
+          labelInside
+          required
+          value={debt}
+          onChange={(e) => setDebt(e.target.value)}
+          placeholder="0 ₽"
+          error={error && !debt.trim()}
+          helperText={error && !debt.trim() ? "Обязательное поле" : undefined}
+        />
+        <Input
+          label="Просрочка"
+          labelInside
+          required
+          value={overdue}
+          onChange={(e) => setOverdue(e.target.value)}
+          placeholder="0 ₽"
+          error={error && !overdue.trim()}
+          helperText={error && !overdue.trim() ? "Обязательное поле" : undefined}
+        />
+        <StageSelect
+          value={stage}
+          onChange={setStage}
+          label="Этап"
+          required
+          placeholder="Выберите этап"
+          error={error && !stage}
+          helperText={error && !stage ? "Обязательное поле" : undefined}
+        />
       </FormGrid>
       <div className="flex justify-end gap-2">
         <Button variant="outline" size="sm" onClick={onCancel}>
@@ -478,46 +507,35 @@ function FormGrid({ children }: { children: React.ReactNode }) {
   return <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">{children}</div>;
 }
 
-function Field({
-  label,
-  error,
-  children,
-}: {
-  label: string;
-  error?: boolean;
-  children: React.ReactNode;
-}) {
-  return (
-    <div className="space-y-1">
-      <label className="text-xs font-medium text-muted-foreground">{label}</label>
-      {children}
-      {error && <div className="text-[11px] text-rose-600">Обязательное поле</div>}
-    </div>
-  );
-}
-
 function StageSelect({
   value,
   onChange,
   placeholder,
+  label,
+  required,
+  error,
+  helperText,
 }: {
   value: string;
   onChange: (v: string) => void;
   placeholder?: string;
+  label?: string;
+  required?: boolean;
+  error?: boolean;
+  helperText?: React.ReactNode;
 }) {
   return (
-    <select
+    <SimpleSelect
+      label={label}
+      labelInside
+      required={required}
+      error={error}
+      helperText={helperText}
+      placeholder={placeholder}
       value={value}
-      onChange={(e) => onChange(e.target.value)}
-      className="flex h-9 w-full rounded-md border border-input bg-white px-3 py-1 text-sm shadow-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
-    >
-      {placeholder !== undefined && <option value="">{placeholder}</option>}
-      {CONTRACT_STAGES.map((s) => (
-        <option key={s} value={s}>
-          {s}
-        </option>
-      ))}
-    </select>
+      onChange={onChange}
+      options={CONTRACT_STAGES.map((s) => ({ value: s, label: s }))}
+    />
   );
 }
 

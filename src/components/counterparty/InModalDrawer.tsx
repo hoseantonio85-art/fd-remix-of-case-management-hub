@@ -1,5 +1,5 @@
 import { ReactNode, useEffect } from "react";
-import { X } from "@/shared/ui";
+import { X, Button } from "@/shared/ui";
 import { cn } from "@/lib/utils";
 
 /**
@@ -40,13 +40,16 @@ export function InModalDrawer({
           className,
         )}
       >
-        <button
-          onClick={() => onOpenChange(false)}
-          className="absolute right-4 top-4 z-10 rounded-full bg-white/80 p-1.5 text-muted-foreground backdrop-blur transition hover:bg-white"
+        <Button
+          variant="ghost"
+          size="icon"
+          iconOnly
           aria-label="Закрыть"
+          onClick={() => onOpenChange(false)}
+          className="absolute right-4 top-4 z-10"
         >
           <X className="h-4 w-4" />
-        </button>
+        </Button>
         {children}
       </div>
     </>

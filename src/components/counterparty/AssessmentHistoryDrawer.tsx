@@ -2,7 +2,7 @@ import { Download, FileClock, FileText, History } from "@/shared/ui";
 import { Button } from "@/shared/ui";
 import { cn } from "@/lib/utils";
 import { InModalDrawer } from "./InModalDrawer";
-import { getToneForTag, toneStyles } from "./header-theme";
+import { CounterpartyStatusBadge } from "./CounterpartyStatusBadge";
 
 // ---------- Types ----------
 
@@ -22,22 +22,6 @@ export type DownloadRecord = {
   tag: string;
   fileName: string;
 };
-
-// ---------- Shared bits ----------
-
-function TagPill({ tag }: { tag: string }) {
-  const tone = getToneForTag(tag);
-  return (
-    <span
-      className={cn(
-        "inline-flex h-6 items-center rounded-full px-2.5 text-[11px] font-medium",
-        toneStyles[tone].badge,
-      )}
-    >
-      {tag}
-    </span>
-  );
-}
 
 // ---------- Correction history ----------
 
@@ -104,9 +88,9 @@ export function CorrectionHistoryDrawer({
                   <span>{r.author}</span>
                 </div>
                 <div className="mt-3 flex flex-wrap items-center gap-2">
-                  <TagPill tag={r.fromTag} />
+                  <CounterpartyStatusBadge tag={r.fromTag} size="compact" />
                   <span className="text-muted-foreground">→</span>
-                  <TagPill tag={r.toTag} />
+                  <CounterpartyStatusBadge tag={r.toTag} size="compact" />
                 </div>
                 <p className="mt-3 text-sm text-foreground">{r.comment}</p>
                 <div className="mt-3 rounded-xl bg-slate-50 px-3 py-2">
@@ -209,7 +193,7 @@ export function DownloadHistoryDrawer({
                   </span>
                   <div className="min-w-0 flex-1">
                     <div className="flex flex-wrap items-center gap-2">
-                      <TagPill tag={r.tag} />
+                      <CounterpartyStatusBadge tag={r.tag} size="compact" />
                       <span className="text-xs text-muted-foreground">{r.dateTime}</span>
                     </div>
                     <div className="mt-1 truncate text-sm font-medium text-foreground">

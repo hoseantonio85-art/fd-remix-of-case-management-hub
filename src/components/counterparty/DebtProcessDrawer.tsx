@@ -8,6 +8,10 @@ import {
   FileText,
   Clock,
   History as HistoryIcon,
+  Button,
+  Input,
+  Textarea,
+  StatusBadge,
 } from "@/shared/ui";
 import type { CollectionSubStep } from "@/domain/counterparty";
 import { InModalDrawer } from "./InModalDrawer";
@@ -194,7 +198,7 @@ export function DebtProcessDrawer({
                       >
                         {step.title}
                       </div>
-                      <StatusBadge status={status} overdue={overdue} />
+                      <StepStatusBadge status={status} overdue={overdue} />
                     </div>
 
                     {meta && (isCurrent || isDone) && (
@@ -226,27 +230,25 @@ export function DebtProcessDrawer({
                           </span>
                         )}
                         {remaining !== null && (
-                          <span
-                            className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 font-medium ${
-                              overdue
-                                ? "bg-amber-50 text-amber-800 border border-amber-100"
-                                : "bg-emerald-50 text-emerald-800 border border-emerald-100"
-                            }`}
-                          >
-                            {overdue ? (
-                              <>
-                                <AlertTriangle className="h-3 w-3" /> Просрочено на{" "}
-                                {Math.abs(remaining)} дн.
-                              </>
-                            ) : (
-                              <>
-                                <Clock className="h-3 w-3" /> Осталось {remaining} дн.
-                              </>
-                            )}
-                          </span>
+                          <StatusBadge tone={overdue ? "warning" : "success"} size="compact">
+                            <span className="inline-flex items-center gap-1">
+                              {overdue ? (
+                                <>
+                                  <AlertTriangle className="h-3 w-3" /> Просрочено на{" "}
+                                  {Math.abs(remaining)} дн.
+                                </>
+                              ) : (
+                                <>
+                                  <Clock className="h-3 w-3" /> Осталось {remaining} дн.
+                                </>
+                              )}
+                            </span>
+                          </StatusBadge>
                         )}
                         {!dueDate && meta?.slaType === "none" && (
-                          <span className="rounded-full bg-muted px-2 py-0.5">Без SLA</span>
+                          <StatusBadge tone="neutral" size="compact">
+                            Без SLA
+                          </StatusBadge>
                         )}
                       </div>
                     )}
@@ -287,50 +289,48 @@ export function DebtProcessDrawer({
                           </div>
                         )}
                         <div className="flex flex-wrap gap-2">
-                          <button
-                            onClick={onAdvance}
-                            className="inline-flex items-center gap-1.5 rounded-md bg-emerald-600 px-3 py-1.5 text-xs font-medium text-white shadow-sm transition hover:bg-emerald-700"
-                          >
+                          <Button size="sm" onClick={onAdvance}>
                             <ArrowRight className="h-3.5 w-3.5" /> На следующий этап
-                          </button>
+                          </Button>
                           {canRollback && !rollbackOpen && (
-                            <button
+                            <Button
+                              size="sm"
+                              variant="secondary"
                               onClick={() => setRollbackOpen(true)}
-                              className="inline-flex items-center gap-1.5 rounded-md border border-border bg-white px-3 py-1.5 text-xs font-medium text-muted-foreground transition hover:bg-muted/40 hover:text-foreground"
                             >
                               <ArrowLeft className="h-3.5 w-3.5" /> Вернуть этап
-                            </button>
+                            </Button>
                           )}
                         </div>
                         {canRollback && rollbackOpen && (
                           <div className="rounded-md border border-border bg-white p-2.5 space-y-2">
-                            <div className="text-[11px] font-medium text-foreground">
-                              Причина отката
-                            </div>
-                            <textarea
-                              value={rollbackComment}
-                              onChange={(e) => setRollbackComment(e.target.value)}
+                            <Textarea
+                              label="Причина отката"
+                              labelInside
+                              required
                               rows={2}
                               placeholder="Комментарий обязателен"
-                              className="w-full resize-none rounded-md border border-border bg-white px-2 py-1.5 text-xs outline-none focus:border-foreground/30"
+                              value={rollbackComment}
+                              onChange={(e) => setRollbackComment(e.target.value)}
                             />
                             <div className="flex gap-2">
-                              <button
+                              <Button
+                                size="sm"
                                 onClick={handleRollback}
                                 disabled={!rollbackComment.trim()}
-                                className="rounded-md bg-foreground px-2.5 py-1 text-xs font-medium text-background disabled:opacity-40"
                               >
                                 Подтвердить
-                              </button>
-                              <button
+                              </Button>
+                              <Button
+                                size="sm"
+                                variant="ghost"
                                 onClick={() => {
                                   setRollbackOpen(false);
                                   setRollbackComment("");
                                 }}
-                                className="rounded-md border border-border bg-white px-2.5 py-1 text-xs font-medium text-muted-foreground hover:bg-muted/40"
                               >
                                 Отмена
-                              </button>
+                              </Button>
                             </div>
                           </div>
                         )}
@@ -385,31 +385,25 @@ function Chip({ label, value, accent }: { label: string; value: string; accent?:
   );
 }
 
-function StatusBadge({ status, overdue }: { status: StepStatus; overdue: boolean }) {
+function StepStatusBadge({ status, overdue }: { status: StepStatus; overdue: boolean }) {
   if (status === "current") {
     return (
-      <span
-        className={`shrink-0 inline-flex items-center rounded-full px-2 h-5 text-[11px] font-medium ${
-          overdue
-            ? "bg-amber-50 text-amber-800 border border-amber-100"
-            : "bg-primary/10 text-primary border border-primary/15"
-        }`}
-      >
+      <StatusBadge tone={overdue ? "warning" : "info"} size="compact" className="shrink-0">
         {overdue ? "Просрочен" : "Текущий"}
-      </span>
+      </StatusBadge>
     );
   }
   if (status === "done") {
     return (
-      <span className="shrink-0 inline-flex items-center rounded-full px-2 h-5 text-[11px] font-medium bg-emerald-50 text-emerald-700 border border-emerald-100">
+      <StatusBadge tone="success" size="compact" className="shrink-0">
         Завершён
-      </span>
+      </StatusBadge>
     );
   }
   return (
-    <span className="shrink-0 inline-flex items-center rounded-full px-2 h-5 text-[11px] font-medium bg-muted text-muted-foreground">
+    <StatusBadge tone="neutral" size="compact" className="shrink-0">
       Ожидает
-    </span>
+    </StatusBadge>
   );
 }
 
@@ -438,34 +432,26 @@ function FieldInput({
             <span className="inline-flex items-center gap-1.5 text-emerald-900">
               <FileText className="h-3.5 w-3.5" /> {value}
             </span>
-            <button
-              onClick={() => onChange("")}
-              className="text-[11px] text-muted-foreground hover:text-foreground"
-            >
+            <Button size="sm" variant="ghost" onClick={() => onChange("")}>
               Удалить
-            </button>
+            </Button>
           </div>
         ) : (
-          <button
-            onClick={() => onChange(mockName)}
-            className="inline-flex items-center gap-1.5 rounded-md border border-dashed border-border bg-white px-2.5 py-1.5 text-xs text-muted-foreground hover:bg-muted/40 hover:text-foreground"
-          >
+          <Button size="sm" variant="secondary" onClick={() => onChange(mockName)}>
             <Paperclip className="h-3.5 w-3.5" /> Прикрепить файл
-          </button>
+          </Button>
         )}
       </div>
     );
   }
   return (
-    <div>
-      <label className="mb-1 block text-[11px] font-medium text-foreground">{field.label}</label>
-      <input
-        type={field.type === "date" ? "date" : field.type === "number" ? "number" : "text"}
-        value={value}
-        onChange={(e) => onChange(e.target.value)}
-        placeholder={field.placeholder}
-        className="w-full rounded-md border border-border bg-white px-2.5 py-1.5 text-xs outline-none focus:border-foreground/30"
-      />
-    </div>
+    <Input
+      label={field.label}
+      labelInside
+      type={field.type === "date" ? "date" : field.type === "number" ? "number" : "text"}
+      value={value}
+      onChange={(e) => onChange(e.target.value)}
+      placeholder={field.placeholder}
+    />
   );
 }

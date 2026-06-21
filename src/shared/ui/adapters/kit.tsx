@@ -20,6 +20,9 @@ import {
   Switch as KitSwitch,
   Badge as KitBadge,
   Chips as KitChips,
+  RadioChips as KitRadioChips,
+  CheckboxChips as KitCheckboxChips,
+  Select as KitSelect,
   Loader as KitLoader,
   Text as KitText,
   Title as KitTitle,
@@ -32,6 +35,8 @@ import {
   type ISwitchProps,
   type IBadgeProps,
   type IChipsProps,
+  type IRadioChipsProps,
+  type ICheckboxChipsProps,
   type ILoaderProps,
   type EIconName,
 } from "@sber-orm/ui-kit";
@@ -311,7 +316,71 @@ export const badgeVariants = (opts?: { className?: string }) => opts?.className 
 
 // ---------- Chips ----------
 export const Chips = KitChips;
-export type { IChipsProps };
+export const RadioChips = KitRadioChips;
+export const CheckboxChips = KitCheckboxChips;
+export type { IChipsProps, IRadioChipsProps, ICheckboxChipsProps };
+
+// ---------- SimpleSelect (kit Select) ----------
+export interface SimpleSelectOption {
+  value: string;
+  label: string;
+  disabled?: boolean;
+}
+
+export interface SimpleSelectProps {
+  label?: string;
+  labelInside?: boolean;
+  options: SimpleSelectOption[];
+  value?: string;
+  onChange?: (value: string) => void;
+  placeholder?: string;
+  error?: boolean;
+  helperText?: React.ReactNode;
+  required?: boolean;
+  disabled?: boolean;
+  size?: "S" | "M" | "L";
+  className?: string;
+}
+
+/**
+ * Корпоративный простой Select поверх @sber-orm/ui-kit Select.
+ * Заменяет нативный <select> и Radix-композицию для одиночного выбора из плоского списка.
+ */
+export const SimpleSelect = ({
+  label,
+  labelInside,
+  options,
+  value,
+  onChange,
+  placeholder,
+  error,
+  helperText,
+  required,
+  disabled,
+  size,
+  className,
+}: SimpleSelectProps) => {
+  const selectedOption = options.find((o) => o.value === value) ?? null;
+  return (
+    <KitSelect
+      label={label}
+      labelInside={labelInside}
+      options={options}
+      value={selectedOption as unknown as undefined}
+      placeholder={placeholder}
+      error={error}
+      helperText={helperText as string | undefined}
+      required={required}
+      disabled={disabled}
+      size={size}
+      className={className}
+      isSearchable={false}
+      onChange={(nextValue: string) => {
+        onChange?.(nextValue);
+      }}
+    />
+  );
+};
 
 /**
  * Centralized semantic mapping for chips/badges → kit palette.

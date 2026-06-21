@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { ChevronDown, MessageSquare } from "@/shared/ui";
+import { ChevronDown, MessageSquare, StatusBadge } from "@/shared/ui";
 import { cn } from "@/lib/utils";
 import { InModalDrawer } from "./InModalDrawer";
 import { NormAssistantIcon } from "./NormAssistantIcon";
@@ -217,11 +217,9 @@ function CriterionCard({ c }: { c: AssessmentCriterion }) {
   const [expanded, setExpanded] = useState(false);
   return (
     <div className="rounded-2xl border border-slate-200 bg-white px-4 py-3.5 transition-colors hover:border-slate-300">
-      <span
-        className={`inline-flex h-5 items-center whitespace-nowrap rounded-full px-2 text-[11px] font-semibold ${m.chip}`}
-      >
+      <StatusBadge tone={m.tone} size="compact">
         {m.label}
-      </span>
+      </StatusBadge>
       <div className="mt-1.5 text-sm font-medium leading-snug text-slate-900">{c.title}</div>
       {showReason && reason && (
         <>

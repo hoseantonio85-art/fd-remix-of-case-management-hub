@@ -958,9 +958,11 @@ export default function Index() {
                     <div className="flex min-w-0 flex-1 flex-col gap-1.5">
                       <div className="flex flex-wrap items-center gap-1.5">
                         {isPending ? (
-                          <StatusBadge tone="violet">На оценке</StatusBadge>
+                          <StatusBadge tone="violet" size="compact">
+                            На оценке
+                          </StatusBadge>
                         ) : (
-                          <CounterpartyStatusBadge tag={categoryLabel[c.status]} />
+                          <CounterpartyStatusBadge tag={categoryLabel[c.status]} size="compact" />
                         )}
                         {!isPending &&
                           statusChanges[c.inn] &&
@@ -968,7 +970,9 @@ export default function Index() {
                             <span
                               title={`${categoryLabel[statusChanges[c.inn].from as CategoryKey]} → ${categoryLabel[statusChanges[c.inn].to as CategoryKey]}`}
                             >
-                              <StatusBadge tone="info">Статус изменён</StatusBadge>
+                              <StatusBadge tone="info" size="compact">
+                                Статус изменён
+                              </StatusBadge>
                             </span>
                           )}
                         {indicators

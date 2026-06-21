@@ -1,10 +1,11 @@
 // UI-presentation для оценки контрагента.
 import type { CriterionStatus } from "@/domain/assessment";
+import type { StatusTone } from "@/shared/ui";
 
-export const criterionStatusMeta: Record<CriterionStatus, { label: string; chip: string }> = {
-  risk: { label: "Выявлен риск", chip: "bg-rose-50 text-rose-700" },
-  clear: { label: "Нарушений нет", chip: "bg-emerald-50 text-emerald-700" },
-  no_data: { label: "Нет данных", chip: "bg-slate-100 text-slate-600" },
+export const criterionStatusMeta: Record<CriterionStatus, { label: string; tone: StatusTone }> = {
+  risk: { label: "Выявлен риск", tone: "danger" },
+  clear: { label: "Нарушений нет", tone: "success" },
+  no_data: { label: "Нет данных", tone: "neutral" },
 };
 
 export const assessmentChangeToneStyles: Record<
