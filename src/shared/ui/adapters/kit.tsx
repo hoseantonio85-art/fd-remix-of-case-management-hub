@@ -360,23 +360,35 @@ export const SimpleSelect = ({
   size,
   className,
 }: SimpleSelectProps) => {
-  const selectedOption = options.find((o) => o.value === value) ?? null;
+  const kitOptions = React.useMemo(
+    () =>
+      options.map((option) => ({
+        id: option.value,
+        label: option.label,
+        disabled: option.disabled,
+      })),
+    [options],
+  );
   return (
     <KitSelect
       label={label}
       labelInside={labelInside}
-      options={options}
-      value={selectedOption as unknown as undefined}
+      options={kitOptions}
+      value={value ?? null}
+      size={size ?? "M"}
       placeholder={placeholder}
       error={error}
       helperText={helperText as string | undefined}
       required={required}
       disabled={disabled}
-      size={size}
-      className={className}
       isSearchable={false}
-      onChange={(nextValue: string) => {
-        onChange?.(nextValue);
+      className={className}
+      onChange={(nextValue: unknown) => {
+        if (Array.isArray(nextValue)) {
+          onChange?.(String(nextValue[0] ?? ""));
+          return;
+        }
+        onChange?.(String(nextValue ?? ""));
       }}
     />
   );
