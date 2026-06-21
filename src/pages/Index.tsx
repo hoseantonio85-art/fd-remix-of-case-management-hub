@@ -39,7 +39,7 @@ import {
   type AssessmentStatus,
   type Disagreement,
 } from "@/components/counterparty/AssessmentModal";
-import { Button } from "@/shared/ui";
+import { Button, StatusBadge } from "@/shared/ui";
 import { ProcessFilterDrawer } from "@/components/counterparty/ProcessFilterDrawer";
 import { processMeta, processOrder } from "@/lib/process-meta";
 import { toast } from "sonner";
