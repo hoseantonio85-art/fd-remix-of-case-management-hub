@@ -60,9 +60,9 @@ export function CounterpartyModal({
     setContracts,
     steps,
     setSteps,
-    persistRisk,
     persistContract,
     persistCollectionStep,
+    persistRiskDecisionFlow,
   } = useCounterpartyCard(counterparty, open);
   const [editing, setEditing] = useState<RiskSignal | null>(null);
   const [initialDecision, setInitialDecision] = useState<DecisionKind>("confirm");
@@ -271,8 +271,8 @@ export function CounterpartyModal({
       setStepAnim({ direction: "backward", tick: Date.now() });
     }
 
-    // Атомарный UI-flow: success только когда сохранены и риск, и связанные этапы.
-    Promise.all([persistRisk(updatedRisk), ...changedSteps.map((s) => persistCollectionStep(s))])
+    // Атомарный UI-flow: одна repository-операция (см. saveRiskDecisionFlow).
+    persistRiskDecisionFlow(updatedRisk, changedSteps)
       .then(() => toast.success("Решение по риску сохранено"))
       .catch(() => {
         setRisks((prev) => prev.map((r) => (r.id === riskId ? prevRisk : r)));
