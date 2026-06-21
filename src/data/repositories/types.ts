@@ -4,6 +4,12 @@ import type { Assessment, AssessmentSource } from "@/domain/assessment";
 
 export type AsyncResult<T> = Promise<T>;
 
+export interface RiskDecisionFlowInput {
+  counterpartyId: string; // ИНН
+  risk: RiskSignal;
+  changedCollectionSteps: CollectionSubStep[];
+}
+
 export interface CounterpartyRepository {
   list(): AsyncResult<Counterparty[]>;
   byInn(inn: string): AsyncResult<Counterparty | null>;
@@ -12,6 +18,10 @@ export interface CounterpartyRepository {
   saveRiskDecision(inn: string, risk: RiskSignal): AsyncResult<void>;
   addOrUpdateContract(inn: string, contract: Contract): AsyncResult<void>;
   updateCollectionStep(inn: string, step: CollectionSubStep): AsyncResult<void>;
+  // Атомарная операция: решение по риску + связанные изменения этапов.
+  // Mock-реализация выполняет действия последовательно, API-реализация —
+  // одним транзакционным запросом (см. API_CONTRACT.md).
+  saveRiskDecisionFlow(input: RiskDecisionFlowInput): AsyncResult<void>;
 }
 
 export interface AssessmentRepository {

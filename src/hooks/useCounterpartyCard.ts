@@ -11,10 +11,15 @@ export interface UseCounterpartyCardResult {
   setContracts: React.Dispatch<React.SetStateAction<Contract[]>>;
   steps: CollectionSubStep[];
   setSteps: React.Dispatch<React.SetStateAction<CollectionSubStep[]>>;
-  // Persistent mutations (mock repo сейчас, http в будущей итерации).
+  // Persistent mutations.
   persistRisk: (risk: RiskSignal) => Promise<void>;
   persistContract: (contract: Contract) => Promise<void>;
   persistCollectionStep: (step: CollectionSubStep) => Promise<void>;
+  // Атомарная операция: риск + связанные этапы одной repository-операцией.
+  persistRiskDecisionFlow: (
+    risk: RiskSignal,
+    changedCollectionSteps: CollectionSubStep[],
+  ) => Promise<void>;
   reset: () => void;
 }
 
@@ -60,6 +65,17 @@ export function useCounterpartyCard(
     if (!counterparty) return;
     await counterpartyRepository.updateCollectionStep(counterparty.inn, step);
   };
+  const persistRiskDecisionFlow = async (
+    risk: RiskSignal,
+    changedCollectionSteps: CollectionSubStep[],
+  ) => {
+    if (!counterparty) return;
+    await counterpartyRepository.saveRiskDecisionFlow({
+      counterpartyId: counterparty.inn,
+      risk,
+      changedCollectionSteps,
+    });
+  };
 
   return {
     risks,
@@ -71,6 +87,7 @@ export function useCounterpartyCard(
     persistRisk,
     persistContract,
     persistCollectionStep,
+    persistRiskDecisionFlow,
     reset,
   };
 }

@@ -326,16 +326,10 @@ export default function Index() {
   } = useCounterparties();
 
   // Все проверки идут через CheckRepository + useChecks (нет setTimeout в UI).
-  const {
-    checks: checksDto,
-    error: checksError,
-    run: runCheckRaw,
-    remove: removeCheckRaw,
-  } = useChecks();
+  // Ошибки checks показываются точечно в обработчиках вызовов (runCheck/removeCheck),
+  // поэтому отдельное поле `error` из useChecks здесь не используем.
+  const { checks: checksDto, run: runCheckRaw, remove: removeCheckRaw } = useChecks();
   const checks: CheckRecord[] = checksDto;
-  // Ошибки checks показываем точечно в обработчиках вызовов (runCheck/removeCheck),
-  // чтобы не дублировать toast для одной и той же операции.
-  void checksError;
   const [checkActionId, setCheckActionId] = useState<string | null>(null);
   const runCheck = async (input: {
     inn?: string;

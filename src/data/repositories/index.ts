@@ -1,11 +1,16 @@
 // Единственная точка выбора реализации репозиториев.
-import { mockCounterpartyRepository } from "./mock/counterparty";
-import { mockAssessmentRepository } from "./mock/assessment";
-import { mockCheckRepository } from "./mock/check";
+// UI и hooks не должны читать VITE_DATA_SOURCE — только импортировать
+// counterpartyRepository / assessmentRepository / checkRepository отсюда.
+import { dataConfig } from "@/data/config";
+import { createMockRepositories } from "./mock";
+import { createApiRepositories } from "@/data/api";
 
-export const counterpartyRepository = mockCounterpartyRepository;
-export const assessmentRepository = mockAssessmentRepository;
-export const checkRepository = mockCheckRepository;
+const repositories =
+  dataConfig.source === "api" ? createApiRepositories(dataConfig) : createMockRepositories();
+
+export const counterpartyRepository = repositories.counterpartyRepository;
+export const assessmentRepository = repositories.assessmentRepository;
+export const checkRepository = repositories.checkRepository;
 
 export type {
   CounterpartyRepository,
@@ -13,4 +18,5 @@ export type {
   CheckRepository,
   CheckRecordDto,
   CheckType,
+  RiskDecisionFlowInput,
 } from "./types";
