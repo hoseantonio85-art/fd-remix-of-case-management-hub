@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { DialogPrimitive } from "@/shared/ui";
-import { X, AlertTriangle, ChevronRight } from "@/shared/ui";
+import { AlertTriangle, ChevronRight, EllipseIconButton } from "@/shared/ui";
 import { Button } from "@/shared/ui";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/shared/ui";
 import { cn } from "@/lib/utils";
