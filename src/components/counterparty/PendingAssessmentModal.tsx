@@ -1,7 +1,7 @@
-import { Dialog, DialogContent } from "@/shared/ui";
+import { Dialog, DialogContent, EllipseIconButton } from "@/shared/ui";
 import { largeModalContentClass } from "@/lib/modal-styles";
 import { CounterpartyStatusBadge } from "./CounterpartyStatusBadge";
-import { Clock, X } from "@/shared/ui";
+import { Clock } from "@/shared/ui";
 import { Button } from "@/shared/ui";
 import type { Counterparty } from "@/domain/counterparty";
 import { CounterpartyHeaderMeta } from "./CounterpartyHeaderMeta";
