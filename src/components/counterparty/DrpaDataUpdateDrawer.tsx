@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react";
-import { Sheet, SheetContent } from "@/shared/ui";
+import { Sheet, SheetContent, StatusBadge } from "@/shared/ui";
 import { Button } from "@/shared/ui";
 import { Input } from "@/shared/ui";
 import { Pencil, Plus, CheckCircle2, ShieldCheck } from "@/shared/ui";
@@ -174,11 +174,7 @@ export function DrpaDataUpdateDrawer({
                 Обновлено <span className="font-medium text-foreground">{updatedCount}</span> из{" "}
                 <span className="font-medium text-foreground">{total}</span>
               </div>
-              <Button
-                disabled={!allDone}
-                onClick={onConfirm}
-                className="h-11 rounded-xl bg-emerald-600 px-6 text-white hover:bg-emerald-700 disabled:bg-emerald-600/40 disabled:text-white"
-              >
+              <Button disabled={!allDone} onClick={onConfirm} size="lg">
                 Подтвердить данные
               </Button>
             </div>
@@ -289,14 +285,13 @@ function DrpaCounterpartyCard({
 
 function StatusTag({ updated }: { updated: boolean }) {
   return updated ? (
-    <span className="inline-flex shrink-0 items-center gap-1 rounded-full bg-emerald-50 px-2.5 py-1 text-[11px] font-medium text-emerald-800">
-      <CheckCircle2 className="h-3 w-3" />
+    <StatusBadge tone="success" className="shrink-0">
       Обновлено
-    </span>
+    </StatusBadge>
   ) : (
-    <span className="inline-flex shrink-0 items-center rounded-full bg-amber-50 px-2.5 py-1 text-[11px] font-medium text-amber-800">
+    <StatusBadge tone="warning" className="shrink-0">
       Требует обновления
-    </span>
+    </StatusBadge>
   );
 }
 

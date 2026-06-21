@@ -2,7 +2,7 @@
  * Реальные adapters над корпоративным @sber-orm/ui-kit.
  *
  * Эти adapters экспортируют shadcn-совместимые сигнатуры базовых controls
- * (Button, Input, Textarea, Checkbox, Switch, Tooltip-нет, Badge, Loader, Chips),
+ * (Button, Input, Textarea, Checkbox, Switch, Badge, Loader, Chips),
  * чтобы продуктовый код продолжал работать без изменений call-site, а в DOM
  * рендерились настоящие корпоративные компоненты.
  *
@@ -33,6 +33,7 @@ import {
   type IBadgeProps,
   type IChipsProps,
   type ILoaderProps,
+  type EIconName,
 } from "@sber-orm/ui-kit";
 import { cn } from "@/lib/utils";
 
@@ -59,11 +60,12 @@ const variantMap: Record<ShadcnButtonVariant, IButtonProperties["variant"]> = {
   link: "ghost",
 };
 
+// sm 32px → XS, default 36px → S, lg 40px → M, icon → XS+iconOnly
 const sizeMap: Record<ShadcnButtonSize, IButtonProperties["size"]> = {
-  default: "M",
-  sm: "S",
-  lg: "L",
-  icon: "M",
+  default: "S",
+  sm: "XS",
+  lg: "M",
+  icon: "XS",
 };
 
 export interface ButtonProps extends Omit<React.ButtonHTMLAttributes<HTMLButtonElement>, "size"> {
@@ -72,17 +74,25 @@ export interface ButtonProps extends Omit<React.ButtonHTMLAttributes<HTMLButtonE
   loading?: boolean;
   asChild?: boolean;
   fullWidth?: boolean;
+  iconOnly?: boolean;
   icon?: IButtonProperties["icon"];
   iconAfter?: IButtonProperties["iconAfter"];
 }
 
 export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
   (
-    { variant = "default", size = "default", asChild, loading, children, className, ...rest },
+    {
+      variant = "default",
+      size = "default",
+      asChild,
+      loading,
+      iconOnly,
+      children,
+      className,
+      ...rest
+    },
     ref,
   ) => {
-    // asChild — несовместимо с kit Button (он всегда рендерит <button>). Fallback на native button
-    // с минимальными классами, чтобы layout не ломался. Реальное использование — единичное (см. отчёт).
     if (asChild) {
       const child = React.Children.only(children) as React.ReactElement;
       return React.cloneElement(child, { className: cn(className, child.props.className) });
@@ -98,7 +108,7 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
       ? sizeMap[size as ShadcnButtonSize]
       : (size as IButtonProperties["size"]);
 
-    const iconOnly = size === "icon" || rest["aria-label"] === undefined ? size === "icon" : false;
+    const effectiveIconOnly = iconOnly ?? size === "icon";
     const link = variant === "link";
 
     return (
@@ -106,13 +116,17 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
         ref={ref}
         variant={kitVariant}
         size={kitSize}
-        iconOnly={iconOnly}
+        iconOnly={effectiveIconOnly}
         link={link}
         loading={loading}
         className={className}
         {...rest}
       >
-        {children}
+        {effectiveIconOnly ? (
+          children
+        ) : (
+          <span className="inline-flex min-w-0 items-center justify-center gap-2">{children}</span>
+        )}
       </KitButton>
     );
   },
@@ -120,28 +134,64 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
 Button.displayName = "Button";
 
 // buttonVariants kept as a no-op stub for call sites that only need the class string.
-// Returns className as-is so layout utilities still work.
 export const buttonVariants = (opts?: { className?: string }) => opts?.className ?? "";
 
 // ---------- Input ----------
+type KitInputSize = NonNullable<IInputProperties["size"]>;
 export interface InputProps extends Omit<
   React.InputHTMLAttributes<HTMLInputElement>,
   "onChange" | "size" | "prefix"
 > {
   onChange?: React.ChangeEventHandler<HTMLInputElement>;
+  label?: string;
+  labelInside?: boolean;
+  helperText?: React.ReactNode;
+  error?: boolean;
+  required?: boolean;
+  size?: KitInputSize;
+  viewOnly?: boolean;
+  readonly?: boolean;
+  icon?: keyof typeof EIconName;
+  tooltip?: React.ReactNode;
 }
 
 export const Input = React.forwardRef<HTMLInputElement, InputProps>(
-  ({ onChange, className, ...rest }, ref) => {
+  (
+    {
+      onChange,
+      className,
+      label,
+      labelInside,
+      helperText,
+      error,
+      required,
+      size,
+      viewOnly,
+      readonly,
+      icon,
+      tooltip,
+      ...rest
+    },
+    ref,
+  ) => {
     return (
       <KitInput
         ref={ref}
         fullWidth
         classes={{ container: className }}
+        label={label}
+        labelInside={labelInside}
+        helperText={helperText as string | undefined}
+        error={error}
+        required={required}
+        size={size}
+        viewOnly={viewOnly}
+        readonly={readonly}
+        icon={icon}
+        tooltip={tooltip}
         {...(rest as Partial<IInputProperties>)}
-        onChange={(value, event) => {
-          // адаптируем kit onChange(value, event) к shadcn onChange(event)
-          if (event && onChange) onChange(event);
+        onChange={(_value, event) => {
+          if (event && onChange) onChange(event as React.ChangeEvent<HTMLInputElement>);
         }}
       />
     );
@@ -150,28 +200,54 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>(
 Input.displayName = "Input";
 
 // ---------- Textarea ----------
+type KitTextareaSize = NonNullable<ITextareaProperties["size"]>;
 export interface TextareaProps extends Omit<
   React.TextareaHTMLAttributes<HTMLTextAreaElement>,
   "onChange" | "size"
 > {
   onChange?: React.ChangeEventHandler<HTMLTextAreaElement>;
+  label?: string;
+  labelInside?: boolean;
+  helperText?: React.ReactNode;
+  error?: boolean;
+  required?: boolean;
+  size?: KitTextareaSize;
+  resize?: ITextareaProperties["resize"];
+  canClear?: boolean;
 }
 
-export const Textarea = React.forwardRef<HTMLTextAreaElement, TextareaProps>(
-  ({ onChange, className, ...rest }, ref) => {
-    return (
-      <KitTextarea
-        fullWidth
-        // ref не пробрасываем — kit Textarea не forwardRef, продуктовые call-site ref не используют
-        {...(rest as Partial<ITextareaProperties>)}
-        ref={ref as never}
-        onChange={(value, event) => {
-          if (event && onChange) onChange(event);
-        }}
-      />
-    );
-  },
-);
+export const Textarea = ({
+  onChange,
+  className,
+  label,
+  labelInside,
+  helperText,
+  error,
+  required,
+  size,
+  resize,
+  canClear,
+  ...rest
+}: TextareaProps) => {
+  return (
+    <KitTextarea
+      fullWidth
+      classes={{ container: className }}
+      label={label}
+      labelInside={labelInside}
+      helperText={helperText as string | undefined}
+      error={error}
+      required={required}
+      size={size}
+      resize={resize}
+      canClear={canClear}
+      {...(rest as Partial<ITextareaProperties>)}
+      onChange={(_value, event) => {
+        if (event && onChange) onChange(event as React.ChangeEvent<HTMLTextAreaElement>);
+      }}
+    />
+  );
+};
 Textarea.displayName = "Textarea";
 
 // ---------- Checkbox ----------
@@ -184,6 +260,7 @@ export const Checkbox = ({ onCheckedChange, ...rest }: CheckboxProps) => {
     <KitCheckbox
       {...rest}
       onChange={(event) => {
+        // Kit Checkbox signature: onChange(event). Use event.target.checked.
         onCheckedChange?.(event.target.checked);
       }}
     />
@@ -206,7 +283,7 @@ export const Switch = ({ onCheckedChange, ...rest }: SwitchProps) => {
   );
 };
 
-// ---------- Badge ----------
+// ---------- Badge (legacy shadcn-compatible re-export) ----------
 type ShadcnBadgeVariant = "default" | "secondary" | "destructive" | "outline";
 const badgeVariantMap: Record<ShadcnBadgeVariant, IBadgeProps["variant"]> = {
   default: "blue",
@@ -238,13 +315,13 @@ export type { IChipsProps };
 
 /**
  * Centralized semantic mapping for chips/badges → kit palette.
- * Используйте эти ключи в продуктовом коде, а не сырые цвета Tailwind.
  */
-export type SemanticTone = "success" | "warning" | "danger" | "info" | "neutral";
+export type SemanticTone = "success" | "warning" | "danger" | "info" | "neutral" | "violet";
 export const semanticBadgeVariant: Record<SemanticTone, IBadgeProps["variant"]> = {
   success: "green",
   warning: "yellow",
   danger: "red",
   info: "blue",
   neutral: "gray",
+  violet: "violet",
 };

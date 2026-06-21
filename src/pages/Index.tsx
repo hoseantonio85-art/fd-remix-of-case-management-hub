@@ -39,7 +39,7 @@ import {
   type AssessmentStatus,
   type Disagreement,
 } from "@/components/counterparty/AssessmentModal";
-import { Button } from "@/shared/ui";
+import { Button, StatusBadge } from "@/shared/ui";
 import { ProcessFilterDrawer } from "@/components/counterparty/ProcessFilterDrawer";
 import { processMeta, processOrder } from "@/lib/process-meta";
 import { toast } from "sonner";
@@ -958,9 +958,7 @@ export default function Index() {
                     <div className="flex min-w-0 flex-1 flex-col gap-1.5">
                       <div className="flex flex-wrap items-center gap-1.5">
                         {isPending ? (
-                          <span className="inline-flex w-fit items-center rounded-full bg-violet-100/80 px-2.5 py-1 text-[11px] font-medium text-violet-800">
-                            На оценке
-                          </span>
+                          <StatusBadge tone="violet">На оценке</StatusBadge>
                         ) : (
                           <CounterpartyStatusBadge tag={categoryLabel[c.status]} />
                         )}
@@ -969,9 +967,8 @@ export default function Index() {
                           statusChanges[c.inn].from !== statusChanges[c.inn].to && (
                             <span
                               title={`${categoryLabel[statusChanges[c.inn].from as CategoryKey]} → ${categoryLabel[statusChanges[c.inn].to as CategoryKey]}`}
-                              className="inline-flex items-center rounded-full border border-violet-100 bg-violet-50 px-2 py-0.5 text-[11px] font-medium text-violet-700"
                             >
-                              Статус изменён
+                              <StatusBadge tone="info">Статус изменён</StatusBadge>
                             </span>
                           )}
                         {indicators
@@ -1032,8 +1029,9 @@ export default function Index() {
       {/* Floating CTA — pinned to bottom of main work area, independent of list height */}
       <div className="pointer-events-none fixed inset-x-0 bottom-6 z-30 flex justify-center lg:left-64">
         <Button
+          size="lg"
           onClick={() => setRunDialogOpen(true)}
-          className="pointer-events-auto h-12 gap-2 rounded-full px-6 text-sm font-semibold shadow-lg shadow-primary/25"
+          className="pointer-events-auto rounded-full shadow-lg shadow-primary/25"
         >
           <Sparkles className="h-4 w-4" />
           Запустить проверку

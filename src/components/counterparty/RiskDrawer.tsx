@@ -151,33 +151,40 @@ export function RiskDrawer({
 
           <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
             <div>
-              <label className="mb-1 block text-xs text-muted-foreground">Дата решения</label>
-              <Input value={date} onChange={(e) => setDate(e.target.value)} />
+              <Input
+                label="Дата решения"
+                labelInside
+                value={date}
+                onChange={(e) => setDate(e.target.value)}
+              />
             </div>
             {mode === "verify" && (
               <div>
-                <label className="mb-1 block text-xs text-muted-foreground">
-                  Ответственный <span className="text-destructive">*</span>
-                </label>
-                <Input value={responsible} onChange={(e) => setResponsible(e.target.value)} />
+                <Input
+                  label="Ответственный"
+                  labelInside
+                  required
+                  value={responsible}
+                  onChange={(e) => setResponsible(e.target.value)}
+                />
               </div>
             )}
             {mode === "verify" && (
               <div className="sm:col-span-2">
-                <label className="mb-1 block text-xs text-muted-foreground">
-                  Плановая дата проверки <span className="text-destructive">*</span>
-                </label>
-                <Input value={plannedDate} onChange={(e) => setPlannedDate(e.target.value)} />
+                <Input
+                  label="Плановая дата проверки"
+                  labelInside
+                  required
+                  value={plannedDate}
+                  onChange={(e) => setPlannedDate(e.target.value)}
+                />
               </div>
             )}
             <div className="sm:col-span-2">
-              <label className="mb-1 block text-xs text-muted-foreground">
-                Комментарий{" "}
-                {(mode === "dismiss" || mode === "verify") && (
-                  <span className="text-destructive">*</span>
-                )}
-              </label>
               <Textarea
+                label="Комментарий"
+                labelInside
+                required={mode === "dismiss" || mode === "verify"}
                 rows={3}
                 placeholder="Опишите контекст принятого решения…"
                 value={comment}

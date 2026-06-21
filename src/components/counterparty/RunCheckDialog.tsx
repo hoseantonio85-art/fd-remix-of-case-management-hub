@@ -102,27 +102,30 @@ export function RunCheckDialog({
           </div>
 
           <div>
-            <label className="text-[11px] font-medium text-muted-foreground">ИНН</label>
             <Input
+              label="ИНН"
+              labelInside
               value={inn}
               onChange={(e) => {
                 setInn(e.target.value);
                 if (error) setError(null);
               }}
               placeholder="Введите ИНН"
-              className="mt-1 bg-white"
               disabled={isSending}
+              error={!!error}
+              helperText={error ?? undefined}
               onKeyDown={(e) => {
                 if (e.key === "Enter" && canSubmit && !isSending) handleStart();
               }}
             />
-            <div className="mt-1.5 inline-flex items-center gap-1.5 text-[12px] text-muted-foreground">
-              <span className="inline-flex h-4 w-4 items-center justify-center rounded-full bg-gradient-to-br from-primary/20 to-violet-200 text-primary">
-                <Sparkles className="h-2.5 w-2.5" />
-              </span>
-              По ИНН будет сформирована оценка контрагента.
-            </div>
-            {error && <div className="mt-1.5 text-[12px] text-rose-600">{error}</div>}
+            {!error && (
+              <div className="mt-1.5 inline-flex items-center gap-1.5 text-[12px] text-muted-foreground">
+                <span className="inline-flex h-4 w-4 items-center justify-center rounded-full bg-gradient-to-br from-primary/20 to-violet-200 text-primary">
+                  <Sparkles className="h-2.5 w-2.5" />
+                </span>
+                По ИНН будет сформирована оценка контрагента.
+              </div>
+            )}
           </div>
 
           <div>
