@@ -47,14 +47,14 @@ export function AssessmentGroupDrawer({
     <InModalDrawer open={open} onOpenChange={onOpenChange}>
       {/* Header */}
       <div className="shrink-0 px-6 pt-6 pb-4">
-        <div className="text-[11px] font-medium uppercase tracking-wide text-slate-500">
-          Группа оценки
-        </div>
-        <h3 className="mt-1 pr-10 text-lg font-semibold leading-snug text-slate-900">
-          {group.title}
-        </h3>
-        <div className="mt-1.5 text-xs leading-relaxed text-slate-500">
-          {group.criteria.length} {pluralCriteria(group.criteria.length)}
+        <div className="pr-16">
+          <div className="text-[11px] font-medium uppercase tracking-wide text-slate-500">
+            Группа оценки
+          </div>
+          <h3 className="mt-1 text-lg font-semibold leading-snug text-slate-900">{group.title}</h3>
+          <div className="mt-1.5 text-xs leading-relaxed text-slate-500">
+            {group.criteria.length} {pluralCriteria(group.criteria.length)}
+          </div>
         </div>
 
         {/* Summary filters */}

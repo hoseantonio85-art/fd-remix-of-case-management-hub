@@ -72,11 +72,13 @@ export function AssessmentCorrectionDrawer({
     <InModalDrawer open={open} onOpenChange={onOpenChange}>
       <div className="flex min-h-full flex-col">
         <div className="flex-1 p-6 pb-4">
-          <h2 className="text-lg font-semibold">Корректировка оценки</h2>
-          <p className="mt-1 text-sm text-muted-foreground">
-            Укажите, почему результат оценки нужно изменить, выберите новый статус контрагента и
-            дату возврата на мониторинг.
-          </p>
+          <div className="pr-16">
+            <h2 className="text-lg font-semibold">Корректировка оценки</h2>
+            <p className="mt-1 text-sm text-muted-foreground">
+              Укажите, почему результат оценки нужно изменить, выберите новый статус контрагента и
+              дату возврата на мониторинг.
+            </p>
+          </div>
 
           <div className="mt-6 space-y-6">
             {/* Comment */}

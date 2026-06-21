@@ -65,18 +65,19 @@ const SheetContent = React.forwardRef<
     <SheetOverlay />
     <SheetPrimitive.Content ref={ref} className={cn(sheetVariants({ side }), className)} {...props}>
       {!hideClose && (
-        <span className="absolute right-4 top-4 z-10">
-          <SheetPrimitive.Close asChild>
-            <KitButton
-              type="button"
-              variant="ellipse"
-              size="XS"
-              icon="cross"
-              iconOnly
-              aria-label="Закрыть"
-              className="shrink-0"
-            />
-          </SheetPrimitive.Close>
+        <span className="pointer-events-none absolute right-4 top-4 z-10 inline-flex h-8 w-8 items-center justify-center">
+          <span className="pointer-events-auto">
+            <SheetPrimitive.Close asChild>
+              <KitButton
+                type="button"
+                variant="ellipse"
+                size="XS"
+                icon="cross"
+                iconOnly
+                aria-label="Закрыть"
+              />
+            </SheetPrimitive.Close>
+          </span>
         </span>
       )}
       {children}

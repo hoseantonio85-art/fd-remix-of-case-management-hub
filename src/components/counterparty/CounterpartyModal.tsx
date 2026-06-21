@@ -531,10 +531,8 @@ export function CounterpartyModal({
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent
-        className={cn(
-          largeModalContentClass,
-          "gap-0 [&>button]:hidden sm:max-w-[calc(100vw-32px)] sm:rounded-3xl",
-        )}
+        hideClose
+        className={cn(largeModalContentClass, "gap-0 sm:max-w-[calc(100vw-32px)] sm:rounded-3xl")}
       >
         <div className="relative flex min-h-0 flex-1 flex-col">
           {/* Header */}

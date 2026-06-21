@@ -62,10 +62,12 @@ export function AssessmentCommentDrawer({
     <InModalDrawer open={open} onOpenChange={onOpenChange}>
       <div className="flex min-h-full flex-col">
         <div className="flex-1 overflow-y-auto p-6 pb-4">
-          <h2 className="text-lg font-semibold">Замечание к оценке</h2>
-          <p className="mt-1 text-sm text-muted-foreground">
-            Выберите группы оценки и оставьте комментарий по каждой из них.
-          </p>
+          <div className="pr-16">
+            <h2 className="text-lg font-semibold">Замечание к оценке</h2>
+            <p className="mt-1 text-sm text-muted-foreground">
+              Выберите группы оценки и оставьте комментарий по каждой из них.
+            </p>
+          </div>
 
           <div className="mt-6 space-y-2">
             {groups.map((g) => {

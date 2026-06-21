@@ -51,18 +51,19 @@ const DialogContent = React.forwardRef<
     >
       {children}
       {!hideClose && (
-        <span className="absolute right-4 top-4 z-10">
-          <DialogPrimitive.Close asChild>
-            <KitButton
-              type="button"
-              variant="ellipse"
-              size="XS"
-              icon="cross"
-              iconOnly
-              aria-label="Закрыть"
-              className="shrink-0"
-            />
-          </DialogPrimitive.Close>
+        <span className="pointer-events-none absolute right-4 top-4 z-10 inline-flex h-8 w-8 items-center justify-center">
+          <span className="pointer-events-auto">
+            <DialogPrimitive.Close asChild>
+              <KitButton
+                type="button"
+                variant="ellipse"
+                size="XS"
+                icon="cross"
+                iconOnly
+                aria-label="Закрыть"
+              />
+            </DialogPrimitive.Close>
+          </span>
         </span>
       )}
     </DialogPrimitive.Content>
