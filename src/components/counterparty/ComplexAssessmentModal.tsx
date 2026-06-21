@@ -64,23 +64,18 @@ export function ComplexAssessmentModal({
         >
           <div className="relative flex min-h-0 flex-1 flex-col">
             {/* Header */}
-            <div className={cn("shrink-0 px-5 pt-6 pb-6 lg:px-10", headerBg)}>
-              <div className="absolute right-5 top-5 flex items-center gap-2">
+            <div className={cn("shrink-0 px-5 pt-6 pb-6 pr-16 lg:px-10 lg:pr-20", headerBg)}>
+              <span className="absolute right-5 top-5 z-10">
                 <EllipseIconButton
                   icon="cross"
                   aria-label="Закрыть"
                   onClick={() => onOpenChange(false)}
                 />
-              </div>
+              </span>
               <div className="flex flex-wrap items-center gap-1.5">
-                <span
-                  className={cn(
-                    "inline-flex items-center rounded-full px-2.5 py-1 text-[11px] font-medium",
-                    resolutionBadge.chip,
-                  )}
-                >
-                  {resolutionBadge.label}
-                </span>
+                <StatusBadge tone={resolutionTone} size="regular">
+                  {resolutionLabel}
+                </StatusBadge>
               </div>
               <h2 className="mt-3 text-2xl font-semibold tracking-tight text-foreground">
                 Оценка контрагента {assessment.counterpartyName}
