@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react";
-import { Sheet, SheetContent } from "@/shared/ui";
+import { Sheet, SheetContent, StatusBadge } from "@/shared/ui";
 import { Button } from "@/shared/ui";
 import { Input } from "@/shared/ui";
 import { Pencil, Plus, CheckCircle2, ShieldCheck } from "@/shared/ui";
