@@ -1029,8 +1029,9 @@ export default function Index() {
       {/* Floating CTA — pinned to bottom of main work area, independent of list height */}
       <div className="pointer-events-none fixed inset-x-0 bottom-6 z-30 flex justify-center lg:left-64">
         <Button
+          size="lg"
           onClick={() => setRunDialogOpen(true)}
-          className="pointer-events-auto h-12 gap-2 rounded-full px-6 text-sm font-semibold shadow-lg shadow-primary/25"
+          className="pointer-events-auto rounded-full shadow-lg shadow-primary/25"
         >
           <Sparkles className="h-4 w-4" />
           Запустить проверку
