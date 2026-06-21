@@ -411,11 +411,7 @@ export function ContractAssessmentModal({
 
             {/* Footer */}
             <div className="shrink-0 border-t border-border bg-white px-5 py-4 lg:px-10">
-              <Button
-                variant="outline"
-                onClick={onDelete}
-                className="h-12 w-full rounded-full text-sm font-medium"
-              >
+              <Button variant="outline" size="lg" onClick={onDelete} className="w-full">
                 Удалить
               </Button>
             </div>
