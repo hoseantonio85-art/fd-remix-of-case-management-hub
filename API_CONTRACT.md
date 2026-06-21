@@ -156,18 +156,27 @@ endpoint, схемы DTO и транспорт обновлений ещё не 
 | Output run | `CheckRecordApiDto` с `status: "running"` |
 | Ошибки | `VALIDATION_ERROR`, `SERVER_ERROR` |
 
-### TBD: транспорт обновлений статуса проверки
+### Загрузка и обновление статуса
 
-Сейчас mock использует `subscribe(listener)` и сам переводит проверку
-`running → done` через `setTimeout`. UI зависит **только** от наличия точки
-подписки, не от конкретного транспорта.
+UI работает по схеме:
 
-Backend-команде нужно выбрать один из вариантов:
+- **первичная загрузка** — `GET /checks` (через `CheckRepository.list()`), вызывается при монтировании `useChecks` **всегда**;
+- **локальные мутации** — после `run()` UI добавляет/обновляет запись в локальном state по `id` (дедупликация), после `remove()` — удаляет; live-транспорт для этого не требуется;
+- **ручной refetch** — `useChecks.retry()` повторно вызывает `list()` (используется кнопкой «Повторить» в ChecksDrawer при ошибке);
+- **live-обновления** (`running → done`, изменения от других клиентов) — опциональны и идут через `CheckRepository.subscribe(listener)`.
 
-- **polling** — UI периодически опрашивает `GET /checks`;
+### TBD: транспорт live-обновлений статуса проверки
+
+Mock использует `subscribe(listener)` и переводит проверку `running → done`
+через `setTimeout`. В API-реализации `subscribe()` сейчас **noop** — это точка
+расширения, базовый сценарий (list/run/remove) работает и без неё.
+
+Backend-команде нужно выбрать один из вариантов live-транспорта:
+
+- **polling** — UI периодически опрашивает `GET /checks` (через `retry()` по таймеру);
 - **SSE** — `GET /checks/stream`;
 - **WebSocket** — общий канал `/ws`;
-- **ручной refetch** — обновление по действию пользователя.
+- **только ручной refetch** — пользователь обновляет вручную, live-транспорт не нужен.
 
 После согласования: реализовать выбранный транспорт в
 `createApiCheckRepository.subscribe` (`src/data/api/repositories/check.ts`).
