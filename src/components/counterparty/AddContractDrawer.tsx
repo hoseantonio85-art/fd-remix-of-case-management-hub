@@ -95,47 +95,51 @@ export function AddContractDrawer({
           <h2 className="text-lg font-semibold tracking-tight text-foreground">Добавить договор</h2>
 
           <div className="mt-5 space-y-4">
-            <Field
+            <Input
               label="Название договора"
-              error={showErrors && errors.name ? "Обязательное поле" : null}
-            >
-              <Input
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                placeholder="Например, Договор поставки № 245"
-              />
-            </Field>
+              labelInside
+              required
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              placeholder="Например, Договор поставки № 245"
+              error={showErrors && errors.name}
+              helperText={showErrors && errors.name ? "Обязательное поле" : undefined}
+            />
 
-            <Field
+            <Input
               label="Задолженность"
-              error={showErrors && errors.debt ? "Обязательное поле" : null}
-            >
-              <Input
-                value={debt}
-                onChange={(e) => setDebt(e.target.value)}
-                placeholder="0 ₽"
-                inputMode="decimal"
-              />
-            </Field>
+              labelInside
+              required
+              value={debt}
+              onChange={(e) => setDebt(e.target.value)}
+              placeholder="0 ₽"
+              inputMode="decimal"
+              error={showErrors && errors.debt}
+              helperText={showErrors && errors.debt ? "Обязательное поле" : undefined}
+            />
 
             <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-              <Field
+              <Input
                 label="Просрочка"
-                error={showErrors && errors.overdue ? "Обязательное поле" : null}
-              >
-                <Input
-                  value={overdue}
-                  onChange={(e) => setOverdue(e.target.value)}
-                  placeholder="0 ₽"
-                  inputMode="decimal"
-                />
-              </Field>
-              <Field
+                labelInside
+                required
+                value={overdue}
+                onChange={(e) => setOverdue(e.target.value)}
+                placeholder="0 ₽"
+                inputMode="decimal"
+                error={showErrors && errors.overdue}
+                helperText={showErrors && errors.overdue ? "Обязательное поле" : undefined}
+              />
+              <Input
                 label="Срок исполнения / дата оплаты"
-                error={showErrors && errors.dueDate ? "Обязательное поле" : null}
-              >
-                <Input type="date" value={dueDate} onChange={(e) => setDueDate(e.target.value)} />
-              </Field>
+                labelInside
+                required
+                type="date"
+                value={dueDate}
+                onChange={(e) => setDueDate(e.target.value)}
+                error={showErrors && errors.dueDate}
+                helperText={showErrors && errors.dueDate ? "Обязательное поле" : undefined}
+              />
             </div>
 
             <Field
