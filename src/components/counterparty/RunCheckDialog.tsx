@@ -70,7 +70,7 @@ export function RunCheckDialog({
 
   return (
     <Dialog open={open} onOpenChange={handleClose}>
-      <DialogContent className="max-w-md gap-0 rounded-2xl p-0 [&>button]:hidden">
+      <DialogContent className="max-w-md gap-0 rounded-2xl p-0" hideClose>
         <div className="flex items-start gap-3 border-b border-border px-5 pt-5 pb-4">
           <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary">
             <Sparkles className="h-4 w-4" />
