@@ -83,13 +83,11 @@ export function RunCheckDialog({
             </p>
           </div>
           {!isSending && (
-            <button
-              onClick={() => handleClose(false)}
-              className="rounded p-1 text-muted-foreground hover:bg-muted"
+            <EllipseIconButton
+              icon="cross"
               aria-label="Закрыть"
-            >
-              <X className="h-4 w-4" />
-            </button>
+              onClick={() => handleClose(false)}
+            />
           )}
         </div>
 
