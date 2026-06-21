@@ -177,7 +177,7 @@ export function DrpaDataUpdateDrawer({
               <Button
                 disabled={!allDone}
                 onClick={onConfirm}
-                className="h-11 rounded-xl bg-emerald-600 px-6 text-white hover:bg-emerald-700 disabled:bg-emerald-600/40 disabled:text-white"
+                size="lg"
               >
                 Подтвердить данные
               </Button>
