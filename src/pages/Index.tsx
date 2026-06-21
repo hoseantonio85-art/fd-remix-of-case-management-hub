@@ -1077,6 +1077,9 @@ export default function Index() {
         open={checkDrawerOpen}
         onOpenChange={setCheckDrawerOpen}
         checks={checks}
+        loading={checksLoading}
+        error={checksError}
+        onRetry={() => void retryChecks()}
         onOpenCheck={(c) => {
           const hasInn = !!c.inn;
           const hasFiles = c.fileNames.length > 0;
