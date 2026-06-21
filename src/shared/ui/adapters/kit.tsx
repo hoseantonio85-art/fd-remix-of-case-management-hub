@@ -344,8 +344,24 @@ export interface SimpleSelectProps {
 
 /**
  * Корпоративный простой Select поверх @sber-orm/ui-kit Select.
- * Заменяет нативный <select> и Radix-композицию для одиночного выбора из плоского списка.
+ *
+ * Реальный контракт kit Select (см. node_modules/@sber-orm/ui-kit/src/components/Select/Select.tsx):
+ *   - options:  Array<{ id?, key?, value?, label?, title? }>
+ *   - value:    объект option (kit хранит selectedValue как full option и
+ *               отображает его через react-select getOptionLabel → option.label).
+ *   - onChange: (value: string, event, fullValue, reason) — где `value` уже
+ *               строковый id выбранной опции (получается из option.value).
+ *
+ * Поэтому:
+ *   - в опции кладём `value` (для getOptionValue) и `label` (для getOptionLabel);
+ *   - в `value` передаём найденный full option-объект, а не строку.
  */
+type KitSelectOption = {
+  value: string;
+  label: string;
+  disabled?: boolean;
+};
+
 export const SimpleSelect = ({
   label,
   labelInside,
@@ -360,21 +376,28 @@ export const SimpleSelect = ({
   size,
   className,
 }: SimpleSelectProps) => {
-  const kitOptions = React.useMemo(
+  const kitOptions = React.useMemo<KitSelectOption[]>(
     () =>
       options.map((option) => ({
-        id: option.value,
+        value: option.value,
         label: option.label,
         disabled: option.disabled,
       })),
     [options],
   );
+
+  const selectedOption = React.useMemo(
+    () => kitOptions.find((option) => option.value === value) ?? null,
+    [kitOptions, value],
+  );
+
   return (
     <KitSelect
       label={label}
       labelInside={labelInside}
       options={kitOptions}
-      value={value ?? null}
+      // kit ожидает full option-объект как controlled value
+      value={selectedOption as unknown as never}
       size={size ?? "M"}
       placeholder={placeholder}
       error={error}
@@ -383,26 +406,14 @@ export const SimpleSelect = ({
       disabled={disabled}
       isSearchable={false}
       className={className}
-      onChange={(nextValue: unknown) => {
-        onChange?.(normalizeKitSelectValue(nextValue));
+      onChange={(nextValue) => {
+        // kit передаёт string-id первым аргументом
+        const id = Array.isArray(nextValue) ? nextValue[0] : nextValue;
+        onChange?.(id == null ? "" : String(id));
       }}
     />
   );
 };
-
-type KitSelectValue = unknown;
-function normalizeKitSelectValue(value: KitSelectValue): string {
-  if (value == null) return "";
-  if (Array.isArray(value)) {
-    const first = value[0];
-    return first == null ? "" : String(first);
-  }
-  if (typeof value === "object" && "value" in (value as Record<string, unknown>)) {
-    const inner = (value as { value: unknown }).value;
-    return inner == null ? "" : String(inner);
-  }
-  return String(value);
-}
 
 /**
  * Centralized semantic mapping for chips/badges → kit palette.
