@@ -289,14 +289,13 @@ function DrpaCounterpartyCard({
 
 function StatusTag({ updated }: { updated: boolean }) {
   return updated ? (
-    <span className="inline-flex shrink-0 items-center gap-1 rounded-full bg-emerald-50 px-2.5 py-1 text-[11px] font-medium text-emerald-800">
-      <CheckCircle2 className="h-3 w-3" />
+    <StatusBadge tone="success" className="shrink-0">
       Обновлено
-    </span>
+    </StatusBadge>
   ) : (
-    <span className="inline-flex shrink-0 items-center rounded-full bg-amber-50 px-2.5 py-1 text-[11px] font-medium text-amber-800">
+    <StatusBadge tone="warning" className="shrink-0">
       Требует обновления
-    </span>
+    </StatusBadge>
   );
 }
 
