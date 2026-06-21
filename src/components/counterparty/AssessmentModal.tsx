@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { DialogPrimitive } from "@/shared/ui";
-import { X, ArrowLeft, ChevronRight, AlertTriangle, MessageSquare, Download } from "@/shared/ui";
+import { ChevronRight, AlertTriangle, MessageSquare, Download, EllipseIconButton, StatusBadge } from "@/shared/ui";
 import { toast } from "sonner";
 import { NormAssistantIcon } from "./NormAssistantIcon";
 import { Button } from "@/shared/ui";
