@@ -1075,3 +1075,123 @@ Kit Select использует собственный popper-портал, по
 Сценарии Select (`AddContractDrawer`, `DrpaDataUpdateDrawer`,
 `ContractDrawer`) переписаны на исправленный controlled API; код
 type-checks и работает в dev preview без console errors.
+
+## Iteration 4.4 — ellipse positioning and visual stabilization
+
+### Ellipse fixed dimensions
+
+`EllipseIconButton` теперь жёстко фиксирует `variant="ellipse"` и `size="XS"`
+(32×32 px). Wrapper отклоняет позиционирующие классы (`absolute`, `fixed`,
+`relative`, `sticky`, `inset-*`, `right-*`, `left-*`, `top-*`, `bottom-*`,
+`z-*`) с dev-warning; разрешены только `shrink-0`, `pointer-events-*`,
+`opacity-*`. Не принимает `children`, `fullWidth`, `variant`, `size`.
+
+### Positioning wrappers
+
+Позиционирование вынесено во внешний `<span className="absolute ...">`:
+
+- `InModalDrawer` — pointer-events-none/auto wrapper в верхнем правом углу.
+- `CounterpartyModal` — `right-5 top-5 z-10`.
+- `AssessmentModal` — back + close сгруппированы в одном wrapper с `flex gap-2`.
+- `ComplexAssessmentModal`, `ContractAssessmentModal`, `PendingAssessmentModal`
+  — одиночный close в absolute wrapper.
+
+Flex-item (без absolute): `RunCheckDialog`, `ProcessFilterDrawer`,
+`ContractDrawer` history overlay.
+
+### InModalDrawer header spacing
+
+Сам контейнер drawer уже `absolute inset-y-0 right-0` (relative-родитель
+обеспечивает `relative flex min-h-0 flex-1 flex-col` в модалках). Кнопка
+закрытия больше не растягивает drawer: wrapper не участвует в flex-layout.
+
+### Dialog hideClose API
+
+`DialogContent` получил prop `hideClose?: boolean`. Стандартный close внутри
+absolute-wrapper рендерится только при `!hideClose`. Старый
+`[&>button]:hidden` удалён из `PendingAssessmentModal` и `RunCheckDialog`.
+
+### Sheet hideClose API
+
+`SheetContent` получил аналогичный `hideClose`. `ProcessFilterDrawer` перешёл
+на этот prop; `[&>button]:hidden` удалён.
+
+### Modal header safe areas
+
+| Modal | Reserved padding |
+|---|---|
+| `CounterpartyModal` | `pr-16 lg:pr-20` |
+| `ComplexAssessmentModal` | `pr-16 lg:pr-20` |
+| `ContractAssessmentModal` | `pr-16 lg:pr-20` |
+| `PendingAssessmentModal` | `pr-16` |
+| `AssessmentModal` (back + close) | `pr-24 lg:pr-28` |
+
+### Assessment modal cleanup
+
+`AssessmentModal` — close/back переехали в общий absolute wrapper; safe-area
+`pr-24 lg:pr-28`. Footer уже использует `size="lg"` без `h-12`/`rounded-full`.
+
+### Complex assessment cleanup
+
+- Ручной `<span>` со статусом «Сделки заключать можно / Не заключать
+  сделки» заменён на `StatusBadge size="regular"` (`success` / `danger`).
+- Удалены `h-12 rounded-full text-sm font-medium` с footer-кнопок;
+  оставлены только `flex-1` + `size="lg"`.
+- Close в absolute-wrapper, header `pr-16 lg:pr-20`.
+
+### Contract assessment cleanup
+
+- `HeaderLevelTag` перешёл на `StatusBadge regular` через явный mapping
+  `Level → StatusTone` (`very_high|high → danger`, `medium → warning`,
+  `low → neutral`).
+- Компактные уровни в `LevelAccordion` — `StatusBadge size="compact"`,
+  ручные `rounded-full px-* text-[11px] bg-*` удалены.
+- `ArrowUp` icon-приставка убрана (тон закрывает семантику).
+- Footer `Удалить` — `size="lg"` без `h-12 rounded-full`.
+- Close в absolute-wrapper, header `pr-16 lg:pr-20`.
+
+### SimpleSelect runtime verification
+
+Введена `normalizeKitSelectValue(value: unknown): string` — обрабатывает
+`null`, массивы (берёт первый элемент), объекты с полем `value`, примитивы.
+Заменила inline `unknown` cast и работает с фактическим shape kit Select.
+
+`options` нормализуются один раз через `useMemo` в `{ id, label, disabled }`.
+
+Ручной прокликивание (preview, `/index` → drawers):
+
+- `AddContractDrawer` → «Этапы урегулирования» — выбор сохраняется при
+  переоткрытии формы.
+- `DrpaDataUpdateDrawer` → этап задолженности — добавление и
+  редактирование, значение восстанавливается.
+- `ContractDrawer` → этап взыскания (внутри overlay с просрочкой) —
+  сохранение и повторное открытие.
+
+Проверены `labelInside`, `placeholder`, `helperText`, `error`,
+поведение внутри скролл-контейнера drawer; высота Select `M` совпадает с
+Input `M`.
+
+### Status semantic mapping
+
+`CounterpartyStatusBadge` перешёл на explicit map (`statusToneByLabel`)
+вместо подстрок `includes("подтвержд")`. «Подтверждена / Подтверждён»
+больше не окрашиваются как `danger`. Включены `Риск подтверждён → danger`,
+`Риск снят → success`, `Статус изменён → info`.
+
+### Remaining visual debt
+
+- Inline X в notification внутри `CounterpartyModal` — utility-action
+  внутри content (не chrome navigation), остаётся `lucide` X.
+- `ProcessFilterDrawer` — карточки этапов остаются ручными `button`-ами с
+  кастомными border/bg (сложная композиция, вне scope итерации).
+- `RiskCard`, `LevelAccordion`, `ErrorCard` — внутренние accordion-кнопки
+  остаются нативными `button` (вне scope).
+- `Tabs`, `Tooltip`, `DropdownMenu`, `Accordion` — без изменений.
+
+### Build, typecheck and lint
+
+- `bunx tsc --noEmit` — 0 ошибок.
+- `bun run lint` — 0 ошибок (17 pre-existing
+  `react-refresh/only-export-components` warnings в shadcn/adapter — не
+  затрагивают prod-bundle).
+- `bun run build` — успешно.
