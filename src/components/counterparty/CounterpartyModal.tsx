@@ -5,7 +5,15 @@ import { largeModalContentClass } from "@/lib/modal-styles";
 import { toast } from "sonner";
 import { Button } from "@/shared/ui";
 
-import { ChevronRight, ChevronDown, X, CheckCircle2, Info as InfoIcon, Plus } from "@/shared/ui";
+import {
+  ChevronRight,
+  ChevronDown,
+  X,
+  CheckCircle2,
+  Info as InfoIcon,
+  Plus,
+  EllipseIconButton,
+} from "@/shared/ui";
 
 import type {
   Counterparty,
@@ -542,13 +550,12 @@ export function CounterpartyModal({
             const styles = toneStyles[tone];
             return (
               <div className={`shrink-0 px-5 pt-6 pb-6 lg:px-10 ${styles.gradient}`}>
-                <button
-                  onClick={() => onOpenChange(false)}
-                  className="absolute right-5 top-5 rounded-full bg-white/70 p-1.5 text-muted-foreground backdrop-blur hover:bg-white"
+                <EllipseIconButton
+                  icon="cross"
                   aria-label="Закрыть"
-                >
-                  <X className="h-4 w-4" />
-                </button>
+                  onClick={() => onOpenChange(false)}
+                  className="absolute right-5 top-5 z-10"
+                />
                 <div className="flex flex-wrap items-center gap-1.5">
                   <CounterpartyStatusBadge tag={tagLabel} size="regular" />
                   {problemIndicators.map((item) => {

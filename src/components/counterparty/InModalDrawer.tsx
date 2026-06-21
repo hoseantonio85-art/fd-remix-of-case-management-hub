@@ -1,5 +1,5 @@
 import { ReactNode, useEffect } from "react";
-import { X, Button } from "@/shared/ui";
+import { EllipseIconButton } from "@/shared/ui";
 import { cn } from "@/lib/utils";
 
 /**
@@ -40,16 +40,12 @@ export function InModalDrawer({
           className,
         )}
       >
-        <Button
-          variant="ghost"
-          size="icon"
-          iconOnly
+        <EllipseIconButton
+          icon="cross"
           aria-label="Закрыть"
           onClick={() => onOpenChange(false)}
           className="absolute right-4 top-4 z-10"
-        >
-          <X className="h-4 w-4" />
-        </Button>
+        />
         {children}
       </div>
     </>

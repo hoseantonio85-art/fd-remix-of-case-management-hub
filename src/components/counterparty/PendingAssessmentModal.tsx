@@ -1,7 +1,7 @@
-import { Dialog, DialogContent } from "@/shared/ui";
+import { Dialog, DialogContent, EllipseIconButton } from "@/shared/ui";
 import { largeModalContentClass } from "@/lib/modal-styles";
 import { CounterpartyStatusBadge } from "./CounterpartyStatusBadge";
-import { Clock, X } from "@/shared/ui";
+import { Clock } from "@/shared/ui";
 import { Button } from "@/shared/ui";
 import type { Counterparty } from "@/domain/counterparty";
 import { CounterpartyHeaderMeta } from "./CounterpartyHeaderMeta";
@@ -19,14 +19,13 @@ export function PendingAssessmentModal({
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className={`${largeModalContentClass} [&>button]:hidden`}>
-        <div className="border-b border-border bg-gradient-to-b from-slate-50 via-slate-50/40 to-transparent px-6 pt-6 pb-5">
-          <button
-            onClick={() => onOpenChange(false)}
-            className="absolute right-4 top-4 rounded p-1 text-muted-foreground hover:bg-muted"
+        <div className="border-b border-border bg-gradient-to-b from-slate-50 via-slate-50/40 to-transparent px-6 pt-6 pb-5 pr-14">
+          <EllipseIconButton
+            icon="cross"
             aria-label="Закрыть"
-          >
-            <X className="h-4 w-4" />
-          </button>
+            onClick={() => onOpenChange(false)}
+            className="absolute right-4 top-4 z-10"
+          />
           <CounterpartyStatusBadge tag="На оценке" />
           <h2 className="mt-3 text-xl font-semibold tracking-tight">{counterparty.name}</h2>
           <CounterpartyHeaderMeta inn={counterparty.inn} />

@@ -1,6 +1,13 @@
 import { useEffect, useState } from "react";
 import { DialogPrimitive } from "@/shared/ui";
-import { X, ArrowLeft, ChevronRight, AlertTriangle, MessageSquare, Download } from "@/shared/ui";
+import {
+  ChevronRight,
+  AlertTriangle,
+  MessageSquare,
+  Download,
+  EllipseIconButton,
+  StatusBadge,
+} from "@/shared/ui";
 import { toast } from "sonner";
 import { NormAssistantIcon } from "./NormAssistantIcon";
 import { Button } from "@/shared/ui";
@@ -258,29 +265,23 @@ export function AssessmentModal({
             <div className={cn("shrink-0 px-5 pt-6 pb-6 lg:px-10", headerBg)}>
               <div className="absolute right-5 top-5 flex items-center gap-2">
                 {onBack && (
-                  <button
-                    onClick={onBack}
-                    className="rounded-full bg-white p-1.5 text-muted-foreground hover:bg-muted"
+                  <EllipseIconButton
+                    icon="previousLarge"
                     aria-label="Вернуться назад"
-                  >
-                    <ArrowLeft className="h-4 w-4" />
-                  </button>
+                    onClick={onBack}
+                  />
                 )}
-                <button
-                  onClick={() => (onCloseFlow ? onCloseFlow() : onOpenChange(false))}
-                  className="rounded-full bg-white p-1.5 text-muted-foreground hover:bg-muted"
+                <EllipseIconButton
+                  icon="cross"
                   aria-label="Закрыть и вернуться на главный экран"
-                >
-                  <X className="h-4 w-4" />
-                </button>
+                  onClick={() => (onCloseFlow ? onCloseFlow() : onOpenChange(false))}
+                />
               </div>
 
               <div className="flex flex-wrap items-center gap-1.5">
-                <span
-                  className={`inline-flex items-center rounded-full px-2.5 py-1 text-[11px] font-medium ${resolutionBadge.chip}`}
-                >
+                <StatusBadge tone={positive ? "success" : "danger"} size="regular">
                   {resolutionBadge.label}
-                </span>
+                </StatusBadge>
               </div>
               <h2 className="mt-3 text-2xl font-semibold tracking-tight text-foreground min-w-0">
                 Оценка контрагента {assessment.counterpartyName}
@@ -336,25 +337,19 @@ export function AssessmentModal({
             <div className="shrink-0 border-t border-border bg-white px-5 py-4 lg:px-10">
               {completionMode ? (
                 <div className="flex gap-3">
-                  <Button
-                    variant="outline"
-                    onClick={onDeleteResult}
-                    className="h-12 flex-1 rounded-full text-sm font-medium"
-                  >
+                  <Button variant="outline" size="lg" onClick={onDeleteResult} className="flex-1">
                     Удалить
                   </Button>
-                  <Button
-                    onClick={onAddToList}
-                    className="h-12 flex-1 rounded-full text-sm font-medium"
-                  >
+                  <Button size="lg" onClick={onAddToList} className="flex-1">
                     Добавить в список дебиторов
                   </Button>
                 </div>
               ) : (
                 <Button
                   variant="outline"
+                  size="lg"
                   onClick={() => setCommentOpen(true)}
-                  className="h-12 w-full rounded-full text-sm font-medium"
+                  className="w-full"
                 >
                   Оставить комментарий
                 </Button>
