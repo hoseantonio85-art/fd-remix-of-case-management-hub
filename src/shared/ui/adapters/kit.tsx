@@ -47,13 +47,7 @@ export type LoaderProps = ILoaderProps;
 export const Loader = KitLoader;
 
 // ---------- Button ----------
-type ShadcnButtonVariant =
-  | "default"
-  | "outline"
-  | "secondary"
-  | "ghost"
-  | "destructive"
-  | "link";
+type ShadcnButtonVariant = "default" | "outline" | "secondary" | "ghost" | "destructive" | "link";
 type ShadcnButtonSize = "default" | "sm" | "lg" | "icon";
 
 const variantMap: Record<ShadcnButtonVariant, IButtonProperties["variant"]> = {
@@ -72,8 +66,7 @@ const sizeMap: Record<ShadcnButtonSize, IButtonProperties["size"]> = {
   icon: "M",
 };
 
-export interface ButtonProps
-  extends Omit<React.ButtonHTMLAttributes<HTMLButtonElement>, "size"> {
+export interface ButtonProps extends Omit<React.ButtonHTMLAttributes<HTMLButtonElement>, "size"> {
   variant?: ShadcnButtonVariant | IButtonProperties["variant"];
   size?: ShadcnButtonSize | IButtonProperties["size"];
   loading?: boolean;
@@ -84,7 +77,10 @@ export interface ButtonProps
 }
 
 export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
-  ({ variant = "default", size = "default", asChild, loading, children, className, ...rest }, ref) => {
+  (
+    { variant = "default", size = "default", asChild, loading, children, className, ...rest },
+    ref,
+  ) => {
     // asChild — несовместимо с kit Button (он всегда рендерит <button>). Fallback на native button
     // с минимальными классами, чтобы layout не ломался. Реальное использование — единичное (см. отчёт).
     if (asChild) {
@@ -128,8 +124,10 @@ Button.displayName = "Button";
 export const buttonVariants = (opts?: { className?: string }) => opts?.className ?? "";
 
 // ---------- Input ----------
-export interface InputProps
-  extends Omit<React.InputHTMLAttributes<HTMLInputElement>, "onChange" | "size" | "prefix"> {
+export interface InputProps extends Omit<
+  React.InputHTMLAttributes<HTMLInputElement>,
+  "onChange" | "size" | "prefix"
+> {
   onChange?: React.ChangeEventHandler<HTMLInputElement>;
 }
 
@@ -152,8 +150,10 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>(
 Input.displayName = "Input";
 
 // ---------- Textarea ----------
-export interface TextareaProps
-  extends Omit<React.TextareaHTMLAttributes<HTMLTextAreaElement>, "onChange" | "size"> {
+export interface TextareaProps extends Omit<
+  React.TextareaHTMLAttributes<HTMLTextAreaElement>,
+  "onChange" | "size"
+> {
   onChange?: React.ChangeEventHandler<HTMLTextAreaElement>;
 }
 
@@ -175,8 +175,7 @@ export const Textarea = React.forwardRef<HTMLTextAreaElement, TextareaProps>(
 Textarea.displayName = "Textarea";
 
 // ---------- Checkbox ----------
-export interface CheckboxProps
-  extends Omit<ICheckboxProperties, "onChange"> {
+export interface CheckboxProps extends Omit<ICheckboxProperties, "onChange"> {
   onCheckedChange?: (checked: boolean) => void;
 }
 
@@ -221,9 +220,10 @@ export interface BadgeProps extends Omit<React.HTMLAttributes<HTMLDivElement>, "
 }
 
 export const Badge = ({ variant = "default", className, children, ...rest }: BadgeProps) => {
-  const kitVariant = (variant as string) in badgeVariantMap
-    ? badgeVariantMap[variant as ShadcnBadgeVariant]
-    : (variant as IBadgeProps["variant"]);
+  const kitVariant =
+    (variant as string) in badgeVariantMap
+      ? badgeVariantMap[variant as ShadcnBadgeVariant]
+      : (variant as IBadgeProps["variant"]);
   return (
     <KitBadge variant={kitVariant} size={EBadgeSize.xxs} className={className} {...rest}>
       {children}
@@ -248,4 +248,3 @@ export const semanticBadgeVariant: Record<SemanticTone, IBadgeProps["variant"]> 
   info: "blue",
   neutral: "gray",
 };
-
