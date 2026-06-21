@@ -1195,3 +1195,147 @@ Input `M`.
   `react-refresh/only-export-components` warnings в shadcn/adapter — не
   затрагивают prod-bundle).
 - `bun run build` — успешно.
+
+---
+
+## Iteration 4.5 — final close and Select stabilization
+
+### CounterpartyModal duplicate close fix
+
+- В `CounterpartyModal` использовался устаревший CSS-селектор
+  `[&>button]:hidden`, который после оборачивания стандартного close в
+  `<span>` перестал что-либо скрывать. В DOM одновременно жили стандартный
+  `DialogContent` close и собственный `EllipseIconButton` в шапке.
+- Заменено на явный prop: `<DialogContent hideClose ...>`. Класс
+  `[&>button]:hidden` удалён. Закрытие осталось одно — собственный
+  `EllipseIconButton` в шапке.
+
+### Legacy close selectors removed
+
+- Поиск `[&>button]:hidden` по проекту:
+  - `src/components/counterparty/CounterpartyModal.tsx` — заменено на
+    `hideClose`;
+  - `src/components/ui/sidebar.tsx` (мобильный sidebar поверх Sheet) —
+    заменено на `hideClose`.
+- Других вхождений `[&>button]:hidden` для управления close в проекте нет.
+  CSS-селектор больше не используется как способ скрытия стандартного close.
+
+### Strict EllipseIconButton API
+
+- `EllipseIconButtonProps` теперь `Omit`-ит также `className`. Компонент
+  больше не принимает позиционирующих и визуальных классов.
+- Удалены `FORBIDDEN_CLASS` regex и `console.warn` — вместо runtime-проверки
+  ограничение зашито в типе.
+- Реализация сведена к минимальной обёртке над `Button` с фиксированными
+  `variant="ellipse"`, `size="XS"`, `iconOnly`. Фактический размер строго
+  32×32 px, задаётся самим kit Button.
+
+### Dialog and Sheet close wrappers
+
+- `DialogContent` и `SheetContent`: стандартный close теперь живёт внутри
+  фиксированного 32×32 wrapper `inline-flex h-8 w-8 items-center justify-center`
+  с `pointer-events-none` на внешнем `span` и `pointer-events-auto` на
+  внутреннем. Это исключает влияние close на layout и устраняет любые
+  визуальные «уплывания».
+- Проп `hideClose` полностью убирает кнопку из DOM (а не прячет через CSS).
+
+### InModalDrawer safe areas
+
+К правому краю верхней области добавлен `pr-16` (64 px) во всех drawer,
+рисуемых через `InModalDrawer` (close в `right-4 top-4`):
+
+- `RiskDrawer` — `pr-16` на `<h2>`;
+- `AddContractDrawer` — `pr-16` на заголовке;
+- `DebtProcessDrawer` — `pr-16` на header-блоке (заголовок + описание +
+  summary chips остаются под защитой);
+- `ContractDrawer` — `pr-16` на header-контейнере; badge
+  «Есть просроченная задолженность», номер договора и имя контрагента
+  больше не заходят под close;
+- `AssessmentCommentDrawer` — `pr-16` на блоке заголовок+описание;
+- `AssessmentCorrectionDrawer` — `pr-16` на блоке заголовок+описание;
+- `AssessmentGroupDrawer` — `pr-16` на всём header-блоке; локальный `pr-10`
+  на `<h3>` удалён;
+- `AssessmentHistoryDrawer` — `pr-16` на обоих режимах (история оценки,
+  история скачивания);
+- `AssessmentCommentHistory` — `pr-16` на блоке заголовок+описание;
+- `RegistrationInfoDrawer` — `pr-16` на блоке заголовок+мета;
+- drawer ошибок внутри `ComplexAssessmentModal` — `pr-16` на header;
+- drawer ошибок внутри `ContractAssessmentModal` — `pr-16` на header.
+
+Safe-area добавлена только к верхней области; padding всего body не
+увеличен; ширина drawer не изменилась; второй close не добавлен.
+
+### Sheet header safe areas
+
+- `CheckProcessDrawer` (Sheet) — `pr-16` на header-контейнере (заголовок и
+  счётчик не заходят под стандартный close);
+- `DrpaDataUpdateDrawer` (Sheet) — `pr-10` заменён на `pr-16` на header-блоке,
+  чтобы длинный заголовок и описание оставались полностью видимы.
+
+### SimpleSelect actual kit contract
+
+Перед изменением открыт `node_modules/@sber-orm/ui-kit/src/components/Select/Select.tsx`
+и зафиксирован реальный контракт:
+
+- option: `{ id?, key?, value?, label?, title? }`;
+- `value` props хранится как **full option-объект** (kit делает
+  `setSelectedValue(externalValue)` и рендерит через react-select
+  `getOptionLabel` → `option.label`);
+- `onChange(value: string[] & string, event, fullValue, reason)` — первый
+  аргумент уже строковый id выбранной опции (получается из `option.value`).
+
+`SimpleSelect` приведён к этому фактическому API:
+
+- внешний API продукта не изменился: `value: string`, `onChange: (value: string) => void`;
+- опции внутри adapter мапятся в `{ value, label, disabled }` (не `id`),
+  чтобы `getOptionValue` находил совпадение;
+- в `value` передаётся найденный full option-объект:
+  `kitOptions.find(o => o.value === value) ?? null`;
+- `onChange` использует первый аргумент kit (string-id), без угадывания
+  структуры. Универсальный `normalizeKitSelectValue(unknown)`,
+  построенный на догадках, удалён.
+
+`unknown` используется только как локальный тип-сужение для первого
+аргумента kit `onChange`, чтобы не зависеть от внутреннего union
+`string[] & string`. Контракт самого `SimpleSelect` строго типизирован.
+
+### Select runtime verification
+
+Прокликаны основные сценарии:
+
+- `AddContractDrawer` — открыт drawer, выбран этап, dropdown показывает label
+  (а не value), после сохранения и повторного открытия в `SimpleSelect`
+  отображается выбранный label;
+- `DrpaDataUpdateDrawer` (через карточку договора) — этап сохраняется и
+  восстанавливается при повторном открытии;
+- `ContractDrawer` — добавление просрочки + смена этапа: выбранный label
+  виден, сохраняется и восстанавливается.
+
+Проверено:
+
+- `labelInside`, placeholder, выбранный label, error, helperText, disabled,
+  длинный option;
+- dropdown не обрезается внутри drawer (используется штатный
+  popper из kit);
+- нет console warnings/errors при выборе.
+
+### Remaining visual debt
+
+Сознательно НЕ менялось в этой итерации:
+
+- Tabs, Tooltip, Accordion, DropdownMenu из shadcn — composition-heavy,
+  ждут отдельной итерации;
+- assessment-модалки целиком (карточки, timeline, accordion внутри);
+- внутренние accordion-кнопки;
+- FileUploader, MoneyInput, InputMask, Notification, Toaster, selectable
+  cards, drag-and-drop.
+
+Эти места перечислены как остающийся legacy и не блокируют backend-готовность.
+
+### Build, typecheck and lint
+
+- `bunx tsc --noEmit` — 0 ошибок.
+- `bun run lint` — 0 ошибок (17 pre-existing
+  `react-refresh/only-export-components` warnings в shadcn/adapter — не
+  затрагивают prod-bundle).
+- `bun run build` — успешно.
