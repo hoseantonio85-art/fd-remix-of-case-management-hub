@@ -1102,15 +1102,11 @@ export function ContractDrawer({
                   Действия по договору: корректировки, просрочки, погашения.
                 </p>
               </div>
-              <Button
-                variant="ghost"
-                size="icon"
-                iconOnly
+              <EllipseIconButton
+                icon="cross"
                 aria-label="Закрыть"
                 onClick={() => setHistoryOpen(false)}
-              >
-                <X className="h-4 w-4" />
-              </Button>
+              />
             </div>
             <div className="flex-1 overflow-y-auto px-6 py-4">
               {changeHistory.length === 0 ? (
