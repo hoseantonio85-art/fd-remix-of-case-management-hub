@@ -412,3 +412,97 @@ UX, визуал и сценарии не менялись.
 - Для прочих мутаций (notification copy, animations) toast/rollback
   политика всё ещё дублируется покомпонентно — общий `useMutation`
   откладывается до интеграции с backend.
+
+---
+
+## Iteration 3 — backend readiness and handoff
+
+Дата: 21.06.2026. UX, маршруты, тексты и `shared/ui` не изменялись.
+
+### Repository source switching
+
+- Добавлен `src/data/config.ts` — единственная точка чтения
+  `VITE_DATA_SOURCE` и `VITE_API_BASE_URL`.
+- Единая точка выбора реализации — `src/data/repositories/index.ts`:
+  `dataConfig.source === "api" ? createApiRepositories(...) : createMockRepositories()`.
+- Создан `.env.example`. По умолчанию — `mock`.
+- Mock-фабрика: `src/data/repositories/mock/index.ts`.
+- API-фабрика: `src/data/api/index.ts`.
+- UI и hooks `VITE_DATA_SOURCE` не читают (проверено grep).
+
+### API layer
+
+- `src/data/api/client/http.ts` — минимальный fetch-клиент: baseUrl, JSON,
+  query, methods, AbortController + timeout, обработка пустого ответа,
+  нормализация ошибок, точка расширения `getAuthHeaders` (TBD-авторизация).
+  Axios не добавлен.
+- `src/data/api/config/endpoints.ts` — реестр endpoints; все значения помечены
+  `TBD`. Любой вызов с TBD-endpoint бросает `API_NOT_CONFIGURED` — UI рисует
+  существующее error/retry-состояние, без белого экрана.
+- API-реализации repository-интерфейсов: `src/data/api/repositories/{counterparty,assessment,check}.ts`.
+- `CheckRepository.subscribe` в API сейчас noop (см. API_CONTRACT.md §11 —
+  транспорт обновлений выбирает backend).
+
+### DTO and mappers
+
+- DTO: `src/data/api/dto/{counterparty,assessment,check}.ts`.
+- Mappers DTO ↔ domain: `src/data/api/mappers/*`.
+- UI и hooks DTO не импортируют (проверено grep
+  `rg "@/data/api/dto" src/components src/hooks src/pages`).
+
+### Error normalization
+
+- `src/data/errors.ts` — `DataError` с кодами `NETWORK_ERROR`, `TIMEOUT`,
+  `UNAUTHORIZED`, `FORBIDDEN`, `NOT_FOUND`, `VALIDATION_ERROR`, `CONFLICT`,
+  `SERVER_ERROR`, `API_NOT_CONFIGURED`, `UNKNOWN` и флагом `retryable`.
+- `fromHttpStatus`, `normalizeUnknownError` — единые точки нормализации.
+- Существующие UI loading/error/retry-состояния работают без знания о HTTP.
+
+### Atomic operations
+
+- В `CounterpartyRepository` добавлен метод
+  `saveRiskDecisionFlow({ counterpartyId, risk, changedCollectionSteps })`.
+- `CounterpartyModal.handleSave` теперь делает **один** repository-вызов
+  вместо `Promise.all([persistRisk, ...persistCollectionStep])`. Поведение
+  UI (success/rollback toast, локальный rollback risks + steps) сохранено.
+- Mock-реализация: один патч стора (риск + изменённые этапы).
+- API-реализация: один POST на `riskDecisionFlow(:inn)` — endpoint TBD,
+  транзакционность требуется от backend (API_CONTRACT.md §5).
+
+### API contracts requiring backend confirmation
+
+Создан `API_CONTRACT.md`. Зафиксированы все используемые операции
+(list/byInn/add/updateStatus/saveRiskDecisionFlow/addOrUpdateContract/
+updateCollectionStep/assessments.build/checks.list/run/remove), HTTP method
+(где очевидно), endpoint = TBD, входные/выходные DTO, ожидаемые ошибки,
+требуется ли атомарность, открытые вопросы (авторизация, формат ошибок,
+пагинация, аплоад файлов проверок, транспорт обновлений проверок).
+
+### Handoff documentation
+
+Создан `HANDOFF.md` с разделами: запуск, env, переключение mock/API,
+архитектура данных, путеводитель по domain/repo/mock/api/dto, основные
+сценарии, что нужно от backend, атомарные операции, статус UI-kit и
+legacy, известный технический долг, чек-лист перед началом разработки.
+
+### Verification
+
+| Команда / сценарий | Результат |
+| --- | --- |
+| `bun install` | OK |
+| `bun run build` | ✓ 4.41s, 580.96 kB JS / 293.98 kB CSS |
+| `bun run lint` | 0 errors, 14 warnings (pre-existing) |
+| Mock-режим (по умолчанию) | список, поиск, фильтры, карточка, проверки, оценка, риск-flow, advance/rollback этапа, договоры, error/retry — работают как раньше |
+| API-режим без `VITE_API_BASE_URL` | приложение запускается, белого экрана нет, error/retry-состояние с нормализованным сообщением `API_NOT_CONFIGURED` |
+| `grep` UI на запрещённые импорты | UI не импортирует `@/data/mock/**`, `@/data/api/dto/**`, `VITE_DATA_SOURCE` |
+
+### Remaining debt
+
+- Endpoints в `src/data/api/config/endpoints.ts` — TBD до согласования с backend.
+- `CheckRepository.subscribe` в API — noop; транспорт (polling/SSE/WS) TBD.
+- Загрузка файлов проверок — не реализована (передаются только имена).
+- `getAuthHeaders` в HTTP-клиенте — точка расширения, без реализации.
+- ESLint-правило, запрещающее импорт `@/data/api/dto/**` и `@/data/mock/**`
+  из `src/components/**` и `src/hooks/**`, не добавлено — контролируется ревью.
+- React/Vite alias-workaround для kit остаётся (см. итерация 1).
+- Tailwind v4 + SCSS kit — нет единого источника токенов.
