@@ -142,7 +142,10 @@ src/
 3. Tailwind v4 + SCSS kit сосуществуют — единого source-of-truth для токенов нет.
 4. Endpoint в `src/data/api/config/endpoints.ts` — **TBD**. До заполнения
    API-режим возвращает `API_NOT_CONFIGURED` для каждой операции.
-5. Транспорт обновлений `CheckRepository.subscribe` в API — TBD (noop).
+5. Live-транспорт `CheckRepository.subscribe` в API — TBD (noop). Базовый
+   сценарий проверок работает без него: первичная загрузка через `list()`,
+   локальные мутации после `run()`/`remove()`, ручной refetch через
+   `useChecks.retry()` (кнопка «Повторить» в ChecksDrawer).
 6. Загрузка файлов проверок не реализована, передаются только имена.
 7. Авторизация в HTTP-клиенте — точка расширения (`getAuthHeaders`), но не заполнена.
 8. ESLint-правило, запрещающее импорт `@/data/mock/**` и `@/data/api/dto/**` из
