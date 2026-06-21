@@ -1,6 +1,6 @@
 import type { Counterparty, RiskSignal, Contract, CollectionSubStep } from "@/domain/counterparty";
 import { counterpartiesMock } from "@/data/mock/counterparties";
-import type { CounterpartyRepository } from "../types";
+import type { CounterpartyRepository, RiskDecisionFlowInput } from "../types";
 
 const LATENCY_MS = Number(import.meta.env.VITE_MOCK_LATENCY_MS ?? 250);
 const sleep = (ms: number) => new Promise<void>((resolve) => setTimeout(resolve, ms));
@@ -57,5 +57,18 @@ export const mockCounterpartyRepository: CounterpartyRepository = {
       ...c,
       collection: c.collection.map((s) => (s.id === step.id ? step : s)),
     }));
+  },
+  async saveRiskDecisionFlow(input: RiskDecisionFlowInput) {
+    // Mock: атомарность не гарантируется, но семантически одна операция.
+    // API: транзакционный backend endpoint (см. API_CONTRACT.md).
+    await sleep(LATENCY_MS / 2);
+    patch(input.counterpartyId, (c) => {
+      const risk = input.risk;
+      const exists = c.risks.some((r) => r.id === risk.id);
+      const risks = exists ? c.risks.map((r) => (r.id === risk.id ? risk : r)) : [...c.risks, risk];
+      const byId = new Map(input.changedCollectionSteps.map((s) => [s.id, s]));
+      const collection = c.collection.map((s) => byId.get(s.id) ?? s);
+      return { ...c, risks, collection };
+    });
   },
 };
