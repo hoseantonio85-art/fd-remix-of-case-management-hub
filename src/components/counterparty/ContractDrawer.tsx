@@ -16,6 +16,7 @@ import {
   X,
   Pencil,
   Trash2,
+  EllipseIconButton,
 } from "@/shared/ui";
 
 const SETTLEMENT_STAGES = [
