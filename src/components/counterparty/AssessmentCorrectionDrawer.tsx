@@ -81,20 +81,17 @@ export function AssessmentCorrectionDrawer({
           <div className="mt-6 space-y-6">
             {/* Comment */}
             <div>
-              <label className="mb-1.5 block text-sm font-medium">Комментарий</label>
               <Textarea
+                label="Комментарий"
+                labelInside
+                required
                 rows={4}
                 placeholder="Опишите, почему вы не согласны с текущей оценкой"
                 value={comment}
                 onChange={(e) => setComment(e.target.value)}
-                className={cn(
-                  "min-h-[104px]",
-                  submitted && errors.comment && "border-rose-400 focus-visible:ring-rose-300",
-                )}
+                error={submitted && errors.comment}
+                helperText={submitted && errors.comment ? "Добавьте комментарий" : undefined}
               />
-              {submitted && errors.comment && (
-                <div className="mt-1 text-xs text-rose-600">Добавьте комментарий</div>
-              )}
             </div>
 
             {/* Tag */}
@@ -130,16 +127,17 @@ export function AssessmentCorrectionDrawer({
 
             {/* Date */}
             <div>
-              <label className="mb-1.5 block text-sm font-medium">
-                Дата возврата на мониторинг
-              </label>
               <Input
+                label="Дата возврата на мониторинг"
+                labelInside
+                required
                 type="date"
                 value={date}
                 onChange={(e) => setDate(e.target.value)}
-                className={cn(
-                  submitted && errors.date && "border-rose-400 focus-visible:ring-rose-300",
-                )}
+                error={submitted && errors.date}
+                helperText={
+                  submitted && errors.date ? "Укажите дату возврата на мониторинг" : undefined
+                }
               />
               <div className="mt-1.5 flex items-start gap-1.5 text-xs text-muted-foreground">
                 <Info className="mt-0.5 h-3 w-3 shrink-0" />
@@ -147,11 +145,6 @@ export function AssessmentCorrectionDrawer({
                   С этой даты агент возобновит мониторинг и будет обновлять оценку по новым данным.
                 </span>
               </div>
-              {submitted && errors.date && (
-                <div className="mt-1 text-xs text-rose-600">
-                  Укажите дату возврата на мониторинг
-                </div>
-              )}
             </div>
           </div>
         </div>
