@@ -394,4 +394,3 @@ export const semanticBadgeVariant: Record<SemanticTone, IBadgeProps["variant"]> 
   neutral: "gray",
   violet: "violet",
 };
-
