@@ -262,8 +262,8 @@ export function AssessmentModal({
         >
           <div className="relative flex min-h-0 flex-1 flex-col">
             {/* Header */}
-            <div className={cn("shrink-0 px-5 pt-6 pb-6 lg:px-10", headerBg)}>
-              <div className="absolute right-5 top-5 flex items-center gap-2">
+            <div className={cn("shrink-0 px-5 pt-6 pb-6 pr-24 lg:px-10 lg:pr-28", headerBg)}>
+              <span className="absolute right-5 top-5 z-10 flex items-center gap-2">
                 {onBack && (
                   <EllipseIconButton
                     icon="previousLarge"
@@ -276,7 +276,7 @@ export function AssessmentModal({
                   aria-label="Закрыть и вернуться на главный экран"
                   onClick={() => (onCloseFlow ? onCloseFlow() : onOpenChange(false))}
                 />
-              </div>
+              </span>
 
               <div className="flex flex-wrap items-center gap-1.5">
                 <StatusBadge tone={positive ? "success" : "danger"} size="regular">
