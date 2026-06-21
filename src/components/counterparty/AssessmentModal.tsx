@@ -258,29 +258,23 @@ export function AssessmentModal({
             <div className={cn("shrink-0 px-5 pt-6 pb-6 lg:px-10", headerBg)}>
               <div className="absolute right-5 top-5 flex items-center gap-2">
                 {onBack && (
-                  <button
-                    onClick={onBack}
-                    className="rounded-full bg-white p-1.5 text-muted-foreground hover:bg-muted"
+                  <EllipseIconButton
+                    icon="previousLarge"
                     aria-label="Вернуться назад"
-                  >
-                    <ArrowLeft className="h-4 w-4" />
-                  </button>
+                    onClick={onBack}
+                  />
                 )}
-                <button
-                  onClick={() => (onCloseFlow ? onCloseFlow() : onOpenChange(false))}
-                  className="rounded-full bg-white p-1.5 text-muted-foreground hover:bg-muted"
+                <EllipseIconButton
+                  icon="cross"
                   aria-label="Закрыть и вернуться на главный экран"
-                >
-                  <X className="h-4 w-4" />
-                </button>
+                  onClick={() => (onCloseFlow ? onCloseFlow() : onOpenChange(false))}
+                />
               </div>
 
               <div className="flex flex-wrap items-center gap-1.5">
-                <span
-                  className={`inline-flex items-center rounded-full px-2.5 py-1 text-[11px] font-medium ${resolutionBadge.chip}`}
-                >
+                <StatusBadge tone={positive ? "success" : "danger"} size="regular">
                   {resolutionBadge.label}
-                </span>
+                </StatusBadge>
               </div>
               <h2 className="mt-3 text-2xl font-semibold tracking-tight text-foreground min-w-0">
                 Оценка контрагента {assessment.counterpartyName}
