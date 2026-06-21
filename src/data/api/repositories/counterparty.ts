@@ -2,10 +2,7 @@ import type { CollectionSubStep, Contract, Counterparty, RiskSignal } from "@/do
 import type { CounterpartyRepository, RiskDecisionFlowInput } from "@/data/repositories/types";
 import type { HttpClient } from "../client/http";
 import { endpoints, isTbdEndpoint } from "../config/endpoints";
-import type {
-  CounterpartyDto,
-  RiskDecisionFlowRequestDto,
-} from "../dto/counterparty";
+import type { CounterpartyDto, RiskDecisionFlowRequestDto } from "../dto/counterparty";
 import {
   fromContract,
   fromRisk,
@@ -88,7 +85,9 @@ export function createApiCounterpartyRepository(http: HttpClient): CounterpartyR
     },
     async saveRiskDecisionFlow(input: RiskDecisionFlowInput): Promise<void> {
       return run(async () => {
-        const path = ensureEndpoint(endpoints.counterparties.riskDecisionFlow(input.counterpartyId));
+        const path = ensureEndpoint(
+          endpoints.counterparties.riskDecisionFlow(input.counterpartyId),
+        );
         const body: RiskDecisionFlowRequestDto = {
           risk: fromRisk(input.risk),
           changedCollectionSteps: input.changedCollectionSteps.map(fromStep),

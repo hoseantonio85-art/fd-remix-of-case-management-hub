@@ -63,7 +63,8 @@ export function fromHttpStatus(status: number, details?: unknown): DataError {
   if (status === 403) return createDataError("FORBIDDEN", { status, details });
   if (status === 404) return createDataError("NOT_FOUND", { status, details });
   if (status === 409) return createDataError("CONFLICT", { status, details });
-  if (status === 422 || status === 400) return createDataError("VALIDATION_ERROR", { status, details });
+  if (status === 422 || status === 400)
+    return createDataError("VALIDATION_ERROR", { status, details });
   if (status >= 500) return createDataError("SERVER_ERROR", { status, details });
   return createDataError("UNKNOWN", { status, details });
 }

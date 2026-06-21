@@ -2,11 +2,7 @@
 import { mockCounterpartyRepository } from "./counterparty";
 import { mockAssessmentRepository } from "./assessment";
 import { mockCheckRepository } from "./check";
-import type {
-  AssessmentRepository,
-  CheckRepository,
-  CounterpartyRepository,
-} from "../types";
+import type { AssessmentRepository, CheckRepository, CounterpartyRepository } from "../types";
 
 export interface MockRepositoriesBundle {
   counterpartyRepository: CounterpartyRepository;

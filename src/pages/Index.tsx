@@ -328,11 +328,7 @@ export default function Index() {
   // Все проверки идут через CheckRepository + useChecks (нет setTimeout в UI).
   // Ошибки checks показываются точечно в обработчиках вызовов (runCheck/removeCheck),
   // поэтому отдельное поле `error` из useChecks здесь не используем.
-  const {
-    checks: checksDto,
-    run: runCheckRaw,
-    remove: removeCheckRaw,
-  } = useChecks();
+  const { checks: checksDto, run: runCheckRaw, remove: removeCheckRaw } = useChecks();
   const checks: CheckRecord[] = checksDto;
   const [checkActionId, setCheckActionId] = useState<string | null>(null);
   const runCheck = async (input: {

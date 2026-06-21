@@ -13,13 +13,10 @@ export const endpoints = {
     byInn: (inn: string) => `${TBD}/${encodeURIComponent(inn)}`, // GET /counterparties/:inn
     add: TBD as Endpoint, // POST /counterparties
     updateStatus: (inn: string) => `${TBD}/${encodeURIComponent(inn)}/status`, // PATCH
-    addOrUpdateContract: (inn: string) =>
-      `${TBD}/${encodeURIComponent(inn)}/contracts`, // PUT
-    updateCollectionStep: (inn: string) =>
-      `${TBD}/${encodeURIComponent(inn)}/collection-steps`, // PUT
+    addOrUpdateContract: (inn: string) => `${TBD}/${encodeURIComponent(inn)}/contracts`, // PUT
+    updateCollectionStep: (inn: string) => `${TBD}/${encodeURIComponent(inn)}/collection-steps`, // PUT
     // Атомарная операция: решение по риску + связанные этапы.
-    riskDecisionFlow: (inn: string) =>
-      `${TBD}/${encodeURIComponent(inn)}/risk-decisions`, // POST (транзакционно)
+    riskDecisionFlow: (inn: string) => `${TBD}/${encodeURIComponent(inn)}/risk-decisions`, // POST (транзакционно)
   },
   assessments: {
     build: TBD as Endpoint, // POST /assessments

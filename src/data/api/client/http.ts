@@ -1,6 +1,11 @@
 // Минимальный HTTP-клиент поверх fetch. Используется только API-репозиториями.
 // Компоненты и hooks не должны импортировать этот модуль.
-import { createDataError, fromHttpStatus, normalizeUnknownError, type DataError } from "@/data/errors";
+import {
+  createDataError,
+  fromHttpStatus,
+  normalizeUnknownError,
+  type DataError,
+} from "@/data/errors";
 
 export type HttpMethod = "GET" | "POST" | "PUT" | "PATCH" | "DELETE";
 
