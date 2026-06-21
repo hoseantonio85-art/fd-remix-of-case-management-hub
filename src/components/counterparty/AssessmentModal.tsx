@@ -332,23 +332,22 @@ export function AssessmentModal({
                 <div className="flex gap-3">
                   <Button
                     variant="outline"
+                    size="lg"
                     onClick={onDeleteResult}
-                    className="h-12 flex-1 rounded-full text-sm font-medium"
+                    className="flex-1"
                   >
                     Удалить
                   </Button>
-                  <Button
-                    onClick={onAddToList}
-                    className="h-12 flex-1 rounded-full text-sm font-medium"
-                  >
+                  <Button size="lg" onClick={onAddToList} className="flex-1">
                     Добавить в список дебиторов
                   </Button>
                 </div>
               ) : (
                 <Button
                   variant="outline"
+                  size="lg"
                   onClick={() => setCommentOpen(true)}
-                  className="h-12 w-full rounded-full text-sm font-medium"
+                  className="w-full"
                 >
                   Оставить комментарий
                 </Button>
