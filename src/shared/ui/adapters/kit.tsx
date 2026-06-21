@@ -406,8 +406,7 @@ export const SimpleSelect = ({
       disabled={disabled}
       isSearchable={false}
       className={className}
-      onChange={(nextValue) => {
-        // kit передаёт string-id первым аргументом
+      onChange={(nextValue: unknown) => {
         const id = Array.isArray(nextValue) ? nextValue[0] : nextValue;
         onChange?.(id == null ? "" : String(id));
       }}
