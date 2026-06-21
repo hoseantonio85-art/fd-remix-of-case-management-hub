@@ -1095,8 +1095,8 @@ export function ContractDrawer({
         {/* Change history overlay */}
         {historyOpen && (
           <div className="absolute inset-0 z-50 flex flex-col bg-white">
-            <div className="flex items-start justify-between border-b border-border px-6 py-4">
-              <div>
+            <div className="flex items-start justify-between gap-3 border-b border-border px-6 py-4">
+              <div className="min-w-0 flex-1">
                 <h3 className="text-lg font-semibold">История изменений</h3>
                 <p className="mt-0.5 text-xs text-muted-foreground">
                   Действия по договору: корректировки, просрочки, погашения.
