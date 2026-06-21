@@ -1,6 +1,13 @@
 import { useEffect, useState } from "react";
 import { DialogPrimitive } from "@/shared/ui";
-import { ChevronRight, AlertTriangle, MessageSquare, Download, EllipseIconButton, StatusBadge } from "@/shared/ui";
+import {
+  ChevronRight,
+  AlertTriangle,
+  MessageSquare,
+  Download,
+  EllipseIconButton,
+  StatusBadge,
+} from "@/shared/ui";
 import { toast } from "sonner";
 import { NormAssistantIcon } from "./NormAssistantIcon";
 import { Button } from "@/shared/ui";
@@ -330,12 +337,7 @@ export function AssessmentModal({
             <div className="shrink-0 border-t border-border bg-white px-5 py-4 lg:px-10">
               {completionMode ? (
                 <div className="flex gap-3">
-                  <Button
-                    variant="outline"
-                    size="lg"
-                    onClick={onDeleteResult}
-                    className="flex-1"
-                  >
+                  <Button variant="outline" size="lg" onClick={onDeleteResult} className="flex-1">
                     Удалить
                   </Button>
                   <Button size="lg" onClick={onAddToList} className="flex-1">

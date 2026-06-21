@@ -1,6 +1,14 @@
 import { useState } from "react";
 import { DialogPrimitive } from "@/shared/ui";
-import { ChevronDown, ArrowUp, Flame, Download, AlertTriangle, ChevronRight, EllipseIconButton } from "@/shared/ui";
+import {
+  ChevronDown,
+  ArrowUp,
+  Flame,
+  Download,
+  AlertTriangle,
+  ChevronRight,
+  EllipseIconButton,
+} from "@/shared/ui";
 import { Button } from "@/shared/ui";
 import { cn } from "@/lib/utils";
 import { largeModalContentClass } from "@/lib/modal-styles";

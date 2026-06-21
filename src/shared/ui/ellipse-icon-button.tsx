@@ -3,8 +3,10 @@ import { Button, type ButtonProps } from "./adapters/kit";
 import type { EIconName } from "@sber-orm/ui-kit";
 import { cn } from "@/lib/utils";
 
-export interface EllipseIconButtonProps
-  extends Omit<ButtonProps, "variant" | "size" | "iconOnly" | "children" | "fullWidth" | "icon"> {
+export interface EllipseIconButtonProps extends Omit<
+  ButtonProps,
+  "variant" | "size" | "iconOnly" | "children" | "fullWidth" | "icon"
+> {
   icon: keyof typeof EIconName;
   "aria-label": string;
 }
