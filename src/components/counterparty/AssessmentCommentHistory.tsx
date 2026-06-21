@@ -59,10 +59,12 @@ export function CommentHistoryDrawer({
     <InModalDrawer open={open} onOpenChange={onOpenChange}>
       <div className="flex min-h-full flex-col">
         <div className="flex-1 overflow-y-auto p-6">
-          <h2 className="text-lg font-semibold">Замечания к оценке</h2>
-          <p className="mt-1 text-sm text-muted-foreground">
-            Пользовательские замечания к группам и факторам оценки.
-          </p>
+          <div className="pr-16">
+            <h2 className="text-lg font-semibold">Замечания к оценке</h2>
+            <p className="mt-1 text-sm text-muted-foreground">
+              Пользовательские замечания к группам и факторам оценки.
+            </p>
+          </div>
 
           {records.length === 0 ? (
             <div className="mt-6 rounded-2xl border border-dashed border-slate-200 bg-white p-6 text-center text-sm text-muted-foreground">

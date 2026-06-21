@@ -76,13 +76,15 @@ export function ChecksDrawer({
     <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent side="right" className="flex w-full flex-col gap-0 p-0 sm:max-w-md">
         <div className="border-b border-border px-6 pt-6 pb-4">
-          <div className="text-base font-semibold tracking-tight">Проверки</div>
-          <div className="mt-1 text-[12px] text-muted-foreground">
-            {loading
-              ? "Загрузка…"
-              : checks.length === 0
-                ? "Нет активных проверок"
-                : `Всего: ${checks.length}`}
+          <div className="pr-16">
+            <div className="text-base font-semibold tracking-tight">Проверки</div>
+            <div className="mt-1 text-[12px] text-muted-foreground">
+              {loading
+                ? "Загрузка…"
+                : checks.length === 0
+                  ? "Нет активных проверок"
+                  : `Всего: ${checks.length}`}
+            </div>
           </div>
           {error && (
             <div className="mt-3 flex items-center justify-between gap-3 rounded-lg border border-rose-200 bg-rose-50 px-3 py-2">

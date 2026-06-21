@@ -91,7 +91,7 @@ export function RiskDrawer({
   return (
     <InModalDrawer open={open} onOpenChange={onOpenChange}>
       <div className="p-6">
-        <h2 className="text-lg font-semibold">{titleByMode[mode]}</h2>
+        <h2 className="pr-16 text-lg font-semibold">{titleByMode[mode]}</h2>
 
         <div className="mt-6 space-y-6">
           <div className="rounded-xl border border-border bg-slate-50/60 p-4">

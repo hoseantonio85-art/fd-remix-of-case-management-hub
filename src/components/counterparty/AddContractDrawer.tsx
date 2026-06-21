@@ -91,7 +91,7 @@ export function AddContractDrawer({
     <InModalDrawer open={open} onOpenChange={onOpenChange}>
       <div className="flex h-full flex-col">
         <div className="flex-1 overflow-y-auto p-6 pb-4">
-          <h2 className="text-lg font-semibold tracking-tight text-foreground">Добавить договор</h2>
+          <h2 className="pr-16 text-lg font-semibold tracking-tight text-foreground">Добавить договор</h2>
 
           <div className="mt-5 space-y-4">
             <Input

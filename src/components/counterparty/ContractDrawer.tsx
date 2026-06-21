@@ -489,7 +489,7 @@ export function ContractDrawer({
     <InModalDrawer open={open} onOpenChange={onOpenChange} className="overflow-hidden">
       <div className="relative flex h-full min-h-0 flex-col">
         {/* HEADER */}
-        <div className={`shrink-0 px-6 pt-6 pb-5 ${styles.gradient}`}>
+        <div className={`shrink-0 px-6 pt-6 pb-5 pr-16 ${styles.gradient}`}>
           <StatusBadge tone={hasOverdue ? "danger" : "success"} size="regular">
             {tagLabel}
           </StatusBadge>

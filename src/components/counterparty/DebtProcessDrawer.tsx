@@ -108,7 +108,7 @@ export function DebtProcessDrawer({
   return (
     <InModalDrawer open={open} onOpenChange={onOpenChange}>
       {/* Header */}
-      <div className="px-6 pt-6 pb-4">
+      <div className="px-6 pt-6 pb-4 pr-16">
         <h2 className="text-lg font-semibold tracking-tight">Работа с задолженностью</h2>
         <p className="mt-1 text-xs text-muted-foreground">
           Этапы взыскания, SLA и обязательные данные

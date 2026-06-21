@@ -75,7 +75,7 @@ export function CorrectionHistoryDrawer({
     <InModalDrawer open={open} onOpenChange={onOpenChange}>
       <div className="flex min-h-full flex-col">
         <div className="flex-1 p-6">
-          <h2 className="text-lg font-semibold">История оценки</h2>
+          <h2 className="pr-16 text-lg font-semibold">История оценки</h2>
           <p className="mt-1 text-sm text-muted-foreground">
             Ручные корректировки статуса контрагента и причины изменений.
           </p>
@@ -172,10 +172,12 @@ export function DownloadHistoryDrawer({
     <InModalDrawer open={open} onOpenChange={onOpenChange}>
       <div className="flex h-full min-h-full flex-col">
         <div className="flex-1 overflow-y-auto p-6">
-          <h2 className="text-lg font-semibold">История скачивания</h2>
-          <p className="mt-1 text-sm text-muted-foreground">
-            Скачанные отчёты по оценке контрагента.
-          </p>
+          <div className="pr-16">
+            <h2 className="text-lg font-semibold">История скачивания</h2>
+            <p className="mt-1 text-sm text-muted-foreground">
+              Скачанные отчёты по оценке контрагента.
+            </p>
+          </div>
 
           {records.length === 0 ? (
             <div className="mt-6 rounded-2xl border border-dashed border-slate-200 bg-white p-6 text-center text-sm text-muted-foreground">

@@ -99,7 +99,7 @@ export function DrpaDataUpdateDrawer({
       >
         {/* Header */}
         <div className="border-b border-border bg-white px-6 pt-6 pb-4">
-          <div className="pr-10">
+          <div className="pr-16">
             <h2 className="text-xl font-semibold tracking-tight">Обновление данных для ДРПА</h2>
             <p className="mt-1 text-sm text-muted-foreground">
               Актуализируйте договоры контрагентов с просрочкой более 30 дней на 01.07.2026. После

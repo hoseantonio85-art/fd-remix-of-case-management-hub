@@ -39,12 +39,14 @@ export function RegistrationInfoDrawer({
   return (
     <InModalDrawer open={open} onOpenChange={onOpenChange}>
       <div className="p-6">
-        <h2 className="text-lg font-semibold tracking-tight text-foreground">
-          Регистрационные данные
-        </h2>
-        <div className="mt-1 text-sm text-muted-foreground">{counterpartyName}</div>
-        <div className="mt-0.5 text-xs text-muted-foreground">
-          ИНН {inn} · ОГРН {ogrnValue}
+        <div className="pr-16">
+          <h2 className="text-lg font-semibold tracking-tight text-foreground">
+            Регистрационные данные
+          </h2>
+          <div className="mt-1 text-sm text-muted-foreground">{counterpartyName}</div>
+          <div className="mt-0.5 text-xs text-muted-foreground">
+            ИНН {inn} · ОГРН {ogrnValue}
+          </div>
         </div>
 
         <div className="mt-5 rounded-2xl border border-border bg-white p-4">
