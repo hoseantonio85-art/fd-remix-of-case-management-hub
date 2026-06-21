@@ -50,11 +50,17 @@ export function ChecksDrawer({
   onOpenChange,
   checks,
   onOpenCheck,
+  loading = false,
+  error = null,
+  onRetry,
 }: {
   open: boolean;
   onOpenChange: (o: boolean) => void;
   checks: CheckRecord[];
   onOpenCheck: (c: CheckRecord) => void;
+  loading?: boolean;
+  error?: Error | null;
+  onRetry?: () => void;
 }) {
   const [filter, setFilter] = useState<CheckTypeFilter>("all");
 
@@ -73,8 +79,28 @@ export function ChecksDrawer({
         <div className="border-b border-border px-6 pt-6 pb-4">
           <div className="text-base font-semibold tracking-tight">Проверки</div>
           <div className="mt-1 text-[12px] text-muted-foreground">
-            {checks.length === 0 ? "Нет активных проверок" : `Всего: ${checks.length}`}
+            {loading
+              ? "Загрузка…"
+              : checks.length === 0
+                ? "Нет активных проверок"
+                : `Всего: ${checks.length}`}
           </div>
+          {error && (
+            <div className="mt-3 flex items-center justify-between gap-3 rounded-lg border border-rose-200 bg-rose-50 px-3 py-2">
+              <div className="text-[12px] text-rose-700">
+                Не удалось загрузить проверки: {error.message}
+              </div>
+              {onRetry && (
+                <button
+                  type="button"
+                  onClick={onRetry}
+                  className="shrink-0 rounded-md border border-rose-300 bg-white px-2 py-1 text-[11px] font-medium text-rose-700 hover:bg-rose-100"
+                >
+                  Повторить
+                </button>
+              )}
+            </div>
+          )}
         </div>
 
         {checks.length > 0 && (
