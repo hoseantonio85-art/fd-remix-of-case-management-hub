@@ -326,9 +326,16 @@ export default function Index() {
   } = useCounterparties();
 
   // Все проверки идут через CheckRepository + useChecks (нет setTimeout в UI).
-  // Ошибки checks показываются точечно в обработчиках вызовов (runCheck/removeCheck),
-  // поэтому отдельное поле `error` из useChecks здесь не используем.
-  const { checks: checksDto, run: runCheckRaw, remove: removeCheckRaw } = useChecks();
+  // Первичная загрузка через list(); subscribe — для последующих live-обновлений;
+  // ручной refetch — через retry().
+  const {
+    checks: checksDto,
+    run: runCheckRaw,
+    remove: removeCheckRaw,
+    loading: checksLoading,
+    error: checksError,
+    retry: retryChecks,
+  } = useChecks();
   const checks: CheckRecord[] = checksDto;
   const [checkActionId, setCheckActionId] = useState<string | null>(null);
   const runCheck = async (input: {
