@@ -5,7 +5,7 @@ import { largeModalContentClass } from "@/lib/modal-styles";
 import { toast } from "sonner";
 import { Button } from "@/shared/ui";
 
-import { ChevronRight, ChevronDown, X, CheckCircle2, Info as InfoIcon, Plus } from "@/shared/ui";
+import { ChevronRight, ChevronDown, X, CheckCircle2, Info as InfoIcon, Plus, EllipseIconButton } from "@/shared/ui";
 
 import type {
   Counterparty,
