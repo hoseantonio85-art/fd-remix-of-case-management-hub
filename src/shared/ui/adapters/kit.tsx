@@ -138,8 +138,10 @@ export const buttonVariants = (opts?: { className?: string }) => opts?.className
 
 // ---------- Input ----------
 type KitInputSize = NonNullable<IInputProperties["size"]>;
-export interface InputProps
-  extends Omit<React.InputHTMLAttributes<HTMLInputElement>, "onChange" | "size" | "prefix"> {
+export interface InputProps extends Omit<
+  React.InputHTMLAttributes<HTMLInputElement>,
+  "onChange" | "size" | "prefix"
+> {
   onChange?: React.ChangeEventHandler<HTMLInputElement>;
   label?: string;
   labelInside?: boolean;
@@ -199,8 +201,10 @@ Input.displayName = "Input";
 
 // ---------- Textarea ----------
 type KitTextareaSize = NonNullable<ITextareaProperties["size"]>;
-export interface TextareaProps
-  extends Omit<React.TextareaHTMLAttributes<HTMLTextAreaElement>, "onChange" | "size"> {
+export interface TextareaProps extends Omit<
+  React.TextareaHTMLAttributes<HTMLTextAreaElement>,
+  "onChange" | "size"
+> {
   onChange?: React.ChangeEventHandler<HTMLTextAreaElement>;
   label?: string;
   labelInside?: boolean;

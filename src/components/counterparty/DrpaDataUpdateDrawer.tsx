@@ -174,11 +174,7 @@ export function DrpaDataUpdateDrawer({
                 Обновлено <span className="font-medium text-foreground">{updatedCount}</span> из{" "}
                 <span className="font-medium text-foreground">{total}</span>
               </div>
-              <Button
-                disabled={!allDone}
-                onClick={onConfirm}
-                size="lg"
-              >
+              <Button disabled={!allDone} onClick={onConfirm} size="lg">
                 Подтвердить данные
               </Button>
             </div>
