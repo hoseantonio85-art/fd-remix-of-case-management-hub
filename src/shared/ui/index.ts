@@ -14,3 +14,4 @@ export * from "./legacy/shadcn";
 export * from "./adapters/kit";
 export * from "./legacy/icons";
 export { StatusBadge, type StatusTone, type StatusBadgeSize } from "./status-badge";
+export { EllipseIconButton, type EllipseIconButtonProps } from "./ellipse-icon-button";
