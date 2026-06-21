@@ -42,9 +42,8 @@ export function ComplexAssessmentModal({
   const headerBg = positive
     ? "bg-gradient-to-b from-emerald-50 via-emerald-50/40 to-transparent"
     : "bg-gradient-to-b from-rose-50 via-rose-50/40 to-transparent";
-  const resolutionBadge = positive
-    ? { label: "Сделки заключать можно", chip: "bg-emerald-100 text-emerald-900" }
-    : { label: "Не заключать сделки", chip: "bg-rose-100 text-rose-900" };
+  const resolutionLabel = positive ? "Сделки заключать можно" : "Не заключать сделки";
+  const resolutionTone = positive ? "success" : "danger";
 
   const grouped: Record<Level, typeof RISKS> = {
     very_high: RISKS.filter((r) => r.level === "very_high"),
