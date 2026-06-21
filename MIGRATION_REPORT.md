@@ -530,3 +530,165 @@ legacy, известный технический долг, чек-лист пе
   фильтры, error/retry; API-режим без `VITE_API_BASE_URL` — ChecksDrawer
   показывает нормализованную ошибку `API_NOT_CONFIGURED` и кнопку
   «Повторить». `bun run build` и `bun run lint` — без ошибок.
+
+## Iteration 4 — visual migration to corporate UI kit
+
+### Components migrated to kit
+
+Базовые controls теперь рендерятся через `@sber-orm/ui-kit` в
+`src/shared/ui/adapters/kit.tsx`:
+
+- `Button` → `KitButton`
+- `Input` → `KitInput`
+- `Textarea` → `KitTextarea`
+- `Checkbox` → `KitCheckbox`
+- `Switch` → `KitSwitch`
+- `Badge` → `KitBadge`
+- `Chips` → `KitChips` (новое — для семантических тегов)
+- `Loader` → `KitLoader`
+- `Text` / `Title` / `Icon` — уже были на kit (адаптер сохранён)
+
+Эти имена удалены из `src/shared/ui/legacy/shadcn.ts`; продуктовый код
+импортирует их по-прежнему из `@/shared/ui` и получает kit-реализацию.
+
+### Variant and size mappings
+
+Button (shadcn API → kit `variant`):
+
+```
+default     → primary
+outline     → secondary
+secondary   → tertiary
+ghost       → ghost
+destructive → danger
+link        → ghost + link={true}
+```
+
+Button (shadcn `size` → kit `size`):
+
+```
+sm      → S
+default → M
+lg      → L
+icon    → M + iconOnly
+```
+
+Badge (shadcn API → kit `variant`):
+
+```
+default     → blue
+secondary   → gray
+destructive → red
+outline     → outlined
+```
+
+Семантические токены для chips/badges (`semanticBadgeVariant`):
+
+```
+success → green
+warning → yellow
+danger  → red
+info    → blue
+neutral → gray
+```
+
+### Product call sites updated
+
+Call sites не менялись (по требованию — UX и текст не трогать). Все
+существующие импорты `from "@/shared/ui"` автоматически получили
+kit-реализацию. Сигнатуры адаптированы внутри адаптера:
+
+- `Input`/`Textarea`: shadcn `onChange(event)` оставлен — kit `onChange(value, event)`
+  пробрасывает `event` обратно;
+- `Checkbox`/`Switch`: shadcn `onCheckedChange(checked)` оставлен — внутри
+  адаптер слушает kit `onChange(event)` и извлекает `event.target.checked`.
+
+### Selects migrated
+
+Не мигрированы в этой итерации. Продуктовые Select используются в
+`ContractDrawer.tsx` (две точки — `newOverdueStage`, `editOvStage`) как
+композиция Radix `Select / SelectTrigger / SelectContent / SelectItem`.
+Перевод на kit Select требует переписывания на `options[]`-API и `value`/
+`onChange`-сигнатуру — сделано отдельной итерацией, чтобы не ломать поведение
+выбора этапа в открытом drawer. Пока остаются в legacy.
+
+### Semantic chips and badges
+
+Добавлен экспорт `Chips` (kit) и таблица `semanticBadgeVariant` для
+централизованного маппинга `success | warning | danger | info | neutral` →
+kit-палитра. Точечная замена существующих «самопальных» цветных pill-блоков
+(статусные плашки в карточке контрагента, kindBadge в RiskDrawer и т.д.) —
+не выполнялась, чтобы не менять визуальные акценты сценариев; запланирована
+как отдельная UX-итерация дизайнерами.
+
+### Components remaining in legacy
+
+В `src/shared/ui/legacy/shadcn.ts` остались:
+
+- `Dialog`, `DialogContent`, `DialogHeader`, `DialogTitle`, `DialogDescription`,
+  `DialogFooter`, `DialogTrigger`, `DialogPrimitive` —
+  использование: `CounterpartyModal.tsx`, `AssessmentModal.tsx`,
+  `ComplexAssessmentModal.tsx`, `ContractAssessmentModal.tsx`,
+  `PendingAssessmentModal.tsx`, `RunCheckDialog.tsx`,
+  `InModalDrawer.tsx`, `AddContractDrawer.tsx`, и др.
+  Несовместимость: kit `Modal` имеет другую композицию (`ModalHeader/Body/Footer`),
+  fullscreen-поведение и backdrop. Переход требует переноса крупных модалок
+  и потенциального изменения композиции — нарушает требование «не менять
+  размеры и общую композицию крупных модальных окон».
+- `Sheet`, `SheetContent`, `SheetHeader`, `SheetTitle`, `SheetDescription`,
+  `SheetFooter`, `SheetTrigger` — использование: `ChecksDrawer`,
+  `RiskDrawer`, `ContractDrawer`, `DebtProcessDrawer`,
+  `AssessmentHistoryDrawer`, `RegistrationInfoDrawer`,
+  `DrpaDataUpdateDrawer`, `ProcessFilterDrawer`, `CheckProcessDrawer`.
+  Несовместимость: kit нет Sheet-компонента, используется Radix Sheet.
+- `Tabs`, `TabsList`, `TabsTrigger`, `TabsContent` — использование:
+  `CounterpartyModal.tsx`, `AssessmentModal.tsx`. В kit нет прямого аналога.
+- `Select`, `SelectTrigger`, `SelectContent`, `SelectItem`, `SelectGroup`,
+  `SelectLabel`, `SelectSeparator`, `SelectValue` — использование:
+  `ContractDrawer.tsx`. Несовместимость: kit Select работает через
+  `options`/`value`/`onChange`, нет Trigger/Content/Item-композиции.
+- `Tooltip`, `TooltipContent`, `TooltipProvider`, `TooltipTrigger` —
+  использование: `AssessmentModal.tsx` (с `asChild`). Несовместимость:
+  kit Tooltip не поддерживает `asChild`-композицию Radix.
+- `Label` — использование: `RunCheckDialog.tsx`, `AddContractDrawer.tsx`,
+  `DrpaDataUpdateDrawer.tsx`. В kit лейблы встроены в Input/Textarea/etc.;
+  отдельный самостоятельный `<Label>` отсутствует. Что нужно для замены:
+  перевести оставшиеся «голые» Label на kit Input.label, либо ввести
+  собственный мини-компонент.
+- `Separator` — использование: `RiskDrawer.tsx`, `CheckProcessDrawer.tsx`.
+  В kit прямого аналога нет.
+- `Skeleton` — использование: общий shadcn-компонент. В kit есть Shimmer,
+  но API и визуал отличаются; миграция отдельной итерацией.
+- `Toaster` (sonner) — использование: `App.tsx`. В kit есть `Notification`/
+  `notification`, но API отличается; не мигрировано.
+
+Кроме того, `Button` с `asChild` (единичный случай: `AssessmentModal.tsx`
+строка 474, `TooltipTrigger asChild`) обрабатывается внутри адаптера через
+`React.cloneElement` — fallback на нативный child, kit-визуал кнопки в этой
+точке не применяется.
+
+### Visual verification
+
+Через Playwright проверены:
+
+- главный экран — список контрагентов отрисовывается; CTA «Запустить проверку»,
+  «Поиск», вкладки «Все признаки / Банкротство / Неисполнение / Негативные
+  факторы» используют kit-кнопки (закругление, шрифт, цвет — корпоративные);
+- статусные плашки контрагентов («Просрочено», «Риск дефолта», «Нет риска»,
+  «Статус изменён») продолжают использовать продуктовые pill-компоненты;
+- console: чистый, рантайм-ошибок нет;
+- `useAssessment` не падает с «Should have a queue» после рестарта dev-сервера
+  (ошибка была от устаревшего HMR-кеша на удалённый `kit.ts`; перезапуск
+  решил проблему).
+
+Крупные модалки и drawer не сломаны — остались на shadcn-композиции и
+визуально не изменились (по требованию).
+
+### Build and lint
+
+- `bun run build` — успешно (6.80s, без ошибок).
+- `bunx tsc --noEmit` — 0 ошибок.
+- `bun run lint` — 0 errors, ~17 warnings (все pre-existing
+  `react-refresh/only-export-components` в shadcn-примитивах и одна новая
+  такая же в `adapters/kit.tsx` из-за смешанного экспорта типов/констант
+  с компонентами — допустимо).
