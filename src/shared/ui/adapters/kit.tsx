@@ -384,15 +384,25 @@ export const SimpleSelect = ({
       isSearchable={false}
       className={className}
       onChange={(nextValue: unknown) => {
-        if (Array.isArray(nextValue)) {
-          onChange?.(String(nextValue[0] ?? ""));
-          return;
-        }
-        onChange?.(String(nextValue ?? ""));
+        onChange?.(normalizeKitSelectValue(nextValue));
       }}
     />
   );
 };
+
+type KitSelectValue = unknown;
+function normalizeKitSelectValue(value: KitSelectValue): string {
+  if (value == null) return "";
+  if (Array.isArray(value)) {
+    const first = value[0];
+    return first == null ? "" : String(first);
+  }
+  if (typeof value === "object" && "value" in (value as Record<string, unknown>)) {
+    const inner = (value as { value: unknown }).value;
+    return inner == null ? "" : String(inner);
+  }
+  return String(value);
+}
 
 /**
  * Centralized semantic mapping for chips/badges → kit palette.

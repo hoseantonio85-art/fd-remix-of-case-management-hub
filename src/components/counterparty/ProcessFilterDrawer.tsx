@@ -40,10 +40,11 @@ export function ProcessFilterDrawer({
     <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent
         side="right"
-        className="flex w-full flex-col gap-0 bg-white p-0 sm:max-w-md [&>button]:hidden"
+        className="flex w-full flex-col gap-0 bg-white p-0 sm:max-w-md"
+        hideClose
       >
-        <div className="flex items-start justify-between border-b border-slate-200 px-6 pt-6 pb-4">
-          <div>
+        <div className="flex items-start justify-between gap-3 border-b border-slate-200 px-6 pt-6 pb-4">
+          <div className="min-w-0 flex-1">
             <div className="text-lg font-semibold tracking-tight text-foreground">
               Фильтр по процессу
             </div>

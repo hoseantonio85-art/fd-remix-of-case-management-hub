@@ -2,12 +2,12 @@ import { useState } from "react";
 import { DialogPrimitive } from "@/shared/ui";
 import {
   ChevronDown,
-  ArrowUp,
   Flame,
-  Download,
   AlertTriangle,
   ChevronRight,
   EllipseIconButton,
+  StatusBadge,
+  type StatusTone,
 } from "@/shared/ui";
 import { Button } from "@/shared/ui";
 import { cn } from "@/lib/utils";
@@ -209,18 +209,18 @@ export function RisksCounter({ count }: { count: number }) {
   );
 }
 
+const levelTone: Record<Level, StatusTone> = {
+  very_high: "danger",
+  high: "danger",
+  medium: "warning",
+  low: "neutral",
+};
+
 function HeaderLevelTag({ level }: { level: Level }) {
-  const m = levelMeta[level];
   return (
-    <span
-      className={cn(
-        "inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-[11px] font-medium",
-        m.chip,
-      )}
-    >
-      {level === "very_high" && <ArrowUp className="h-3 w-3" />}
-      {m.label}
-    </span>
+    <StatusBadge tone={levelTone[level]} size="regular">
+      {levelMeta[level].label}
+    </StatusBadge>
   );
 }
 
@@ -278,15 +278,9 @@ export function LevelAccordion({ level, risks }: { level: Level; risks: Contract
         className="flex w-full items-center justify-between gap-3 px-4 py-3 text-left"
       >
         <div className="flex items-center gap-2">
-          <span
-            className={cn(
-              "inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-[11px] font-medium",
-              m.chip,
-            )}
-          >
-            {level === "very_high" && <ArrowUp className="h-3 w-3" />}
+          <StatusBadge tone={levelTone[level]} size="compact">
             {m.label}
-          </span>
+          </StatusBadge>
           <span className="text-[12px] text-muted-foreground">
             · {count} {countLabel}
           </span>
@@ -347,14 +341,19 @@ export function ContractAssessmentModal({
         >
           <div className="relative flex min-h-0 flex-1 flex-col">
             {/* Header */}
-            <div className={cn("shrink-0 px-5 pt-6 pb-6 lg:px-10", headerGradient[topLevel])}>
-              <div className="absolute right-5 top-5 flex items-center gap-2">
+            <div
+              className={cn(
+                "shrink-0 px-5 pt-6 pb-6 pr-16 lg:px-10 lg:pr-20",
+                headerGradient[topLevel],
+              )}
+            >
+              <span className="absolute right-5 top-5 z-10">
                 <EllipseIconButton
                   icon="cross"
                   aria-label="Закрыть"
                   onClick={() => onOpenChange(false)}
                 />
-              </div>
+              </span>
               <div className="flex flex-wrap items-center gap-1.5">
                 <HeaderLevelTag level={topLevel} />
               </div>
@@ -417,11 +416,7 @@ export function ContractAssessmentModal({
 
             {/* Footer */}
             <div className="shrink-0 border-t border-border bg-white px-5 py-4 lg:px-10">
-              <Button
-                variant="outline"
-                onClick={onDelete}
-                className="h-12 w-full rounded-full text-sm font-medium"
-              >
+              <Button variant="outline" size="lg" onClick={onDelete} className="w-full">
                 Удалить
               </Button>
             </div>

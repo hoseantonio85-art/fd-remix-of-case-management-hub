@@ -12,15 +12,32 @@ export interface EllipseIconButtonProps extends Omit<
 }
 
 /**
- * Штатная корпоративная круглая icon-кнопка для close / back / utility navigation.
- * Жёстко зафиксированы variant="ellipse" и size="XS" (фактически 32×32 px).
+ * Штатная корпоративная круглая icon-кнопка (32×32 px) для close / back / utility navigation.
+ *
+ * ВАЖНО: компонент НЕ принимает позиционирующих классов.
+ * Если нужно absolute-позиционирование, оборачивай в внешний wrapper
+ * (`<span className="absolute right-4 top-4 z-10">`), а сам Button оставляй чистым.
+ *
+ * Разрешённые классы: `shrink-0`, `pointer-events-*`, `opacity-*`.
  */
+const FORBIDDEN_CLASS =
+  /(^|\s)(absolute|fixed|relative|sticky|inset-|right-|left-|top-|bottom-|z-)/;
+
 export function EllipseIconButton({
   icon,
   className,
   type = "button",
   ...rest
 }: EllipseIconButtonProps) {
+  if (className && FORBIDDEN_CLASS.test(className)) {
+    if (typeof process !== "undefined" && process.env?.NODE_ENV !== "production") {
+      console.warn(
+        "[EllipseIconButton] positioning classes are forbidden on the button itself. " +
+          "Wrap it in an absolutely positioned <span> instead. Got:",
+        className,
+      );
+    }
+  }
   return (
     <Button
       {...rest}

@@ -29,10 +29,16 @@ const DialogOverlay = React.forwardRef<
 ));
 DialogOverlay.displayName = DialogPrimitive.Overlay.displayName;
 
+type DialogContentBaseProps = React.ComponentPropsWithoutRef<typeof DialogPrimitive.Content>;
+export interface DialogContentProps extends DialogContentBaseProps {
+  /** Скрыть стандартный close (если компонент рисует свой close в шапке). */
+  hideClose?: boolean;
+}
+
 const DialogContent = React.forwardRef<
   React.ElementRef<typeof DialogPrimitive.Content>,
-  React.ComponentPropsWithoutRef<typeof DialogPrimitive.Content>
->(({ className, children, ...props }, ref) => (
+  DialogContentProps
+>(({ className, children, hideClose, ...props }, ref) => (
   <DialogPortal>
     <DialogOverlay />
     <DialogPrimitive.Content
@@ -44,17 +50,21 @@ const DialogContent = React.forwardRef<
       {...props}
     >
       {children}
-      <DialogPrimitive.Close asChild>
-        <KitButton
-          type="button"
-          variant="ellipse"
-          size="XS"
-          icon="cross"
-          iconOnly
-          aria-label="Закрыть"
-          className="absolute right-4 top-4 z-10 shrink-0"
-        />
-      </DialogPrimitive.Close>
+      {!hideClose && (
+        <span className="absolute right-4 top-4 z-10">
+          <DialogPrimitive.Close asChild>
+            <KitButton
+              type="button"
+              variant="ellipse"
+              size="XS"
+              icon="cross"
+              iconOnly
+              aria-label="Закрыть"
+              className="shrink-0"
+            />
+          </DialogPrimitive.Close>
+        </span>
+      )}
     </DialogPrimitive.Content>
   </DialogPortal>
 ));

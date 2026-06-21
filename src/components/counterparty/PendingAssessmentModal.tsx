@@ -18,14 +18,15 @@ export function PendingAssessmentModal({
   if (!counterparty) return null;
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className={`${largeModalContentClass} [&>button]:hidden`}>
-        <div className="border-b border-border bg-gradient-to-b from-slate-50 via-slate-50/40 to-transparent px-6 pt-6 pb-5 pr-14">
-          <EllipseIconButton
-            icon="cross"
-            aria-label="Закрыть"
-            onClick={() => onOpenChange(false)}
-            className="absolute right-4 top-4 z-10"
-          />
+      <DialogContent className={largeModalContentClass} hideClose>
+        <div className="relative border-b border-border bg-gradient-to-b from-slate-50 via-slate-50/40 to-transparent px-6 pt-6 pb-5 pr-16">
+          <span className="absolute right-4 top-4 z-10">
+            <EllipseIconButton
+              icon="cross"
+              aria-label="Закрыть"
+              onClick={() => onOpenChange(false)}
+            />
+          </span>
           <CounterpartyStatusBadge tag="На оценке" />
           <h2 className="mt-3 text-xl font-semibold tracking-tight">{counterparty.name}</h2>
           <CounterpartyHeaderMeta inn={counterparty.inn} />
