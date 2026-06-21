@@ -20,7 +20,8 @@ export interface EllipseIconButtonProps extends Omit<
  *
  * Разрешённые классы: `shrink-0`, `pointer-events-*`, `opacity-*`.
  */
-const FORBIDDEN_CLASS = /(^|\s)(absolute|fixed|relative|sticky|inset-|right-|left-|top-|bottom-|z-)/;
+const FORBIDDEN_CLASS =
+  /(^|\s)(absolute|fixed|relative|sticky|inset-|right-|left-|top-|bottom-|z-)/;
 
 export function EllipseIconButton({
   icon,
@@ -30,7 +31,6 @@ export function EllipseIconButton({
 }: EllipseIconButtonProps) {
   if (className && FORBIDDEN_CLASS.test(className)) {
     if (typeof process !== "undefined" && process.env?.NODE_ENV !== "production") {
-      // eslint-disable-next-line no-console
       console.warn(
         "[EllipseIconButton] positioning classes are forbidden on the button itself. " +
           "Wrap it in an absolutely positioned <span> instead. Got:",
