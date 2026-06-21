@@ -2,12 +2,12 @@ import { useState } from "react";
 import { DialogPrimitive } from "@/shared/ui";
 import {
   ChevronDown,
-  ArrowUp,
   Flame,
-  Download,
   AlertTriangle,
   ChevronRight,
   EllipseIconButton,
+  StatusBadge,
+  type StatusTone,
 } from "@/shared/ui";
 import { Button } from "@/shared/ui";
 import { cn } from "@/lib/utils";
