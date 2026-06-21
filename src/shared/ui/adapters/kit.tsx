@@ -210,10 +210,10 @@ export const Switch = ({ onCheckedChange, ...rest }: SwitchProps) => {
 // ---------- Badge ----------
 type ShadcnBadgeVariant = "default" | "secondary" | "destructive" | "outline";
 const badgeVariantMap: Record<ShadcnBadgeVariant, IBadgeProps["variant"]> = {
-  default: "primary",
-  secondary: "secondary",
-  destructive: "error",
-  outline: "neutral",
+  default: "blue",
+  secondary: "gray",
+  destructive: "red",
+  outline: "outlined",
 };
 
 export interface BadgeProps extends Omit<React.HTMLAttributes<HTMLDivElement>, "color"> {
@@ -237,14 +237,15 @@ export const Chips = KitChips;
 export type { IChipsProps };
 
 /**
- * Centralized semantic mapping for chips/badges.
+ * Centralized semantic mapping for chips/badges → kit palette.
  * Используйте эти ключи в продуктовом коде, а не сырые цвета Tailwind.
  */
 export type SemanticTone = "success" | "warning" | "danger" | "info" | "neutral";
 export const semanticBadgeVariant: Record<SemanticTone, IBadgeProps["variant"]> = {
-  success: "success",
-  warning: "warning",
-  danger: "error",
-  info: "info",
-  neutral: "neutral",
+  success: "green",
+  warning: "yellow",
+  danger: "red",
+  info: "blue",
+  neutral: "gray",
 };
+
