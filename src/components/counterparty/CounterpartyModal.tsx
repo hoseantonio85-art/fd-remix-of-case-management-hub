@@ -549,13 +549,14 @@ export function CounterpartyModal({
             const tone = getToneForTag(tagLabel);
             const styles = toneStyles[tone];
             return (
-              <div className={`shrink-0 px-5 pt-6 pb-6 lg:px-10 ${styles.gradient}`}>
-                <EllipseIconButton
-                  icon="cross"
-                  aria-label="Закрыть"
-                  onClick={() => onOpenChange(false)}
-                  className="absolute right-5 top-5 z-10"
-                />
+              <div className={`shrink-0 px-5 pt-6 pb-6 pr-16 lg:px-10 lg:pr-20 ${styles.gradient}`}>
+                <span className="absolute right-5 top-5 z-10">
+                  <EllipseIconButton
+                    icon="cross"
+                    aria-label="Закрыть"
+                    onClick={() => onOpenChange(false)}
+                  />
+                </span>
                 <div className="flex flex-wrap items-center gap-1.5">
                   <CounterpartyStatusBadge tag={tagLabel} size="regular" />
                   {problemIndicators.map((item) => {
