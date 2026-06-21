@@ -13,6 +13,14 @@ export interface UseChecksResult {
   retry: () => Promise<void>;
 }
 
+function upsert(list: CheckRecordDto[], rec: CheckRecordDto): CheckRecordDto[] {
+  const idx = list.findIndex((c) => c.id === rec.id);
+  if (idx === -1) return [rec, ...list];
+  const copy = list.slice();
+  copy[idx] = rec;
+  return copy;
+}
+
 export function useChecks(): UseChecksResult {
   const [checks, setChecks] = useState<CheckRecordDto[]>([]);
   const [loading, setLoading] = useState(true);
@@ -31,22 +39,30 @@ export function useChecks(): UseChecksResult {
     }
   }, []);
 
+  // Первичная загрузка — всегда через list(). subscribe() используется
+  // дополнительно для live-обновлений (running → done, изменения от других клиентов).
+  useEffect(() => {
+    void load();
+  }, [load]);
+
   useEffect(() => {
     const unsubscribe = checkRepository.subscribe((records) => {
       setChecks(records);
-      setLoading(false);
     });
     return unsubscribe;
   }, []);
 
   const run = useCallback(
     async (input: { inn?: string; fileNames: string[]; type?: CheckType }) => {
+      setError(null);
       try {
-        await checkRepository.run({
+        const created = await checkRepository.run({
           inn: input.inn,
           fileNames: input.fileNames,
           type: input.type ?? "counterparty",
         });
+        // Работает и без live-транспорта: дедуплицируем по id.
+        setChecks((prev) => upsert(prev, created));
       } catch (e) {
         setError(e as Error);
         throw e;
@@ -56,8 +72,10 @@ export function useChecks(): UseChecksResult {
   );
 
   const remove = useCallback(async (id: string) => {
+    setError(null);
     try {
       await checkRepository.remove(id);
+      setChecks((prev) => prev.filter((c) => c.id !== id));
     } catch (e) {
       setError(e as Error);
       throw e;
