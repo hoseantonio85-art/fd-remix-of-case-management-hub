@@ -49,13 +49,11 @@ export function ProcessFilterDrawer({
             </div>
             <p className="mt-1 text-sm text-muted-foreground">Выберите этап работы с дебитором</p>
           </div>
-          <button
-            onClick={() => onOpenChange(false)}
-            className="rounded p-1 text-muted-foreground hover:bg-muted"
+          <EllipseIconButton
+            icon="cross"
             aria-label="Закрыть"
-          >
-            <X className="h-4 w-4" />
-          </button>
+            onClick={() => onOpenChange(false)}
+          />
         </div>
 
         <div className="flex-1 overflow-y-auto px-6 py-5">
