@@ -341,14 +341,14 @@ export function ContractAssessmentModal({
         >
           <div className="relative flex min-h-0 flex-1 flex-col">
             {/* Header */}
-            <div className={cn("shrink-0 px-5 pt-6 pb-6 lg:px-10", headerGradient[topLevel])}>
-              <div className="absolute right-5 top-5 flex items-center gap-2">
+            <div className={cn("shrink-0 px-5 pt-6 pb-6 pr-16 lg:px-10 lg:pr-20", headerGradient[topLevel])}>
+              <span className="absolute right-5 top-5 z-10">
                 <EllipseIconButton
                   icon="cross"
                   aria-label="Закрыть"
                   onClick={() => onOpenChange(false)}
                 />
-              </div>
+              </span>
               <div className="flex flex-wrap items-center gap-1.5">
                 <HeaderLevelTag level={topLevel} />
               </div>
