@@ -278,15 +278,9 @@ export function LevelAccordion({ level, risks }: { level: Level; risks: Contract
         className="flex w-full items-center justify-between gap-3 px-4 py-3 text-left"
       >
         <div className="flex items-center gap-2">
-          <span
-            className={cn(
-              "inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-[11px] font-medium",
-              m.chip,
-            )}
-          >
-            {level === "very_high" && <ArrowUp className="h-3 w-3" />}
+          <StatusBadge tone={levelTone[level]} size="compact">
             {m.label}
-          </span>
+          </StatusBadge>
           <span className="text-[12px] text-muted-foreground">
             · {count} {countLabel}
           </span>
