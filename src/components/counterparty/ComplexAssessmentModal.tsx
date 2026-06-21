@@ -165,17 +165,10 @@ export function ComplexAssessmentModal({
             {/* Footer */}
             <div className="shrink-0 border-t border-border bg-white px-5 py-4 lg:px-10">
               <div className="flex gap-3">
-                <Button
-                  variant="outline"
-                  onClick={onDelete}
-                  className="h-12 flex-1 rounded-full text-sm font-medium"
-                >
+                <Button variant="outline" size="lg" onClick={onDelete} className="flex-1">
                   Удалить
                 </Button>
-                <Button
-                  onClick={onAddToList}
-                  className="h-12 flex-1 rounded-full text-sm font-medium"
-                >
+                <Button size="lg" onClick={onAddToList} className="flex-1">
                   Добавить в список дебиторов
                 </Button>
               </div>
