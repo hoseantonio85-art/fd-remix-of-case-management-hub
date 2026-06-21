@@ -1,5 +1,5 @@
 import { ReactNode, useEffect } from "react";
-import { X, Button } from "@/shared/ui";
+import { EllipseIconButton } from "@/shared/ui";
 import { cn } from "@/lib/utils";
 
 /**
