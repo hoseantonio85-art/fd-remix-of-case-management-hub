@@ -88,9 +88,9 @@ export function CorrectionHistoryDrawer({
                   <span>{r.author}</span>
                 </div>
                 <div className="mt-3 flex flex-wrap items-center gap-2">
-                  <TagPill tag={r.fromTag} />
+                  <CounterpartyStatusBadge tag={r.fromTag} size="compact" />
                   <span className="text-muted-foreground">→</span>
-                  <TagPill tag={r.toTag} />
+                  <CounterpartyStatusBadge tag={r.toTag} size="compact" />
                 </div>
                 <p className="mt-3 text-sm text-foreground">{r.comment}</p>
                 <div className="mt-3 rounded-xl bg-slate-50 px-3 py-2">
@@ -193,7 +193,7 @@ export function DownloadHistoryDrawer({
                   </span>
                   <div className="min-w-0 flex-1">
                     <div className="flex flex-wrap items-center gap-2">
-                      <TagPill tag={r.tag} />
+                      <CounterpartyStatusBadge tag={r.tag} size="compact" />
                       <span className="text-xs text-muted-foreground">{r.dateTime}</span>
                     </div>
                     <div className="mt-1 truncate text-sm font-medium text-foreground">
