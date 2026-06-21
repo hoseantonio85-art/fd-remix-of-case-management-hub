@@ -15,7 +15,12 @@ export interface EllipseIconButtonProps extends Omit<
  * Штатная корпоративная круглая icon-кнопка для close / back / utility navigation.
  * Жёстко зафиксированы variant="ellipse" и size="XS" (фактически 32×32 px).
  */
-export function EllipseIconButton({ icon, className, type = "button", ...rest }: EllipseIconButtonProps) {
+export function EllipseIconButton({
+  icon,
+  className,
+  type = "button",
+  ...rest
+}: EllipseIconButtonProps) {
   return (
     <Button
       {...rest}
