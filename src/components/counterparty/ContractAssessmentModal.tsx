@@ -209,18 +209,18 @@ export function RisksCounter({ count }: { count: number }) {
   );
 }
 
+const levelTone: Record<Level, StatusTone> = {
+  very_high: "danger",
+  high: "danger",
+  medium: "warning",
+  low: "neutral",
+};
+
 function HeaderLevelTag({ level }: { level: Level }) {
-  const m = levelMeta[level];
   return (
-    <span
-      className={cn(
-        "inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-[11px] font-medium",
-        m.chip,
-      )}
-    >
-      {level === "very_high" && <ArrowUp className="h-3 w-3" />}
-      {m.label}
-    </span>
+    <StatusBadge tone={levelTone[level]} size="regular">
+      {levelMeta[level].label}
+    </StatusBadge>
   );
 }
 
