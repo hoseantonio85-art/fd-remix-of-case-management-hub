@@ -40,12 +40,15 @@ export function InModalDrawer({
           className,
         )}
       >
-        <EllipseIconButton
-          icon="cross"
-          aria-label="Закрыть"
-          onClick={() => onOpenChange(false)}
-          className="absolute right-4 top-4 z-10"
-        />
+        <span className="pointer-events-none absolute right-4 top-4 z-10">
+          <span className="pointer-events-auto">
+            <EllipseIconButton
+              icon="cross"
+              aria-label="Закрыть"
+              onClick={() => onOpenChange(false)}
+            />
+          </span>
+        </span>
         {children}
       </div>
     </>
