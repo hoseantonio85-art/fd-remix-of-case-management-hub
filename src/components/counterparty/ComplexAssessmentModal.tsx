@@ -19,6 +19,7 @@ import {
 import { InModalDrawer } from "./InModalDrawer";
 import { SourcesDrawer, DEFAULT_CONTRACT_SOURCE } from "./SourcesDrawer";
 import { CounterpartyHeaderMeta } from "./CounterpartyHeaderMeta";
+import { AssessmentGroupDrawer } from "./AssessmentGroupDrawer";
 
 
 export function ComplexAssessmentModal({
