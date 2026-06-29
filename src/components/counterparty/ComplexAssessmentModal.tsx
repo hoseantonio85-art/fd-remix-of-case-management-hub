@@ -113,7 +113,7 @@ export function ComplexAssessmentModal({
                           const g = assessment.groups.find((x) => x.id === id);
                           if (!g) return null;
                           return (
-                            <GroupCard key={g.id} group={g as AssessmentGroup} onOpen={() => {}} />
+                            <GroupCard key={g.id} group={g as AssessmentGroup} onOpen={setGroupDrawer} />
                           );
                         })}
                       </div>
