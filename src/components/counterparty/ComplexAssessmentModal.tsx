@@ -17,7 +17,9 @@ import {
   type Level,
 } from "./ContractAssessmentModal";
 import { InModalDrawer } from "./InModalDrawer";
+import { SourcesDrawer, DEFAULT_CONTRACT_SOURCE } from "./SourcesDrawer";
 import { CounterpartyHeaderMeta } from "./CounterpartyHeaderMeta";
+
 
 export function ComplexAssessmentModal({
   assessment,
@@ -36,6 +38,8 @@ export function ComplexAssessmentModal({
 }) {
   const [tab, setTab] = useState<"counterparty" | "contract">("counterparty");
   const [errorsOpen, setErrorsOpen] = useState(false);
+  const [sourcesOpen, setSourcesOpen] = useState(false);
+
 
   if (!assessment) return null;
 
@@ -140,7 +144,11 @@ export function ComplexAssessmentModal({
                   </section>
                   <aside className="order-2 lg:col-start-2 lg:row-start-1">
                     <div className="lg:sticky lg:top-0">
-                      <AssessmentInfoWidget contractFile="dogovor_uslugi_v3.pdf" />
+                      <AssessmentInfoWidget
+                        contractFile="dogovor_uslugi_v3.pdf"
+                        onOpenSources={() => setSourcesOpen(true)}
+                      />
+
                     </div>
                   </aside>
                 </div>
@@ -161,6 +169,15 @@ export function ComplexAssessmentModal({
                 ))}
               </div>
             </InModalDrawer>
+
+            <SourcesDrawer
+              open={sourcesOpen}
+              onOpenChange={setSourcesOpen}
+              sections={[
+                { title: "Документ проверки", files: [DEFAULT_CONTRACT_SOURCE] },
+              ]}
+            />
+
 
             {/* Footer */}
             <div className="shrink-0 border-t border-border bg-white px-5 py-4 lg:px-10">

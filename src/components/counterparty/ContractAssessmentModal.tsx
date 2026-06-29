@@ -14,6 +14,8 @@ import { cn } from "@/lib/utils";
 import { largeModalContentClass } from "@/lib/modal-styles";
 import { AssessmentInfoWidget } from "./AssessmentModal";
 import { InModalDrawer } from "./InModalDrawer";
+import { SourcesDrawer, DEFAULT_CONTRACT_SOURCE } from "./SourcesDrawer";
+
 
 type ContractError = {
   id: string;
@@ -314,6 +316,8 @@ export function ContractAssessmentModal({
   onDelete?: () => void;
 }) {
   const [errorsOpen, setErrorsOpen] = useState(false);
+  const [sourcesOpen, setSourcesOpen] = useState(false);
+
   const grouped: Record<Level, ContractRisk[]> = {
     very_high: RISKS.filter((r) => r.level === "very_high"),
     high: RISKS.filter((r) => r.level === "high"),
@@ -393,7 +397,11 @@ export function ContractAssessmentModal({
                 </section>
                 <aside className="order-2 lg:col-start-2 lg:row-start-1">
                   <div className="lg:sticky lg:top-0">
-                    <AssessmentInfoWidget contractFile="dogovor_uslugi_v3.pdf" />
+                    <AssessmentInfoWidget
+                      contractFile="dogovor_uslugi_v3.pdf"
+                      onOpenSources={() => setSourcesOpen(true)}
+                    />
+
                   </div>
                 </aside>
               </div>
@@ -413,6 +421,15 @@ export function ContractAssessmentModal({
                 ))}
               </div>
             </InModalDrawer>
+
+            <SourcesDrawer
+              open={sourcesOpen}
+              onOpenChange={setSourcesOpen}
+              sections={[
+                { title: "Документ проверки", files: [DEFAULT_CONTRACT_SOURCE] },
+              ]}
+            />
+
 
             {/* Footer */}
             <div className="shrink-0 border-t border-border bg-white px-5 py-4 lg:px-10">
