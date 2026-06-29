@@ -397,7 +397,11 @@ export function ContractAssessmentModal({
                 </section>
                 <aside className="order-2 lg:col-start-2 lg:row-start-1">
                   <div className="lg:sticky lg:top-0">
-                    <AssessmentInfoWidget contractFile="dogovor_uslugi_v3.pdf" />
+                    <AssessmentInfoWidget
+                      contractFile="dogovor_uslugi_v3.pdf"
+                      onOpenSources={() => setSourcesOpen(true)}
+                    />
+
                   </div>
                 </aside>
               </div>
