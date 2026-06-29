@@ -14,6 +14,8 @@ import { cn } from "@/lib/utils";
 import { largeModalContentClass } from "@/lib/modal-styles";
 import { AssessmentInfoWidget } from "./AssessmentModal";
 import { InModalDrawer } from "./InModalDrawer";
+import { SourcesDrawer, DEFAULT_CONTRACT_SOURCE } from "./SourcesDrawer";
+
 
 type ContractError = {
   id: string;
