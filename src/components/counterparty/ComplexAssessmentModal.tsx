@@ -40,6 +40,7 @@ export function ComplexAssessmentModal({
   const [tab, setTab] = useState<"counterparty" | "contract">("counterparty");
   const [errorsOpen, setErrorsOpen] = useState(false);
   const [sourcesOpen, setSourcesOpen] = useState(false);
+  const [groupDrawer, setGroupDrawer] = useState<AssessmentGroup | null>(null);
 
 
   if (!assessment) return null;
