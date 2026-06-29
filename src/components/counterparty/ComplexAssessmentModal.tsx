@@ -17,7 +17,9 @@ import {
   type Level,
 } from "./ContractAssessmentModal";
 import { InModalDrawer } from "./InModalDrawer";
+import { SourcesDrawer, DEFAULT_CONTRACT_SOURCE } from "./SourcesDrawer";
 import { CounterpartyHeaderMeta } from "./CounterpartyHeaderMeta";
+
 
 export function ComplexAssessmentModal({
   assessment,
