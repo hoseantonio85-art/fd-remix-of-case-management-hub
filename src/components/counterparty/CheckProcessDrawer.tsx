@@ -138,7 +138,7 @@ export function ChecksDrawer({
                 const isContract = recordType === "contract";
                 const isComplex = recordType === "complex";
                 const clickable = isDone;
-                const title = isContract ? "Договор № 24/06-У" : "ООО „Альтаир Логистик“";
+                const title = isContract ? "Договор № 24/06-У" : "Розничные технологии 27";
                 const meta = isComplex
                   ? `ИНН ${c.inn} · Договор об оказании услуг · ${formatDateOnly(c.createdAt)} · Измайлова Л.Д.`
                   : isContract

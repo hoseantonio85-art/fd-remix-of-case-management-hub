@@ -1091,7 +1091,7 @@ export default function Index() {
             setActiveComplexCheckId(c.id);
             setCheckDrawerOpen(false);
             setComplexModalOpen(true);
-            void assessmentForComplex.run(`ООО „Альтаир Логистик“`, c.inn ?? "", {
+            void assessmentForComplex.run(`Розничные технологии 27`, c.inn ?? "", {
               source: "auto",
               variant: "positive",
             });
@@ -1106,7 +1106,7 @@ export default function Index() {
           setActiveCheckId(c.id);
           setCheckDrawerOpen(false);
           setCheckAssessmentOpen(true);
-          void assessmentForChecks.run(`ООО „Альтаир Логистик“`, c.inn ?? "", {
+          void assessmentForChecks.run(`Розничные технологии 27`, c.inn ?? "", {
             source: "auto",
             variant: "positive",
           });
@@ -1162,7 +1162,7 @@ export default function Index() {
           const today = new Date().toLocaleDateString("ru-RU");
           const cp: Counterparty = {
             ...buildNewCounterparty(check.inn ?? "", today),
-            name: `ООО „Альтаир Логистик“`,
+            name: `Розничные технологии 27`,
             tag: "Нет риска",
             status: "no_risk",
           };
@@ -1201,7 +1201,7 @@ export default function Index() {
             toast.error("Не указан ИНН для повторной оценки");
             return;
           }
-          void assessmentForChecks.run(`ООО „Альтаир Логистик“`, innForRetry, {
+          void assessmentForChecks.run(`Розничные технологии 27`, innForRetry, {
             source: "auto",
             variant: "positive",
           });
@@ -1227,7 +1227,7 @@ export default function Index() {
           const today = new Date().toLocaleDateString("ru-RU");
           const cp: Counterparty = {
             ...buildNewCounterparty(check.inn ?? "", today),
-            name: `ООО „Альтаир Логистик“`,
+            name: `Розничные технологии 27`,
             tag: "Нет риска",
             status: "no_risk",
           };
