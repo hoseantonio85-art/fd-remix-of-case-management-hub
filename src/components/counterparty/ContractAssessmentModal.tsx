@@ -25,6 +25,11 @@ type ContractError = {
   justification: string;
 };
 
+export type ContractErrorGroup = {
+  document: string;
+  errors: ContractError[];
+};
+
 export const CONTRACT_ERRORS: ContractError[] = [
   {
     id: "e1",
@@ -70,6 +75,17 @@ export const CONTRACT_ERRORS: ContractError[] = [
   },
 ];
 
+export const CONTRACT_ERROR_GROUPS: ContractErrorGroup[] = [
+  {
+    document: "Договор_оказания_услуг.pdf",
+    errors: CONTRACT_ERRORS.slice(0, 2),
+  },
+  {
+    document: "Приложение_№2.pdf",
+    errors: CONTRACT_ERRORS.slice(2),
+  },
+];
+
 export function ErrorCard({ err }: { err: ContractError }) {
   const [open, setOpen] = useState(false);
   return (
@@ -91,24 +107,44 @@ export function ErrorCard({ err }: { err: ContractError }) {
         />
       </button>
       {open && (
-        <div className="space-y-3 border-t border-slate-100 px-3 py-3">
-          <div>
-            <div className="text-[11px] font-medium uppercase tracking-wide text-muted-foreground">
-              Описание
-            </div>
-            <div className="mt-1 text-sm leading-relaxed text-foreground">{err.description}</div>
+        <div className="border-t border-slate-100 px-3 py-3">
+          <div className="text-[11px] font-medium uppercase tracking-wide text-muted-foreground">
+            Описание
           </div>
-          <div>
-            <div className="text-[11px] font-medium uppercase tracking-wide text-muted-foreground">
-              Обоснование
-            </div>
-            <div className="mt-1 text-sm leading-relaxed text-foreground">{err.justification}</div>
-          </div>
+          <div className="mt-1 text-sm leading-relaxed text-foreground">{err.description}</div>
         </div>
       )}
     </div>
   );
 }
+
+export function ContractErrorsDrawerContent() {
+  const totalErrors = CONTRACT_ERROR_GROUPS.reduce((sum, g) => sum + g.errors.length, 0);
+  const totalDocs = CONTRACT_ERROR_GROUPS.length;
+  return (
+    <>
+      <div className="px-6 pt-6 pb-4 pr-16">
+        <h3 className="text-lg font-semibold text-foreground">Ошибки в документах</h3>
+        <p className="mt-1 text-[13px] text-muted-foreground">
+          Найдено {totalErrors} ошибок в {totalDocs} документах
+        </p>
+      </div>
+      <div className="space-y-5 px-6 pb-6">
+        {CONTRACT_ERROR_GROUPS.map((group) => (
+          <div key={group.document} className="space-y-2">
+            <div className="text-sm font-medium text-foreground">{group.document}</div>
+            <div className="space-y-2">
+              {group.errors.map((e) => (
+                <ErrorCard key={e.id} err={e} />
+              ))}
+            </div>
+          </div>
+        ))}
+      </div>
+    </>
+  );
+}
+
 
 export type Level = "very_high" | "high" | "medium" | "low";
 
@@ -408,18 +444,7 @@ export function ContractAssessmentModal({
             </div>
 
             <InModalDrawer open={errorsOpen} onOpenChange={setErrorsOpen}>
-              <div className="px-6 pt-6 pb-4 pr-16">
-                <h3 className="text-lg font-semibold text-foreground">Ошибки документа</h3>
-                <p className="mt-1 text-[13px] text-muted-foreground">
-                  Найдено {CONTRACT_ERRORS.length} ошибок, которые могут повлиять на корректность
-                  договора.
-                </p>
-              </div>
-              <div className="space-y-2 px-6 pb-6">
-                {CONTRACT_ERRORS.map((e) => (
-                  <ErrorCard key={e.id} err={e} />
-                ))}
-              </div>
+              <ContractErrorsDrawerContent />
             </InModalDrawer>
 
             <SourcesDrawer
