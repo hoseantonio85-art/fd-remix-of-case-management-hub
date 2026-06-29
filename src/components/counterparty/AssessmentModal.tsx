@@ -4,7 +4,6 @@ import {
   ChevronRight,
   AlertTriangle,
   MessageSquare,
-  MessageSquare,
   EllipseIconButton,
   StatusBadge,
 } from "@/shared/ui";
