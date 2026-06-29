@@ -19,6 +19,7 @@ import {
 import { InModalDrawer } from "./InModalDrawer";
 import { SourcesDrawer, DEFAULT_CONTRACT_SOURCE } from "./SourcesDrawer";
 import { CounterpartyHeaderMeta } from "./CounterpartyHeaderMeta";
+import { AssessmentGroupDrawer } from "./AssessmentGroupDrawer";
 
 
 export function ComplexAssessmentModal({
@@ -39,6 +40,7 @@ export function ComplexAssessmentModal({
   const [tab, setTab] = useState<"counterparty" | "contract">("counterparty");
   const [errorsOpen, setErrorsOpen] = useState(false);
   const [sourcesOpen, setSourcesOpen] = useState(false);
+  const [groupDrawer, setGroupDrawer] = useState<AssessmentGroup | null>(null);
 
 
   if (!assessment) return null;
@@ -111,7 +113,7 @@ export function ComplexAssessmentModal({
                           const g = assessment.groups.find((x) => x.id === id);
                           if (!g) return null;
                           return (
-                            <GroupCard key={g.id} group={g as AssessmentGroup} onOpen={() => {}} />
+                            <GroupCard key={g.id} group={g as AssessmentGroup} onOpen={setGroupDrawer} />
                           );
                         })}
                       </div>
@@ -165,6 +167,12 @@ export function ComplexAssessmentModal({
               sections={[
                 { title: "Документ проверки", files: [DEFAULT_CONTRACT_SOURCE] },
               ]}
+            />
+
+            <AssessmentGroupDrawer
+              group={groupDrawer}
+              open={!!groupDrawer}
+              onOpenChange={(o) => !o && setGroupDrawer(null)}
             />
 
 
