@@ -169,6 +169,12 @@ export function ComplexAssessmentModal({
               ]}
             />
 
+            <AssessmentGroupDrawer
+              group={groupDrawer}
+              open={!!groupDrawer}
+              onOpenChange={(o) => !o && setGroupDrawer(null)}
+            />
+
 
             {/* Footer */}
             <div className="shrink-0 border-t border-border bg-white px-5 py-4 lg:px-10">
