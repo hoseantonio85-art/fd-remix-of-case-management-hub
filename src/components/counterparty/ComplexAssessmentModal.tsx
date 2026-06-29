@@ -170,6 +170,15 @@ export function ComplexAssessmentModal({
               </div>
             </InModalDrawer>
 
+            <SourcesDrawer
+              open={sourcesOpen}
+              onOpenChange={setSourcesOpen}
+              sections={[
+                { title: "Документ проверки", files: [DEFAULT_CONTRACT_SOURCE] },
+              ]}
+            />
+
+
             {/* Footer */}
             <div className="shrink-0 border-t border-border bg-white px-5 py-4 lg:px-10">
               <div className="flex gap-3">
