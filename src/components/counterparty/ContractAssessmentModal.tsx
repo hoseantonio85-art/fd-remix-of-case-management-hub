@@ -25,6 +25,11 @@ type ContractError = {
   justification: string;
 };
 
+export type ContractErrorGroup = {
+  document: string;
+  errors: ContractError[];
+};
+
 export const CONTRACT_ERRORS: ContractError[] = [
   {
     id: "e1",
