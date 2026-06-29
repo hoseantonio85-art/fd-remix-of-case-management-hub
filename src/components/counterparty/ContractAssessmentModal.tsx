@@ -444,18 +444,7 @@ export function ContractAssessmentModal({
             </div>
 
             <InModalDrawer open={errorsOpen} onOpenChange={setErrorsOpen}>
-              <div className="px-6 pt-6 pb-4 pr-16">
-                <h3 className="text-lg font-semibold text-foreground">Ошибки документа</h3>
-                <p className="mt-1 text-[13px] text-muted-foreground">
-                  Найдено {CONTRACT_ERRORS.length} ошибок, которые могут повлиять на корректность
-                  договора.
-                </p>
-              </div>
-              <div className="space-y-2 px-6 pb-6">
-                {CONTRACT_ERRORS.map((e) => (
-                  <ErrorCard key={e.id} err={e} />
-                ))}
-              </div>
+              <ContractErrorsDrawerContent />
             </InModalDrawer>
 
             <SourcesDrawer
