@@ -13,7 +13,7 @@ import {
   RISKS,
   RisksCounter,
   CONTRACT_ERRORS,
-  ErrorCard,
+  ContractErrorsDrawerContent,
   type Level,
 } from "./ContractAssessmentModal";
 import { InModalDrawer } from "./InModalDrawer";
