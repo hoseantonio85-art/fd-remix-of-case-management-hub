@@ -1142,7 +1142,8 @@ export default function Index() {
             assessmentForComplex.reset();
           }
         }}
-        positive
+        positive={false}
+
         onDelete={() => {
           const id = activeComplexCheckId;
           setComplexModalOpen(false);
