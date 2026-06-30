@@ -1205,13 +1205,14 @@ export default function Index() {
           }
           void assessmentForChecks.run(`Розничные технологии 27`, innForRetry, {
             source: "auto",
-            variant: "positive",
+            variant: "negative",
           });
         }}
         onConfirm={() => {}}
         onDisagree={() => {}}
         completionMode
-        positive
+        positive={false}
+
         onDeleteResult={() => {
           const id = activeCheckId;
           setCheckAssessmentOpen(false);
