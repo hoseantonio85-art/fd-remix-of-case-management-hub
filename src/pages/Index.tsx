@@ -1093,7 +1093,7 @@ export default function Index() {
             setComplexModalOpen(true);
             void assessmentForComplex.run(`Розничные технологии 27`, c.inn ?? "", {
               source: "auto",
-              variant: "positive",
+              variant: "negative",
             });
             return;
           }
@@ -1108,8 +1108,9 @@ export default function Index() {
           setCheckAssessmentOpen(true);
           void assessmentForChecks.run(`Розничные технологии 27`, c.inn ?? "", {
             source: "auto",
-            variant: "positive",
+            variant: "negative",
           });
+
         }}
       />
 
