@@ -1093,7 +1093,7 @@ export default function Index() {
             setComplexModalOpen(true);
             void assessmentForComplex.run(`Розничные технологии 27`, c.inn ?? "", {
               source: "auto",
-              variant: "positive",
+              variant: "negative",
             });
             return;
           }
@@ -1108,8 +1108,9 @@ export default function Index() {
           setCheckAssessmentOpen(true);
           void assessmentForChecks.run(`Розничные технологии 27`, c.inn ?? "", {
             source: "auto",
-            variant: "positive",
+            variant: "negative",
           });
+
         }}
       />
 
@@ -1141,7 +1142,8 @@ export default function Index() {
             assessmentForComplex.reset();
           }
         }}
-        positive
+        positive={false}
+
         onDelete={() => {
           const id = activeComplexCheckId;
           setComplexModalOpen(false);
@@ -1203,13 +1205,14 @@ export default function Index() {
           }
           void assessmentForChecks.run(`Розничные технологии 27`, innForRetry, {
             source: "auto",
-            variant: "positive",
+            variant: "negative",
           });
         }}
         onConfirm={() => {}}
         onDisagree={() => {}}
         completionMode
-        positive
+        positive={false}
+
         onDeleteResult={() => {
           const id = activeCheckId;
           setCheckAssessmentOpen(false);
