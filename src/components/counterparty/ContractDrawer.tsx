@@ -187,6 +187,10 @@ export function ContractDrawer({
     setPayAmount("");
     setPayDate("");
     setPayError(null);
+    setEditRepayment(null);
+    setEditRepaymentAmount("");
+    setEditRepaymentDate("");
+    setEditRepaymentError(null);
     setEditOvIdx(null);
     setEditOvError(null);
     setOverdues(
