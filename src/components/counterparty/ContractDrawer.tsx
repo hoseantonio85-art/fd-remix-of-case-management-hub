@@ -74,7 +74,7 @@ const stageToStartStep: Record<string, number> = {
   "Завершение работы": 8,
 };
 
-type Repayment = { amount: number; date: string };
+type Repayment = { id: string; amount: number; date: string };
 type LocalOverdue = OverdueRecord & {
   source?: string;
   stage: string;
@@ -129,6 +129,13 @@ export function ContractDrawer({
   const [payAmount, setPayAmount] = useState("");
   const [payDate, setPayDate] = useState("");
   const [payError, setPayError] = useState<string | null>(null);
+  const [editRepayment, setEditRepayment] = useState<{
+    overdueIdx: number;
+    repaymentId: string;
+  } | null>(null);
+  const [editRepaymentAmount, setEditRepaymentAmount] = useState("");
+  const [editRepaymentDate, setEditRepaymentDate] = useState("");
+  const [editRepaymentError, setEditRepaymentError] = useState<string | null>(null);
   const [editOvIdx, setEditOvIdx] = useState<number | null>(null);
   const [editOvAmount, setEditOvAmount] = useState("");
   const [editOvDate, setEditOvDate] = useState("");
@@ -180,6 +187,10 @@ export function ContractDrawer({
     setPayAmount("");
     setPayDate("");
     setPayError(null);
+    setEditRepayment(null);
+    setEditRepaymentAmount("");
+    setEditRepaymentDate("");
+    setEditRepaymentError(null);
     setEditOvIdx(null);
     setEditOvError(null);
     setOverdues(
@@ -470,7 +481,12 @@ export function ContractDrawer({
     const wasFull = remain - amtMln < 1e-9;
     setOverdues((arr) => {
       const next = [...arr];
-      next[i] = { ...o, repayments: [{ amount: amtMln, date: payDate }, ...o.repayments] };
+      const newRepayment: Repayment = {
+        id: Math.random().toString(36).slice(2),
+        amount: amtMln,
+        date: payDate,
+      };
+      next[i] = { ...o, repayments: [newRepayment, ...o.repayments] };
       return next;
     });
     const newOverdueTotal = Math.max(0, effectiveOverdue - amtMln);
@@ -484,6 +500,81 @@ export function ContractDrawer({
     setPayDate("");
     setPayOpenIdx(null);
   };
+
+  const openEditRepayment = (overdueIdx: number, repayment: Repayment) => {
+    setEditRepayment({ overdueIdx, repaymentId: repayment.id });
+    setEditRepaymentAmount(String(Math.round(repayment.amount * 1_000_000)));
+    setEditRepaymentDate(repayment.date);
+    setEditRepaymentError(null);
+    setExpandedOverdues((s) => ({ ...s, [overdueIdx]: true }));
+    setPayOpenIdx(null);
+  };
+
+  const handleSaveRepaymentEdit = () => {
+    if (!editRepayment) return;
+    const { overdueIdx, repaymentId } = editRepayment;
+    const o = overdues[overdueIdx];
+    if (!o) return;
+    const n = Number(editRepaymentAmount.replace(",", "."));
+    if (!editRepaymentAmount || !Number.isFinite(n) || n <= 0) {
+      setEditRepaymentError("Введите сумму погашения");
+      return;
+    }
+    if (!editRepaymentDate || !parseDDMMYYYY(editRepaymentDate)) {
+      setEditRepaymentError("Укажите дату погашения");
+      return;
+    }
+    const amtMln = n / 1_000_000;
+    const nextRepayments = o.repayments.map((r) =>
+      r.id === repaymentId ? { ...r, amount: amtMln, date: editRepaymentDate } : r,
+    );
+    const totalPaid = nextRepayments.reduce((s, r) => s + r.amount, 0);
+    if (totalPaid - o.amount > 1e-9) {
+      setEditRepaymentError("Сумма погашений больше суммы просрочки");
+      return;
+    }
+    const nextOverdues = overdues.map((x, k) =>
+      k === overdueIdx ? { ...x, repayments: nextRepayments } : x,
+    );
+    setOverdues(nextOverdues);
+    const newOverdueTotal = nextOverdues.reduce(
+      (s, x) => s + Math.max(0, x.amount - x.repayments.reduce((a, r) => a + r.amount, 0)),
+      0,
+    );
+    onUpdateContract?.(contract.id, { overdue: newOverdueTotal });
+    logChange("Погашение изменено", `${amtMln.toFixed(2)} млн ₽ · ${editRepaymentDate}`);
+    toast.success("Погашение обновлено");
+    setEditRepayment(null);
+    setEditRepaymentAmount("");
+    setEditRepaymentDate("");
+    setEditRepaymentError(null);
+  };
+
+  const handleDeleteRepayment = (overdueIdx: number, repaymentId: string) => {
+    const o = overdues[overdueIdx];
+    if (!o) return;
+    const target = o.repayments.find((r) => r.id === repaymentId);
+    if (!target) return;
+    const nextRepayments = o.repayments.filter((r) => r.id !== repaymentId);
+    const nextOverdues = overdues.map((x, k) =>
+      k === overdueIdx ? { ...x, repayments: nextRepayments } : x,
+    );
+    setOverdues(nextOverdues);
+    const newOverdueTotal = nextOverdues.reduce(
+      (s, x) => s + Math.max(0, x.amount - x.repayments.reduce((a, r) => a + r.amount, 0)),
+      0,
+    );
+    onUpdateContract?.(contract.id, { overdue: newOverdueTotal });
+    logChange("Погашение удалено", `${target.amount.toFixed(2)} млн ₽ · ${target.date}`);
+    toast.success("Погашение удалено");
+    if (editRepayment?.repaymentId === repaymentId) {
+      setEditRepayment(null);
+      setEditRepaymentAmount("");
+      setEditRepaymentDate("");
+      setEditRepaymentError(null);
+    }
+  };
+
 
   return (
     <InModalDrawer open={open} onOpenChange={onOpenChange} className="overflow-hidden">
@@ -989,20 +1080,106 @@ export function ContractDrawer({
                                 Погашения
                               </div>
                               <div className="space-y-1">
-                                {o.repayments.map((r, ri) => (
-                                  <div key={ri} className="flex justify-between text-xs">
-                                    <span className="text-foreground">
-                                      {r.amount.toLocaleString("ru-RU", {
-                                        maximumFractionDigits: 2,
-                                      })}{" "}
-                                      млн ₽
-                                    </span>
-                                    <span className="text-muted-foreground">{r.date}</span>
-                                  </div>
-                                ))}
+                                {o.repayments.map((r) => {
+                                  const isEditingRep =
+                                    editRepayment?.overdueIdx === i &&
+                                    editRepayment?.repaymentId === r.id;
+                                  return (
+                                    <div key={r.id}>
+                                      <div className="flex items-center gap-2 text-xs">
+                                        <div className="min-w-0 flex-1">
+                                          <span className="text-foreground">
+                                            {r.amount.toLocaleString("ru-RU", {
+                                              maximumFractionDigits: 2,
+                                            })}{" "}
+                                            млн ₽
+                                          </span>{" "}
+                                          <span className="text-muted-foreground">· {r.date}</span>
+                                        </div>
+                                        <div className="flex shrink-0 items-center gap-1">
+                                          <Button
+                                            type="button"
+                                            variant="ghost"
+                                            size="icon"
+                                            iconOnly
+                                            aria-label="Редактировать погашение"
+                                            onClick={() => openEditRepayment(i, r)}
+                                          >
+                                            <Pencil className="h-3.5 w-3.5" />
+                                          </Button>
+                                          <Button
+                                            type="button"
+                                            variant="ghost"
+                                            size="icon"
+                                            iconOnly
+                                            aria-label="Удалить погашение"
+                                            onClick={() => handleDeleteRepayment(i, r.id)}
+                                          >
+                                            <Trash2 className="h-3.5 w-3.5" />
+                                          </Button>
+                                        </div>
+                                      </div>
+                                      {isEditingRep && (
+                                        <div className="mt-2 rounded-2xl border border-border bg-muted/30 p-3">
+                                          <div className="space-y-2">
+                                            <LabeledInput
+                                              label="Сумма погашения, ₽"
+                                              value={editRepaymentAmount}
+                                              onChange={(v) => {
+                                                setEditRepaymentAmount(v);
+                                                setEditRepaymentError(null);
+                                              }}
+                                              placeholder="50000"
+                                            />
+                                            <LabeledInput
+                                              label="Дата погашения"
+                                              value={editRepaymentDate}
+                                              onChange={(v) => {
+                                                setEditRepaymentDate(v);
+                                                setEditRepaymentError(null);
+                                              }}
+                                              placeholder="ДД.ММ.ГГГГ"
+                                            />
+                                          </div>
+                                          {editRepaymentError && (
+                                            <div className="mt-2 flex items-start gap-2 rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 text-xs text-amber-900">
+                                              <AlertTriangle className="mt-0.5 h-3.5 w-3.5 shrink-0" />
+                                              {editRepaymentError}
+                                            </div>
+                                          )}
+                                          <div className="mt-3 flex items-center gap-2">
+                                            <Button
+                                              size="sm"
+                                              className="flex-1"
+                                              onClick={handleSaveRepaymentEdit}
+                                              disabled={
+                                                !editRepaymentAmount || !editRepaymentDate
+                                              }
+                                            >
+                                              Сохранить
+                                            </Button>
+                                            <Button
+                                              size="sm"
+                                              variant="ghost"
+                                              onClick={() => {
+                                                setEditRepayment(null);
+                                                setEditRepaymentAmount("");
+                                                setEditRepaymentDate("");
+                                                setEditRepaymentError(null);
+                                              }}
+                                            >
+                                              Отмена
+                                            </Button>
+                                          </div>
+                                        </div>
+                                      )}
+                                    </div>
+                                  );
+                                })}
                               </div>
                             </div>
                           )}
+
 
                           {!fullyPaid && payOpenIdx === i && (
                             <div className="rounded-2xl border border-border bg-muted/30 p-3">
