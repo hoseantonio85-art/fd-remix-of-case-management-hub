@@ -481,7 +481,12 @@ export function ContractDrawer({
     const wasFull = remain - amtMln < 1e-9;
     setOverdues((arr) => {
       const next = [...arr];
-      next[i] = { ...o, repayments: [{ amount: amtMln, date: payDate }, ...o.repayments] };
+      const newRepayment: Repayment = {
+        id: Math.random().toString(36).slice(2),
+        amount: amtMln,
+        date: payDate,
+      };
+      next[i] = { ...o, repayments: [newRepayment, ...o.repayments] };
       return next;
     });
     const newOverdueTotal = Math.max(0, effectiveOverdue - amtMln);
