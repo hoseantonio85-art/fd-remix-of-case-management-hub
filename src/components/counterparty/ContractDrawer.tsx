@@ -1080,20 +1080,106 @@ export function ContractDrawer({
                                 Погашения
                               </div>
                               <div className="space-y-1">
-                                {o.repayments.map((r, ri) => (
-                                  <div key={ri} className="flex justify-between text-xs">
-                                    <span className="text-foreground">
-                                      {r.amount.toLocaleString("ru-RU", {
-                                        maximumFractionDigits: 2,
-                                      })}{" "}
-                                      млн ₽
-                                    </span>
-                                    <span className="text-muted-foreground">{r.date}</span>
-                                  </div>
-                                ))}
+                                {o.repayments.map((r) => {
+                                  const isEditingRep =
+                                    editRepayment?.overdueIdx === i &&
+                                    editRepayment?.repaymentId === r.id;
+                                  return (
+                                    <div key={r.id}>
+                                      <div className="flex items-center gap-2 text-xs">
+                                        <div className="min-w-0 flex-1">
+                                          <span className="text-foreground">
+                                            {r.amount.toLocaleString("ru-RU", {
+                                              maximumFractionDigits: 2,
+                                            })}{" "}
+                                            млн ₽
+                                          </span>{" "}
+                                          <span className="text-muted-foreground">· {r.date}</span>
+                                        </div>
+                                        <div className="flex shrink-0 items-center gap-1">
+                                          <Button
+                                            type="button"
+                                            variant="ghost"
+                                            size="icon"
+                                            iconOnly
+                                            aria-label="Редактировать погашение"
+                                            onClick={() => openEditRepayment(i, r)}
+                                          >
+                                            <Pencil className="h-3.5 w-3.5" />
+                                          </Button>
+                                          <Button
+                                            type="button"
+                                            variant="ghost"
+                                            size="icon"
+                                            iconOnly
+                                            aria-label="Удалить погашение"
+                                            onClick={() => handleDeleteRepayment(i, r.id)}
+                                          >
+                                            <Trash2 className="h-3.5 w-3.5" />
+                                          </Button>
+                                        </div>
+                                      </div>
+                                      {isEditingRep && (
+                                        <div className="mt-2 rounded-2xl border border-border bg-muted/30 p-3">
+                                          <div className="space-y-2">
+                                            <LabeledInput
+                                              label="Сумма погашения, ₽"
+                                              value={editRepaymentAmount}
+                                              onChange={(v) => {
+                                                setEditRepaymentAmount(v);
+                                                setEditRepaymentError(null);
+                                              }}
+                                              placeholder="50000"
+                                            />
+                                            <LabeledInput
+                                              label="Дата погашения"
+                                              value={editRepaymentDate}
+                                              onChange={(v) => {
+                                                setEditRepaymentDate(v);
+                                                setEditRepaymentError(null);
+                                              }}
+                                              placeholder="ДД.ММ.ГГГГ"
+                                            />
+                                          </div>
+                                          {editRepaymentError && (
+                                            <div className="mt-2 flex items-start gap-2 rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 text-xs text-amber-900">
+                                              <AlertTriangle className="mt-0.5 h-3.5 w-3.5 shrink-0" />
+                                              {editRepaymentError}
+                                            </div>
+                                          )}
+                                          <div className="mt-3 flex items-center gap-2">
+                                            <Button
+                                              size="sm"
+                                              className="flex-1"
+                                              onClick={handleSaveRepaymentEdit}
+                                              disabled={
+                                                !editRepaymentAmount || !editRepaymentDate
+                                              }
+                                            >
+                                              Сохранить
+                                            </Button>
+                                            <Button
+                                              size="sm"
+                                              variant="ghost"
+                                              onClick={() => {
+                                                setEditRepayment(null);
+                                                setEditRepaymentAmount("");
+                                                setEditRepaymentDate("");
+                                                setEditRepaymentError(null);
+                                              }}
+                                            >
+                                              Отмена
+                                            </Button>
+                                          </div>
+                                        </div>
+                                      )}
+                                    </div>
+                                  );
+                                })}
                               </div>
                             </div>
                           )}
+
 
                           {!fullyPaid && payOpenIdx === i && (
                             <div className="rounded-2xl border border-border bg-muted/30 p-3">
