@@ -501,6 +501,81 @@ export function ContractDrawer({
     setPayOpenIdx(null);
   };
 
+  const openEditRepayment = (overdueIdx: number, repayment: Repayment) => {
+    setEditRepayment({ overdueIdx, repaymentId: repayment.id });
+    setEditRepaymentAmount(String(Math.round(repayment.amount * 1_000_000)));
+    setEditRepaymentDate(repayment.date);
+    setEditRepaymentError(null);
+    setExpandedOverdues((s) => ({ ...s, [overdueIdx]: true }));
+    setPayOpenIdx(null);
+  };
+
+  const handleSaveRepaymentEdit = () => {
+    if (!editRepayment) return;
+    const { overdueIdx, repaymentId } = editRepayment;
+    const o = overdues[overdueIdx];
+    if (!o) return;
+    const n = Number(editRepaymentAmount.replace(",", "."));
+    if (!editRepaymentAmount || !Number.isFinite(n) || n <= 0) {
+      setEditRepaymentError("Введите сумму погашения");
+      return;
+    }
+    if (!editRepaymentDate || !parseDDMMYYYY(editRepaymentDate)) {
+      setEditRepaymentError("Укажите дату погашения");
+      return;
+    }
+    const amtMln = n / 1_000_000;
+    const nextRepayments = o.repayments.map((r) =>
+      r.id === repaymentId ? { ...r, amount: amtMln, date: editRepaymentDate } : r,
+    );
+    const totalPaid = nextRepayments.reduce((s, r) => s + r.amount, 0);
+    if (totalPaid - o.amount > 1e-9) {
+      setEditRepaymentError("Сумма погашений больше суммы просрочки");
+      return;
+    }
+    const nextOverdues = overdues.map((x, k) =>
+      k === overdueIdx ? { ...x, repayments: nextRepayments } : x,
+    );
+    setOverdues(nextOverdues);
+    const newOverdueTotal = nextOverdues.reduce(
+      (s, x) => s + Math.max(0, x.amount - x.repayments.reduce((a, r) => a + r.amount, 0)),
+      0,
+    );
+    onUpdateContract?.(contract.id, { overdue: newOverdueTotal });
+    logChange("Погашение изменено", `${amtMln.toFixed(2)} млн ₽ · ${editRepaymentDate}`);
+    toast.success("Погашение обновлено");
+    setEditRepayment(null);
+    setEditRepaymentAmount("");
+    setEditRepaymentDate("");
+    setEditRepaymentError(null);
+  };
+
+  const handleDeleteRepayment = (overdueIdx: number, repaymentId: string) => {
+    const o = overdues[overdueIdx];
+    if (!o) return;
+    const target = o.repayments.find((r) => r.id === repaymentId);
+    if (!target) return;
+    const nextRepayments = o.repayments.filter((r) => r.id !== repaymentId);
+    const nextOverdues = overdues.map((x, k) =>
+      k === overdueIdx ? { ...x, repayments: nextRepayments } : x,
+    );
+    setOverdues(nextOverdues);
+    const newOverdueTotal = nextOverdues.reduce(
+      (s, x) => s + Math.max(0, x.amount - x.repayments.reduce((a, r) => a + r.amount, 0)),
+      0,
+    );
+    onUpdateContract?.(contract.id, { overdue: newOverdueTotal });
+    logChange("Погашение удалено", `${target.amount.toFixed(2)} млн ₽ · ${target.date}`);
+    toast.success("Погашение удалено");
+    if (editRepayment?.repaymentId === repaymentId) {
+      setEditRepayment(null);
+      setEditRepaymentAmount("");
+      setEditRepaymentDate("");
+      setEditRepaymentError(null);
+    }
+  };
+
+
   return (
     <InModalDrawer open={open} onOpenChange={onOpenChange} className="overflow-hidden">
       <div className="relative flex h-full min-h-0 flex-col">
