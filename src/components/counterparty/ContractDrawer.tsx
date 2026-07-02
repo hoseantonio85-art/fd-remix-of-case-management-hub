@@ -74,7 +74,7 @@ const stageToStartStep: Record<string, number> = {
   "Завершение работы": 8,
 };
 
-type Repayment = { amount: number; date: string };
+type Repayment = { id: string; amount: number; date: string };
 type LocalOverdue = OverdueRecord & {
   source?: string;
   stage: string;
