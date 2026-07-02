@@ -129,6 +129,13 @@ export function ContractDrawer({
   const [payAmount, setPayAmount] = useState("");
   const [payDate, setPayDate] = useState("");
   const [payError, setPayError] = useState<string | null>(null);
+  const [editRepayment, setEditRepayment] = useState<{
+    overdueIdx: number;
+    repaymentId: string;
+  } | null>(null);
+  const [editRepaymentAmount, setEditRepaymentAmount] = useState("");
+  const [editRepaymentDate, setEditRepaymentDate] = useState("");
+  const [editRepaymentError, setEditRepaymentError] = useState<string | null>(null);
   const [editOvIdx, setEditOvIdx] = useState<number | null>(null);
   const [editOvAmount, setEditOvAmount] = useState("");
   const [editOvDate, setEditOvDate] = useState("");
